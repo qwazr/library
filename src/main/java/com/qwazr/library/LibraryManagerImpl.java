@@ -63,7 +63,6 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	}
 
 	public void load() throws IOException {
-		etcTracker.check();
 	}
 
 	@Override
@@ -115,8 +114,10 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 			final LibraryConfiguration configuration;
 			configuration = JsonMapper.MAPPER.readValue(jsonFile, LibraryConfiguration.class);
 
-			if (configuration == null || configuration.library == null)
+			if (configuration == null || configuration.library == null) {
+				unloadLibrarySet(jsonFile);
 				return;
+			}
 
 			if (logger.isInfoEnabled())
 				logger.info("Load library configuration file: " + jsonFile.getAbsolutePath());
