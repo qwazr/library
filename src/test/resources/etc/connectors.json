@@ -1,5 +1,5 @@
 {
-  "connectors": [
+  "library": [
     {
       "name": "cassandra",
       "class": "com.qwazr.connectors.CassandraConnector",

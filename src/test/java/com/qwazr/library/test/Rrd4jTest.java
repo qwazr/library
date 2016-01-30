@@ -28,7 +28,7 @@ public class Rrd4jTest extends AbstractLibraryTest {
 
 	@Test
 	public void rrd4j() throws IOException {
-		Rrd4jTool rrd_memory = getLibraryManager().get("rrd_memory");
+		Rrd4jTool rrd_memory = getLibraryManager().getLibrary("rrd_memory");
 		Assert.assertNotNull(rrd_memory);
 		IOUtils.CloseableList closeables = new IOUtils.CloseableList();
 		try {

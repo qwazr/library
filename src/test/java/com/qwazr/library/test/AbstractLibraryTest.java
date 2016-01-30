@@ -16,9 +16,12 @@
 package com.qwazr.library.test;
 
 import com.qwazr.library.LibraryManager;
+import com.qwazr.utils.file.TrackedDirectory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class AbstractLibraryTest {
 
@@ -26,7 +29,11 @@ public abstract class AbstractLibraryTest {
 		final LibraryManager libraryManager = LibraryManager.getInstance();
 		if (libraryManager != null)
 			return libraryManager;
-		LibraryManager.load(new File("src/test/resources"));
+		Set<String> etcSet = new HashSet<>();
+		etcSet.add("connectors");
+		etcSet.add("tools");
+		TrackedDirectory etcTracker = new TrackedDirectory(new File("src/test/resources/etc"));
+		LibraryManager.load(new File("src/test/resources"), etcTracker, etcSet);
 		return LibraryManager.getInstance();
 	}
 

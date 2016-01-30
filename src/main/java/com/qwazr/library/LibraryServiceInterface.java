@@ -33,11 +33,11 @@ public interface LibraryServiceInterface extends ServiceInterface {
 	@GET
 	@Path("/")
 	@Produces(ServiceInterface.APPLICATION_JSON_UTF8)
-	Map<String, String> list();
+	Map<String, String> getLibraries();
 
 	@GET
 	@Path("/{library_name}")
 	@Produces(ServiceInterface.APPLICATION_JSON_UTF8)
-	Object get(@PathParam("library_name") String library_name);
+	AbstractLibrary getLibrary(@PathParam("library_name") String library_name);
 
 }

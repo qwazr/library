@@ -21,17 +21,14 @@ import com.qwazr.utils.ReadOnlyMap;
 import com.qwazr.utils.file.TrackedDirectory;
 import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.json.JsonMapper;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		implements LibraryManager, TrackedInterface.FileChangeConsumer, Closeable {
@@ -40,29 +37,33 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	static volatile LibraryManagerImpl INSTANCE = null;
 
-	static synchronized void load(File dataDirectory) throws IOException {
+	static synchronized void load(File dataDirectory, TrackedDirectory etcTracker, Set<String> confSet)
+			throws IOException {
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
-		INSTANCE = new LibraryManagerImpl(dataDirectory);
+		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker, confSet);
+		etcTracker.register(INSTANCE);
 	}
 
 	private final File rootDirectory;
-	private final File etcDirectory;
 
-	private final TrackedDirectory directoryTracker;
+	private final TrackedDirectory etcTracker;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, AbstractLibrary>> libraryFileMap;
 
-	private LibraryManagerImpl(File dataDirectory) throws IOException {
+	private final Set<String> confSet;
+
+	private LibraryManagerImpl(File dataDirectory, TrackedDirectory etcTracker, Set<String> confSet)
+			throws IOException {
 		this.rootDirectory = dataDirectory;
-		etcDirectory = new File(rootDirectory, "etc");
-		libraryFileMap = new HashMap<>();
-		directoryTracker = new TrackedDirectory(this, etcDirectory);
+		this.confSet = confSet;
+		this.libraryFileMap = new HashMap<>();
+		this.etcTracker = etcTracker;
 	}
 
 	public void load() throws IOException {
-		directoryTracker.check();
+		etcTracker.check();
 	}
 
 	@Override
@@ -77,34 +78,48 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		}
 	}
 
-	public AbstractLibrary get(String name) throws IOException {
-		directoryTracker.check();
+	public AbstractLibrary getLibrary(String name) {
+		etcTracker.check();
 		return super.get(name);
 	}
 
-	public LibraryServiceInterface getRemoteClient(String address, Integer msTimeOut) throws URISyntaxException {
-		return new LibraryServiceClient(address, msTimeOut);
+	public Map<String, String> getLibraries() {
+		etcTracker.check();
+		final Map<String, String> map = new LinkedHashMap<>();
+		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
+		return map;
 	}
 
 	@Override
 	public void accept(TrackedInterface.ChangeReason changeReason, File jsonFile) {
+		if (confSet != null) {
+			String filebase = FilenameUtils.removeExtension(jsonFile.getName());
+			if (!confSet.contains(filebase))
+				return;
+		}
+		String extension = FilenameUtils.getExtension(jsonFile.getName());
+		if (!"json".equals(extension))
+			return;
 		switch (changeReason) {
 		case UPDATED:
 			loadLibrarySet(jsonFile);
+			break;
 		case DELETED:
 			unloadLibrarySet(jsonFile);
+			break;
 		}
 	}
 
 	private void loadLibrarySet(File jsonFile) {
-		if (logger.isInfoEnabled())
-			logger.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 		try {
 			final LibraryConfiguration configuration;
 			configuration = JsonMapper.MAPPER.readValue(jsonFile, LibraryConfiguration.class);
 
 			if (configuration == null || configuration.library == null)
 				return;
+
+			if (logger.isInfoEnabled())
+				logger.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 
 			mapLock.w.lock();
 			try {
@@ -122,14 +137,14 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	}
 
 	private void unloadLibrarySet(File jsonFile) {
-		if (logger.isInfoEnabled())
-			logger.info("Unload library configuration file: " + jsonFile.getAbsolutePath());
 		final Map<String, AbstractLibrary> map;
 		mapLock.w.lock();
 		try {
 			map = libraryFileMap.remove(jsonFile);
 			if (map == null)
 				return;
+			if (logger.isInfoEnabled())
+				logger.info("Unload library configuration file: " + jsonFile.getAbsolutePath());
 			buildGlobalMap();
 		} finally {
 			mapLock.w.unlock();

@@ -55,13 +55,13 @@ public class MybatisTest extends AbstractLibraryTest {
 
 	@Test
 	public void mybatis_default() throws IOException {
-		final MybatisConnector mybatis = getLibraryManager().get("mybatis_default");
+		final MybatisConnector mybatis = getLibraryManager().getLibrary("mybatis_default");
 		checkSessionFactory(mybatis);
 	}
 
 	@Test
 	public void mybatis_file() throws IOException {
-		final MybatisConnector mybatis = getLibraryManager().get("mybatis_file");
+		final MybatisConnector mybatis = getLibraryManager().getLibrary("mybatis_file");
 		checkSessionFactory(mybatis);
 	}
 }

@@ -15,26 +15,16 @@
  **/
 package com.qwazr.library;
 
-import com.qwazr.utils.server.ServerException;
-
-import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LibraryServiceImpl implements LibraryServiceInterface {
 
-	public Map<String, String> list() {
-		Map<String, String> libraries = new LinkedHashMap<>();
-		LibraryManager.getInstance().forEach((name, library) -> libraries.put(name, library.getClass().getName()));
-		return libraries;
+	public Map<String, String> getLibraries() {
+		return LibraryManager.getInstance().getLibraries();
 	}
 
-	public AbstractLibrary get(String libraryName) {
-		try {
-			return LibraryManager.getInstance().get(libraryName);
-		} catch (IOException e) {
-			throw ServerException.getJsonException(e);
-		}
+	public AbstractLibrary getLibrary(String libraryName) {
+		return LibraryManager.getInstance().getLibrary(libraryName);
 	}
 
 }

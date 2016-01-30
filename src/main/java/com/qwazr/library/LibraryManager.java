@@ -15,23 +15,25 @@
  **/
 package com.qwazr.library;
 
+import com.qwazr.utils.file.TrackedDirectory;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 public interface LibraryManager extends Map<String, AbstractLibrary> {
 
-	static void load(File dataDirectory) throws IOException {
-		LibraryManagerImpl.load(dataDirectory);
+	static void load(File dataDirectory, TrackedDirectory etcTracker, Set<String> etcSet) throws IOException {
+		LibraryManagerImpl.load(dataDirectory, etcTracker, etcSet);
 	}
 
 	static LibraryManager getInstance() {
 		return LibraryManagerImpl.INSTANCE;
 	}
 
-	<T extends AbstractLibrary> T get(String name) throws IOException;
+	<T extends AbstractLibrary> T getLibrary(String name);
 
-	LibraryServiceInterface getRemoteClient(String address, Integer msTimeOut) throws URISyntaxException;
+	Map<String, String> getLibraries();
+
 }
