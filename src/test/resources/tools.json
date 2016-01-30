@@ -1,0 +1,63 @@
+{
+  "tools": [
+    {
+      "name": "freemarker",
+      "class": "com.qwazr.tools.FreeMarkerTool"
+    },
+    {
+      "name": "rrd_memory",
+      "class": "com.qwazr.tools.Rrd4jTool",
+      "path": "memory.rrd",
+      "backendFactory": "MEMORY",
+      "step": 60,
+      "datasources": [
+        {
+          "dsName": "freeMemory",
+          "dsType": "COUNTER",
+          "heartbeat": 120,
+          "minValue": 0
+        },
+        {
+          "dsName": "maxMemory",
+          "dsType": "COUNTER",
+          "heartbeat": 120,
+          "minValue": 0
+        },
+        {
+          "dsName": "totalMemory",
+          "dsType": "COUNTER",
+          "heartbeat": 120,
+          "minValue": 0
+        }
+      ],
+      "archives": [
+        {
+          "consolFun": "AVERAGE",
+          "xff": 0.5,
+          "steps": 1,
+          "rows": 600
+        },
+        {
+          "consolFun": "TOTAL",
+          "xff": 0.5,
+          "steps": 1,
+          "rows": 600
+        },
+        {
+          "consolFun": "MAX",
+          "xff": 0.5,
+          "steps": 1,
+          "rows": 600
+        }
+      ]
+    },
+    {
+      "name": "xml",
+      "class": "com.qwazr.tools.XMLTool"
+    },
+    {
+      "name": "csv",
+      "class": "com.qwazr.tools.CSVTool"
+    }
+  ]
+}
