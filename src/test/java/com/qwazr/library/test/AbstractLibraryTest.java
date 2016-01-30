@@ -34,6 +34,7 @@ public abstract class AbstractLibraryTest {
 		etcSet.add("tools");
 		TrackedDirectory etcTracker = new TrackedDirectory(new File("src/test/resources/etc"));
 		LibraryManager.load(new File("src/test/resources"), etcTracker, etcSet);
+		etcTracker.check();
 		return LibraryManager.getInstance();
 	}
 
