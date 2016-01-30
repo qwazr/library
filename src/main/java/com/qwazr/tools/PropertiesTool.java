@@ -15,13 +15,14 @@
  **/
 package com.qwazr.tools;
 
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 
 import java.io.*;
 import java.util.Objects;
 import java.util.Properties;
 
-public class PropertiesTool extends AbstractTool {
+public class PropertiesTool extends AbstractLibrary {
 
 	final public String path = null;
 

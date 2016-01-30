@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.connectors;
+package com.qwazr.library;
 
-import com.qwazr.utils.server.ServerException;
-
+import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Objects;
 
-public class ConnectorsServiceImpl implements ConnectorsServiceInterface {
+public interface LibraryManager extends Map<String, AbstractLibrary> {
 
-	public Map<String, String> list() {
-		Map<String, String> tools = new LinkedHashMap<String, String>();
-		ConnectorManagerImpl.getInstance()
-						.forEach((s, abstractTool) -> tools.put(s, abstractTool.getClass().getName()));
-		return tools;
+	static void load(File dataDirectory) throws IOException {
+		LibraryManagerImpl.load(dataDirectory);
 	}
 
-	public AbstractConnector get(String connectorName) {
-		try {
-			return ConnectorManagerImpl.getInstance().get(connectorName);
-		} catch (IOException e) {
-			throw ServerException.getJsonException(e);
-		}
+	static LibraryManager getInstance() {
+		return LibraryManagerImpl.INSTANCE;
 	}
 
+	<T extends AbstractLibrary> T get(String name) throws IOException;
+
+	LibraryServiceInterface getRemoteClient(String address, Integer msTimeOut) throws URISyntaxException;
 }

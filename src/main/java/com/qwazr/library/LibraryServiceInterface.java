@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools;
+package com.qwazr.library;
 
 import com.qwazr.utils.server.ServiceInterface;
 import com.qwazr.utils.server.ServiceName;
@@ -23,13 +23,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-@Path("/tools")
-@RolesAllowed("tools")
-@ServiceName("tools")
-public interface ToolsServiceInterface extends ServiceInterface {
+@Path("/library")
+@RolesAllowed("library")
+@ServiceName("library")
+public interface LibraryServiceInterface extends ServiceInterface {
 
 	@GET
 	@Path("/")
@@ -37,8 +36,8 @@ public interface ToolsServiceInterface extends ServiceInterface {
 	Map<String, String> list();
 
 	@GET
-	@Path("/{tool_name}")
+	@Path("/{library_name}")
 	@Produces(ServiceInterface.APPLICATION_JSON_UTF8)
-	Object get(@PathParam("tool_name") String toolName);
+	Object get(@PathParam("library_name") String library_name);
 
 }

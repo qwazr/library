@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -28,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class HdfsConnector extends AbstractConnector {
+public class HdfsConnector extends AbstractLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(HdfsConnector.class);
 

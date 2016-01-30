@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.SubstitutedVariables;
 import org.rrd4j.ConsolFun;
@@ -30,7 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Rrd4jTool extends AbstractTool {
+public class Rrd4jTool extends AbstractLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(Rrd4jTool.class);
 

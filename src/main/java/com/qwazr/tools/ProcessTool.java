@@ -15,6 +15,7 @@
  **/
 package com.qwazr.tools;
 
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.ScriptUtils;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
@@ -26,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProcessTool extends AbstractTool {
+public class ProcessTool extends AbstractLibrary {
 
 	final public List<String> commands = null;
 	final public Map<String, String> environment_variables = null;

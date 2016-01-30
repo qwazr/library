@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools;
+package com.qwazr.library.test;
 
+import com.qwazr.library.LibraryManager;
+
+import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Map;
 
-public interface ToolsManager extends Map<String, AbstractTool> {
+public abstract class AbstractLibraryTest {
 
-	<T extends AbstractTool> T get(String name) throws IOException;
+	final protected LibraryManager getLibraryManager() throws IOException {
+		final LibraryManager libraryManager = LibraryManager.getInstance();
+		if (libraryManager != null)
+			return libraryManager;
+		LibraryManager.load(new File("src/test/resources"));
+		return LibraryManager.getInstance();
+	}
 
-	ToolsServiceInterface getRemoteClient(String address, Integer msTimeOut) throws URISyntaxException;
 }

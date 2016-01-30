@@ -15,11 +15,12 @@
  **/
 package com.qwazr.tools;
 
+import com.qwazr.library.AbstractLibrary;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import java.io.File;
 
-public class FileCrawlerTool extends AbstractTool {
+public class FileCrawlerTool extends AbstractLibrary {
 
 	@Override
 	public void load(File parentDir) {

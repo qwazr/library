@@ -1,5 +1,5 @@
 /**
- * Copyright 2014-2016 Emmanuel Keller / QWAZR
+ * Copyright 2015-2016 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools;
+package com.qwazr.library;
 
 import com.qwazr.utils.server.ServerException;
 
@@ -21,17 +21,17 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ToolsServiceImpl implements ToolsServiceInterface {
+public class LibraryServiceImpl implements LibraryServiceInterface {
 
 	public Map<String, String> list() {
-		Map<String, String> tools = new LinkedHashMap<>();
-		ToolsManagerImpl.getInstance().forEach((s, abstractTool) -> tools.put(s, abstractTool.getClass().getName()));
-		return tools;
+		Map<String, String> libraries = new LinkedHashMap<>();
+		LibraryManager.getInstance().forEach((name, library) -> libraries.put(name, library.getClass().getName()));
+		return libraries;
 	}
 
-	public AbstractTool get(String toolName) {
+	public AbstractLibrary get(String libraryName) {
 		try {
-			return ToolsManagerImpl.getInstance().get(toolName);
+			return LibraryManager.getInstance().get(libraryName);
 		} catch (IOException e) {
 			throw ServerException.getJsonException(e);
 		}

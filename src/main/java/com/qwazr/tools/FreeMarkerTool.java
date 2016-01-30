@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
@@ -29,7 +30,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FreeMarkerTool extends AbstractTool {
+public class FreeMarkerTool extends AbstractLibrary {
 
 	public final String output_encoding;
 	public final String default_encoding;
@@ -57,9 +58,8 @@ public class FreeMarkerTool extends AbstractTool {
 	public void load(File parentDir) {
 		this.parentDir = parentDir;
 		cfg = new Configuration(Configuration.VERSION_2_3_23);
-		cfg.setTemplateLoader((use_classloader != null && use_classloader) ?
-						new ResourceTemplateLoader() :
-						new FileTemplateLoader());
+		cfg.setTemplateLoader(
+				(use_classloader != null && use_classloader) ? new ResourceTemplateLoader() : new FileTemplateLoader());
 		cfg.setOutputEncoding(output_encoding == null ? DEFAULT_CHARSET : output_encoding);
 		cfg.setDefaultEncoding(default_encoding == null ? DEFAULT_CHARSET : default_encoding);
 		cfg.setLocalizedLookup(false);
@@ -73,7 +73,7 @@ public class FreeMarkerTool extends AbstractTool {
 	}
 
 	public void template(String templatePath, Map<String, Object> dataModel, HttpServletResponse response)
-					throws TemplateException, IOException {
+			throws TemplateException, IOException {
 		if (response.getContentType() == null)
 			response.setContentType(default_content_type == null ? DEFAULT_CONTENT_TYPE : default_content_type);
 		response.setCharacterEncoding(DEFAULT_CHARSET);
@@ -82,7 +82,7 @@ public class FreeMarkerTool extends AbstractTool {
 	}
 
 	public void template(String templatePath, HttpServletRequest request, HttpServletResponse response)
-					throws IOException, TemplateException {
+			throws IOException, TemplateException {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("request", request);
 		variables.put("session", request.getSession());

@@ -23,6 +23,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.StringUtils;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MongoDbConnector extends AbstractConnector {
+public class MongoDbConnector extends AbstractLibrary {
 
 	private MongoClient mongoClient = null;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools.test;
+package com.qwazr.library.test;
 
 import com.qwazr.tools.Rrd4jTool;
 import com.qwazr.utils.IOUtils;
@@ -24,11 +24,11 @@ import org.rrd4j.core.Sample;
 
 import java.io.IOException;
 
-public class Rrd4jTest extends AbstractToolsTest {
+public class Rrd4jTest extends AbstractLibraryTest {
 
 	@Test
 	public void rrd4j() throws IOException {
-		Rrd4jTool rrd_memory = getToolManager().get("rrd_memory");
+		Rrd4jTool rrd_memory = getLibraryManager().get("rrd_memory");
 		Assert.assertNotNull(rrd_memory);
 		IOUtils.CloseableList closeables = new IOUtils.CloseableList();
 		try {

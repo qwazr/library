@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -26,7 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-public class CSVTool extends AbstractTool {
+public class CSVTool extends AbstractLibrary {
 
 	public enum Format {
 

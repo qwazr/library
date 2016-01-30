@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.directory.api.ldap.model.constants.LdapSecurityConstants;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LdapConnector extends AbstractPasswordConnector {
+public class LdapConnector extends AbstractPasswordLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(LdapConnector.class);
 

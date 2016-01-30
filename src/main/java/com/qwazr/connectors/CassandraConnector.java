@@ -18,6 +18,7 @@ package com.qwazr.connectors;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.cassandra.CassandraCluster;
 import com.qwazr.utils.cassandra.CassandraSession;
 import org.apache.commons.io.IOUtils;
@@ -26,7 +27,7 @@ import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
-public class CassandraConnector extends AbstractPasswordConnector {
+public class CassandraConnector extends AbstractPasswordLibrary {
 
 	public final List<String> hosts = null;
 

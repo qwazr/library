@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.CharsetUtils;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.json.JsonMapper;
@@ -37,7 +38,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ArchiverTool extends AbstractTool {
+public class ArchiverTool extends AbstractLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(ArchiverTool.class);
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.connectors.test;
+package com.qwazr.library.test;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -37,13 +37,13 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CassandraTest extends AbstractConnectorsTest {
+public class CassandraTest extends AbstractLibraryTest {
 
 	private final static Logger logger = Logger.getLogger(CassandraTest.class.getName());
 
 	private CassandraConnector getCassandra() throws IOException {
 
-		return (CassandraConnector) getConnectorManager().get("cassandra");
+		return (CassandraConnector) getLibraryManager().get("cassandra");
 	}
 
 	private final static String CREATE_SCHEMA = "CREATE KEYSPACE qwazr_connector_test WITH REPLICATION "

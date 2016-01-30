@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import com.qwazr.utils.StringUtils;
 import com.qwazr.utils.jdbc.Transaction;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.sql.SQLException;
 
-public class DatabaseConnector extends AbstractPasswordConnector {
+public class DatabaseConnector extends AbstractPasswordLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(DatabaseConnector.class);
 

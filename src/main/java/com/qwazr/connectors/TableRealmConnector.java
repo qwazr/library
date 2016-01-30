@@ -17,6 +17,7 @@ package com.qwazr.connectors;
 
 import com.qwazr.database.TableServiceImpl;
 import com.qwazr.database.model.ColumnDefinition;
+import com.qwazr.library.AbstractLibrary;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
@@ -30,7 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class TableRealmConnector extends AbstractConnector implements IdentityManager {
+public class TableRealmConnector extends AbstractLibrary implements IdentityManager {
 
 	public final String table_name = null;
 	public final String login_column = null;

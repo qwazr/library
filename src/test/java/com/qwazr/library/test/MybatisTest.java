@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.connectors.test;
+package com.qwazr.library.test;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 import com.qwazr.connectors.MybatisConnector;
@@ -27,7 +27,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.sql.Connection;
 
-public class MybatisTest extends AbstractConnectorsTest {
+public class MybatisTest extends AbstractLibraryTest {
 
 	protected void checkSession(SqlSessionFactory sessionFactory) {
 		Assert.assertNotNull(sessionFactory);
@@ -55,13 +55,13 @@ public class MybatisTest extends AbstractConnectorsTest {
 
 	@Test
 	public void mybatis_default() throws IOException {
-		final MybatisConnector mybatis = getConnectorManager().get("mybatis_default");
+		final MybatisConnector mybatis = getLibraryManager().get("mybatis_default");
 		checkSessionFactory(mybatis);
 	}
 
 	@Test
 	public void mybatis_file() throws IOException {
-		final MybatisConnector mybatis = getConnectorManager().get("mybatis_file");
+		final MybatisConnector mybatis = getLibraryManager().get("mybatis_file");
 		checkSessionFactory(mybatis);
 	}
 }

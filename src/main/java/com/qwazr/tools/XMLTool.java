@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.jamesmurty.utils.XMLBuilder2;
+import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.XmlMapper;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -32,7 +33,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.*;
 import java.io.*;
 
-public class XMLTool extends AbstractTool {
+public class XMLTool extends AbstractLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(XMLTool.class);
 

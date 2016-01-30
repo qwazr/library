@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools;
+package com.qwazr.library;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.qwazr.utils.json.client.JsonClientAbstract;
@@ -22,11 +22,11 @@ import org.apache.http.client.fluent.Request;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-public class ToolsServiceClient extends JsonClientAbstract implements ToolsServiceInterface {
+public class LibraryServiceClient extends JsonClientAbstract implements LibraryServiceInterface {
 
 	private final static String TOOLS_PREFIX = "/tools/";
 
-	ToolsServiceClient(String url, Integer msTimeOut) throws URISyntaxException {
+	LibraryServiceClient(String url, Integer msTimeOut) throws URISyntaxException {
 		super(url, msTimeOut);
 	}
 

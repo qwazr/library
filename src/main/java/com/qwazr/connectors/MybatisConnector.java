@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import org.apache.ibatis.io.Resources;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-public class MybatisConnector extends AbstractPasswordConnector {
+public class MybatisConnector extends AbstractPasswordLibrary {
 
 	private static final Logger logger = LoggerFactory.getLogger(MybatisConnector.class);
 

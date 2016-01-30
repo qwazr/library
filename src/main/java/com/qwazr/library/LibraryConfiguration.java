@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools;
+package com.qwazr.library;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ToolsConfiguration {
+public class LibraryConfiguration {
 
-	public List<AbstractTool> tools;
+	public List<AbstractLibrary> library;
 
 }

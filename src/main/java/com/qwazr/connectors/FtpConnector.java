@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.net.ftp.*;
@@ -26,7 +27,7 @@ import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class FtpConnector extends AbstractPasswordConnector {
+public class FtpConnector extends AbstractPasswordLibrary {
 
 	public final String hostname = null;
 	public final String username = null;

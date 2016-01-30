@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.library.AbstractLibrary;
 import org.apache.commons.io.FileUtils;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
@@ -24,7 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class MarkdownTool extends AbstractTool {
+public class MarkdownTool extends AbstractLibrary {
 
 	public List<ExtensionEnum> extensions;
 
