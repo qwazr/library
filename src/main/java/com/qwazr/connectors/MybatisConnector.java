@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.IOUtils.CloseableContext;
@@ -71,8 +72,8 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 		if (configurationFile != null)
 			inputStream = new FileInputStream(configurationFile);
 		else
-			inputStream = Resources.getResourceAsStream(
-							configuration_resource != null ? configuration_resource : default_configuration);
+			inputStream = Resources.getResourceAsStream(ClassLoaderManager.classLoader,
+					configuration_resource != null ? configuration_resource : default_configuration);
 		try {
 			if (environment != null) {
 				if (props != null)

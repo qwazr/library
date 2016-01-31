@@ -16,6 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import com.qwazr.utils.StringUtils;
@@ -71,7 +72,7 @@ public class DatabaseConnector extends AbstractPasswordLibrary {
 			if (pool == null) {
 				JDBCConnection cnx = new JDBCConnection();
 				if (!StringUtils.isEmpty(driver))
-					cnx.setDriver(driver);
+					cnx.setDriver(ClassLoaderManager.classLoader, driver);
 				if (!StringUtils.isEmpty(url))
 					cnx.setUrl(url);
 				if (!StringUtils.isEmpty(username))

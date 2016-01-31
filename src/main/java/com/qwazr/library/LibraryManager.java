@@ -43,7 +43,7 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 		LibraryManager manager = getInstance();
 		if (manager == null)
 			return;
-		Field[] fields = object.getClass().getFields();
+		Field[] fields = object.getClass().getDeclaredFields();
 		if (fields == null)
 			return;
 		for (Field field : fields) {
@@ -53,6 +53,7 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 			AbstractLibrary libraryItem = manager.getLibrary(library.value());
 			if (libraryItem == null)
 				continue;
+			field.setAccessible(true);
 			field.set(object, libraryItem);
 		}
 	}

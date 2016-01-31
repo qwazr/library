@@ -121,6 +121,11 @@
             <artifactId>rrd4j</artifactId>
             <version>2.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-compiler</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
