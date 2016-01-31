@@ -7,26 +7,22 @@ The library is a set of tools and connectors available in a QWAZR application.
 
 These objects are defined in JSON files located in the **etc** directory on the ROOT of a QWAZR application.
 
-It is possible to group set of configuration files in a subdirectory. Therefore the environnement variable "QWAZR_ETC" defines which subdirectories will be loaded. 
+The environnement variable "QWAZR_ETC" accepts wildcard patterns filtering which file will be loaded.
 
 A typical **etc** structure:
 
 ```
 my-app
 |-- etc
-    | -- global.json
-    | -- dev
-         | -- tools.json
-         | -- connectors.json
-    | -- production
-         | -- tools.json
-         | -- connectors.json
-    | -- disabled
-         | -- testing.json
+    | -- dev-tools.json
+    | -- dev-connectors.json
+    | -- prod-tools.json
+    | -- prod-connectors.json
+    | -- testing.json
 ```
 
-- Configuration files in the root of **etc** are always loaded: **global.json**
-- Configuration files in the a sub directory are loaded if theirs names are set in a QWAZR_ETC environment variable.: ```QWAZR_ETC="dev"```
+Configuration files are loaded if theirs names matches any wildcard pattern in the QWAZR_ETC environment variable.:
+```QWAZR_ETC="dev-*"```
 
 ### The content of a configuration file
 
@@ -86,7 +82,7 @@ import com.qwazr.library.Qwazr;
 
 public class MyClass {
 
-    @qwazr("freemarker")
+    @library("freemarker")
     FreemarkerTool freemarker;
 }
 

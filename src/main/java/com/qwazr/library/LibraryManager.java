@@ -15,10 +15,12 @@
  **/
 package com.qwazr.library;
 
+import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.file.TrackedDirectory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 public interface LibraryManager extends Map<String, AbstractLibrary> {
@@ -34,5 +36,25 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 	<T extends AbstractLibrary> T getLibrary(String name);
 
 	Map<String, String> getLibraries();
+
+	static void inject(Object object) throws IllegalAccessException {
+		if (object == null)
+			return;
+		LibraryManager manager = getInstance();
+		if (manager == null)
+			return;
+		Field[] fields = object.getClass().getFields();
+		if (fields == null)
+			return;
+		for (Field field : fields) {
+			Library library = field.getAnnotation(Library.class);
+			if (library == null)
+				continue;
+			AbstractLibrary libraryItem = manager.getLibrary(library.value());
+			if (libraryItem == null)
+				continue;
+			field.set(object, libraryItem);
+		}
+	}
 
 }
