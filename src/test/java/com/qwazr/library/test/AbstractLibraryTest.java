@@ -17,6 +17,7 @@ package com.qwazr.library.test;
 
 import com.qwazr.library.LibraryManager;
 import com.qwazr.utils.file.TrackedDirectory;
+import org.apache.commons.io.filefilter.FileFileFilter;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +33,8 @@ public abstract class AbstractLibraryTest {
 		Set<String> etcSet = new HashSet<>();
 		etcSet.add("connectors");
 		etcSet.add("tools");
-		TrackedDirectory etcTracker = new TrackedDirectory(new File("src/test/resources/etc"));
-		LibraryManager.load(new File("src/test/resources"), etcTracker, etcSet);
+		TrackedDirectory etcTracker = new TrackedDirectory(new File("src/test/resources/etc"), FileFileFilter.FILE);
+		LibraryManager.load(new File("src/test/resources"), etcTracker);
 		etcTracker.check();
 		return LibraryManager.getInstance();
 	}

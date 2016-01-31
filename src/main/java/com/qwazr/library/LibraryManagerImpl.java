@@ -37,11 +37,10 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	static volatile LibraryManagerImpl INSTANCE = null;
 
-	static synchronized void load(File dataDirectory, TrackedDirectory etcTracker, Set<String> confSet)
-			throws IOException {
+	static synchronized void load(File dataDirectory, TrackedDirectory etcTracker) throws IOException {
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
-		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker, confSet);
+		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker);
 		etcTracker.register(INSTANCE);
 	}
 
@@ -52,12 +51,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, AbstractLibrary>> libraryFileMap;
 
-	private final Set<String> confSet;
-
-	private LibraryManagerImpl(File dataDirectory, TrackedDirectory etcTracker, Set<String> confSet)
-			throws IOException {
+	private LibraryManagerImpl(File dataDirectory, TrackedDirectory etcTracker) throws IOException {
 		this.rootDirectory = dataDirectory;
-		this.confSet = confSet;
 		this.libraryFileMap = new HashMap<>();
 		this.etcTracker = etcTracker;
 	}
@@ -91,11 +86,6 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	@Override
 	public void accept(TrackedInterface.ChangeReason changeReason, File jsonFile) {
-		if (confSet != null) {
-			String filebase = FilenameUtils.removeExtension(jsonFile.getName());
-			if (!confSet.contains(filebase))
-				return;
-		}
 		String extension = FilenameUtils.getExtension(jsonFile.getName());
 		if (!"json".equals(extension))
 			return;

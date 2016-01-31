@@ -20,12 +20,11 @@ import com.qwazr.utils.file.TrackedDirectory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 public interface LibraryManager extends Map<String, AbstractLibrary> {
 
-	static void load(File dataDirectory, TrackedDirectory etcTracker, Set<String> etcSet) throws IOException {
-		LibraryManagerImpl.load(dataDirectory, etcTracker, etcSet);
+	static void load(File dataDirectory, TrackedDirectory etcTracker) throws IOException {
+		LibraryManagerImpl.load(dataDirectory, etcTracker);
 	}
 
 	static LibraryManager getInstance() {
