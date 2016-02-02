@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.qwazr.library.AbstractLibrary;
+import com.qwazr.utils.StringUtils;
 import org.iban4j.*;
 
 import java.io.File;
@@ -31,21 +32,48 @@ public class IbanTool extends AbstractLibrary {
 
 	}
 
-	public String check_error_compact(String iban) {
+	private String getErrorMessage(String key, Iban4jException error) {
+		if (error_messages == null)
+			return error.getLocalizedMessage();
+		String msg = error_messages.get(key);
+		return StringUtils.isEmpty(msg) ? error.getLocalizedMessage() : msg;
+	}
+
+	public String iban_validate_compact(String iban) {
 		try {
 			IbanUtil.validate(iban);
 			return null;
-		} catch (IbanFormatException | InvalidCheckDigitException | UnsupportedCountryException e) {
-			return e.getMessage();
+		} catch (IbanFormatException e) {
+			return getErrorMessage(e.getFormatViolation().name(), e);
+		} catch (InvalidCheckDigitException e) {
+			return getErrorMessage("INVALIDCHECKDIGIT", e);
+		} catch (UnsupportedCountryException e) {
+			return getErrorMessage("UNSUPPORTEDCOUNTRY", e);
 		}
 	}
 
-	public String check_error_default(String iban) {
+	public String iban_validate_default(String iban) {
 		try {
 			IbanUtil.validate(iban, IbanFormat.Default);
 			return null;
-		} catch (IbanFormatException | InvalidCheckDigitException | UnsupportedCountryException e) {
-			return e.getMessage();
+		} catch (IbanFormatException e) {
+			return getErrorMessage(e.getFormatViolation().name(), e);
+		} catch (InvalidCheckDigitException e) {
+			return getErrorMessage("INVALIDCHECKDIGIT", e);
+		} catch (UnsupportedCountryException e) {
+			return getErrorMessage("UNSUPPORTEDCOUNTRY", e);
 		}
 	}
+
+	public String bic_validate(String bic) {
+		try {
+			BicUtil.validate(bic);
+			return null;
+		} catch (BicFormatException e) {
+			return getErrorMessage(e.getFormatViolation().name(), e);
+		} catch (UnsupportedCountryException e) {
+			return getErrorMessage("UNSUPPORTEDCOUNTRY", e);
+		}
+	}
+
 }
