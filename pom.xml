@@ -122,9 +122,13 @@
             <version>2.2.1</version>
         </dependency>
         <dependency>
+            <groupId>org.iban4j</groupId>
+            <artifactId>iban4j</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.qwazr</groupId>
             <artifactId>qwazr-compiler</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
