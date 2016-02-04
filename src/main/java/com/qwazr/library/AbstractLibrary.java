@@ -34,7 +34,7 @@ import java.io.IOException;
 		@Type(value = ArchiverTool.class), @Type(value = CSVTool.class), @Type(value = FileCrawlerTool.class),
 		@Type(value = FreeMarkerTool.class), @Type(value = IbanTool.class), @Type(value = MarkdownTool.class),
 		@Type(value = ProcessTool.class), @Type(value = PropertiesTool.class), @Type(value = Rrd4jTool.class),
-		@Type(value = XMLTool.class), @Type(value = XPathTool.class) })
+		@Type(value = ThymeleafTool.class), @Type(value = XMLTool.class), @Type(value = XPathTool.class) })
 public abstract class AbstractLibrary implements Closeable {
 
 	public final String name = null;
