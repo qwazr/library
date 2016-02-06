@@ -27,6 +27,7 @@ import freemarker.template.TemplateExceptionHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,6 +87,13 @@ public class FreeMarkerTool extends AbstractLibrary {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("request", request);
 		variables.put("session", request.getSession());
+		Enumeration<String> attrNames = request.getAttributeNames();
+		if (attrNames != null) {
+			while (attrNames.hasMoreElements()) {
+				String attrName = attrNames.nextElement();
+				variables.put(attrName, request.getAttribute(attrName));
+			}
+		}
 		template(templatePath, variables, response);
 	}
 
