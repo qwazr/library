@@ -19,11 +19,13 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.qwazr.connectors.CassandraConnector;
+import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.threads.ThreadUtils;
 import com.qwazr.utils.threads.ThreadUtils.CallableExceptionCatcher;
 import com.qwazr.utils.threads.ThreadUtils.ProcedureExceptionCatcher;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -41,9 +43,12 @@ public class CassandraTest extends AbstractLibraryTest {
 
 	private final static Logger logger = Logger.getLogger(CassandraTest.class.getName());
 
-	private CassandraConnector getCassandra() throws IOException {
+	@Library("cassandra")
+	private CassandraConnector cassandra;
 
-		return (CassandraConnector) getLibraryManager().get("cassandra");
+	@Before
+	public void before() throws IOException {
+		super.before();
 	}
 
 	private final static String CREATE_SCHEMA = "CREATE KEYSPACE qwazr_connector_test WITH REPLICATION "
@@ -57,7 +62,6 @@ public class CassandraTest extends AbstractLibraryTest {
 	@Test
 	public void test_02_create() throws IOException {
 		try {
-			CassandraConnector cassandra = getCassandra();
 			Assert.assertTrue(cassandra.execute(CREATE_SCHEMA).wasApplied());
 			Assert.assertTrue(cassandra.execute(CREATE_TABLE).wasApplied());
 			Assert.assertTrue(cassandra.execute(CREATE_INDEX).wasApplied());
@@ -72,7 +76,7 @@ public class CassandraTest extends AbstractLibraryTest {
 	public void test_10_transaction() throws Exception {
 		ExecutorService executor = Executors.newFixedThreadPool(10);
 		try {
-			getCassandra().execute("SELECT count(*) FROM qwazr_connector_test.test").all();
+			cassandra.execute("SELECT count(*) FROM qwazr_connector_test.test").all();
 			finalTime = System.currentTimeMillis() + 10000;
 			List<ProcedureExceptionCatcher> threadList = new ArrayList<ProcedureExceptionCatcher>();
 			for (int i = 0; i < 50; i++) {
@@ -95,7 +99,6 @@ public class CassandraTest extends AbstractLibraryTest {
 	@Test
 	public void test_98_drop() throws IOException {
 		try {
-			CassandraConnector cassandra = getCassandra();
 			Assert.assertTrue(cassandra.execute(DROP_TABLE).wasApplied());
 			Assert.assertTrue(cassandra.execute(DROP_SCHEMA).wasApplied());
 		} catch (NoHostAvailableException e) {
@@ -111,7 +114,6 @@ public class CassandraTest extends AbstractLibraryTest {
 		public void execute() throws Exception {
 			long id = Thread.currentThread().getId();
 			logger.info("Starts - id: " + id);
-			CassandraConnector cassandra = getCassandra();
 			int count = 0;
 			while (System.currentTimeMillis() < finalTime) {
 				Assert.assertTrue(cassandra.execute(INSERT, RandomUtils.nextInt(0, 10)).wasApplied());
@@ -131,7 +133,6 @@ public class CassandraTest extends AbstractLibraryTest {
 		public void execute() throws Exception {
 			long id = Thread.currentThread().getId();
 			logger.info("Starts - id: " + id);
-			CassandraConnector cassandra = getCassandra();
 			int count = 0;
 			while (System.currentTimeMillis() < finalTime) {
 				ResultSet result = cassandra.execute(SELECT, RandomUtils.nextInt(0, 10));

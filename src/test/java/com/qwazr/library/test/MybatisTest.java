@@ -17,17 +17,30 @@ package com.qwazr.library.test;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 import com.qwazr.connectors.MybatisConnector;
+import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.IOUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.sql.Connection;
 
 public class MybatisTest extends AbstractLibraryTest {
+
+	@Library("mybatis_default")
+	private MybatisConnector mybatis_default;
+
+	@Library("mybatis_file")
+	private MybatisConnector mybatis_file;
+
+	@Before
+	public void before() throws IOException {
+		super.before();
+	}
 
 	protected void checkSession(SqlSessionFactory sessionFactory) {
 		Assert.assertNotNull(sessionFactory);
@@ -55,13 +68,11 @@ public class MybatisTest extends AbstractLibraryTest {
 
 	@Test
 	public void mybatis_default() throws IOException {
-		final MybatisConnector mybatis = getLibraryManager().getLibrary("mybatis_default");
-		checkSessionFactory(mybatis);
+		checkSessionFactory(mybatis_default);
 	}
 
 	@Test
 	public void mybatis_file() throws IOException {
-		final MybatisConnector mybatis = getLibraryManager().getLibrary("mybatis_file");
-		checkSessionFactory(mybatis);
+		checkSessionFactory(mybatis_file);
 	}
 }

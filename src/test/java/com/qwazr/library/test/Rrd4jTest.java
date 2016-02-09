@@ -15,9 +15,11 @@
  **/
 package com.qwazr.library.test;
 
+import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.Rrd4jTool;
 import com.qwazr.utils.IOUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.Sample;
@@ -26,9 +28,16 @@ import java.io.IOException;
 
 public class Rrd4jTest extends AbstractLibraryTest {
 
+	@Library("rrd_memory")
+	private Rrd4jTool rrd_memory;
+
+	@Before
+	public void before() throws IOException {
+		super.before();
+	}
+
 	@Test
 	public void rrd4j() throws IOException {
-		Rrd4jTool rrd_memory = getLibraryManager().getLibrary("rrd_memory");
 		Assert.assertNotNull(rrd_memory);
 		IOUtils.CloseableList closeables = new IOUtils.CloseableList();
 		try {

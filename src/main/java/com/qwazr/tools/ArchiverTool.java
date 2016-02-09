@@ -342,7 +342,7 @@ public class ArchiverTool extends AbstractLibrary {
 		}
 	}
 
-	public static ContentType APPLICATION_ZIP = ContentType.create("application/zip");
+	public final static ContentType APPLICATION_ZIP = ContentType.create("application/zip");
 
 	@JsonIgnore
 	public static ContentType getApplicationZipContentType() {

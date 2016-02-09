@@ -37,7 +37,7 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 
 	Map<String, String> getLibraries();
 
-	static void inject(Object object) throws IllegalAccessException {
+	static void inject(Object object) {
 		if (object == null)
 			return;
 		LibraryManager manager = getInstance();
@@ -46,15 +46,19 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 		Field[] fields = object.getClass().getDeclaredFields();
 		if (fields == null)
 			return;
-		for (Field field : fields) {
-			Library library = field.getAnnotation(Library.class);
-			if (library == null)
-				continue;
-			AbstractLibrary libraryItem = manager.getLibrary(library.value());
-			if (libraryItem == null)
-				continue;
-			field.setAccessible(true);
-			field.set(object, libraryItem);
+		try {
+			for (Field field : fields) {
+				Library library = field.getAnnotation(Library.class);
+				if (library == null)
+					continue;
+				AbstractLibrary libraryItem = manager.getLibrary(library.value());
+				if (libraryItem == null)
+					continue;
+				field.setAccessible(true);
+				field.set(object, libraryItem);
+			}
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

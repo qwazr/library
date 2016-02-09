@@ -58,6 +58,38 @@
     {
       "name": "csv",
       "class": "com.qwazr.tools.CSVTool"
+    },
+    {
+      "name": "freemarker_classloader",
+      "class": "com.qwazr.tools.FreeMarkerTool",
+      "use_classloader": true,
+      "output_encoding": "UTF-8",
+      "default_encoding": "UTF-8",
+      "default_content_type": "TEXT/HTML"
+    },
+    {
+      "name": "freemarker_files",
+      "class": "com.qwazr.tools.FreeMarkerTool",
+      "output_encoding": "UTF-8",
+      "default_encoding": "UTF-8",
+      "default_content_type": "TEXT/HTML"
+    },
+    {
+      "name": "thymeleaf_classloader",
+      "class": "com.qwazr.tools.ThymeleafTool",
+      "use_classloader": true,
+      "cache_enabled": true,
+      "cache_ttl_ms": 60000,
+      "template_mode": "XHTML",
+      "suffix": ".html"
+    },
+    {
+      "name": "thymeleaf_files",
+      "class": "com.qwazr.tools.ThymeleafTool",
+      "cache_enabled": false,
+      "character_encoding": "UTF-8",
+      "suffix": ".html",
+      "template_mode": "XHTML"
     }
   ]
 }
