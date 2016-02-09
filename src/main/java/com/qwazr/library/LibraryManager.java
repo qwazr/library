@@ -43,7 +43,20 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 		LibraryManager manager = getInstance();
 		if (manager == null)
 			return;
-		Field[] fields = object.getClass().getDeclaredFields();
+		inject(manager, object, object.getClass());
+	}
+
+	static void inject(LibraryManager manager, Object object, Class<?> clazz) {
+		if (clazz == null || clazz.isPrimitive())
+			return;
+		inject(manager, object, clazz.getDeclaredFields());
+		Class<?> nextClazz = clazz.getSuperclass();
+		if (nextClazz == clazz)
+			return;
+		inject(manager, object, nextClazz);
+	}
+
+	static void inject(LibraryManager manager, Object object, Field[] fields) {
 		if (fields == null)
 			return;
 		try {
