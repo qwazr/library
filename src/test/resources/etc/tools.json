@@ -1,10 +1,6 @@
 {
   "library": [
     {
-      "name": "freemarker",
-      "class": "com.qwazr.tools.FreeMarkerTool"
-    },
-    {
       "name": "rrd_memory",
       "class": "com.qwazr.tools.Rrd4jTool",
       "path": "memory.rrd",

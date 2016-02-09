@@ -19,6 +19,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.qwazr.connectors.CassandraConnector;
+import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.threads.ThreadUtils;
 import com.qwazr.utils.threads.ThreadUtils.CallableExceptionCatcher;
@@ -49,6 +50,7 @@ public class CassandraTest extends AbstractLibraryTest {
 	@Before
 	public void before() throws IOException {
 		super.before();
+		LibraryManager.inject(this);
 	}
 
 	private final static String CREATE_SCHEMA = "CREATE KEYSPACE qwazr_connector_test WITH REPLICATION "

@@ -15,6 +15,7 @@
  **/
 package com.qwazr.library.test;
 
+import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.Rrd4jTool;
 import com.qwazr.utils.IOUtils;
@@ -34,6 +35,7 @@ public class Rrd4jTest extends AbstractLibraryTest {
 	@Before
 	public void before() throws IOException {
 		super.before();
+		LibraryManager.inject(this);
 	}
 
 	@Test

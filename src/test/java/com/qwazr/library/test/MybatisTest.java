@@ -17,6 +17,7 @@ package com.qwazr.library.test;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 import com.qwazr.connectors.MybatisConnector;
+import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.IOUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -40,6 +41,7 @@ public class MybatisTest extends AbstractLibraryTest {
 	@Before
 	public void before() throws IOException {
 		super.before();
+		LibraryManager.inject(this);
 	}
 
 	protected void checkSession(SqlSessionFactory sessionFactory) {
