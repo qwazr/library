@@ -16,6 +16,8 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.CharsetUtils;
 import com.qwazr.utils.IOUtils;
@@ -90,7 +92,7 @@ public class ArchiverTool extends AbstractLibrary {
 	 */
 	@JsonIgnore
 	public InputStreamReader getCompressorReader(File source, IOUtils.CloseableContext context)
-			throws IOException, CompressorException {
+					throws IOException, CompressorException {
 		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(source)));
 		InputStreamReader reader = new InputStreamReader(input);
 		if (context != null)
@@ -136,17 +138,54 @@ public class ArchiverTool extends AbstractLibrary {
 	 * @throws IOException         related to I/O errors
 	 * @throws CompressorException if any compression error occurs
 	 */
-	public Object decompressJson(File sourceFile) throws IOException, CompressorException {
+	public <T> T decompressJsonClass(File sourceFile, Class<T> valueType) throws IOException, CompressorException {
 		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
 		try {
-			return JsonMapper.MAPPER.readValue(input, Object.class);
+			return JsonMapper.MAPPER.readValue(input, valueType);
+		} finally {
+			IOUtils.closeQuietly(input);
+		}
+	}
+
+	/**
+	 * Decompress a JSON structure
+	 *
+	 * @param sourceFile
+	 * @param typeReference
+	 * @param <T>
+	 * @return
+	 * @throws IOException
+	 * @throws CompressorException
+	 */
+	public <T> T decompressJsonType(File sourceFile, TypeReference<T> typeReference)
+					throws IOException, CompressorException {
+		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
+		try {
+			return JsonMapper.MAPPER.readValue(input, typeReference);
+		} finally {
+			IOUtils.closeQuietly(input);
+		}
+	}
+
+	/**
+	 * Decompress a JSON structure
+	 *
+	 * @param sourceFile
+	 * @return
+	 * @throws IOException
+	 * @throws CompressorException
+	 */
+	public JsonNode decompressJson(File sourceFile) throws IOException, CompressorException {
+		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
+		try {
+			return JsonMapper.MAPPER.readTree(input);
 		} finally {
 			IOUtils.closeQuietly(input);
 		}
 	}
 
 	public void decompress_dir(File sourceDir, String sourceExtension, File destDir, String destExtension)
-			throws IOException, CompressorException {
+					throws IOException, CompressorException {
 		if (!sourceDir.exists())
 			throw new FileNotFoundException("The source directory does not exist: " + sourceDir.getPath());
 		if (!destDir.exists())
@@ -169,7 +208,7 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void decompress_dir(String sourcePath, String sourceExtension, String destPath, String destExtension)
-			throws IOException, CompressorException {
+					throws IOException, CompressorException {
 		decompress_dir(new File(sourcePath), sourceExtension, new File(destPath), destExtension);
 	}
 
@@ -208,7 +247,7 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void extract_dir(File sourceDir, String sourceExtension, File destDir, Boolean logErrorAndContinue)
-			throws IOException, ArchiveException {
+					throws IOException, ArchiveException {
 		if (logErrorAndContinue == null)
 			logErrorAndContinue = false;
 		if (!sourceDir.exists())
@@ -236,7 +275,7 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void extract_dir(String sourcePath, String sourceExtension, String destPath, Boolean logErrorAndContinue)
-			throws IOException, ArchiveException {
+					throws IOException, ArchiveException {
 		extract_dir(new File(sourcePath), sourceExtension, new File(destPath), logErrorAndContinue);
 	}
 

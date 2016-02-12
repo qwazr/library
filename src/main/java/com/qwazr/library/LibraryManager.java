@@ -16,12 +16,14 @@
 package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
+import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.file.TrackedDirectory;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface LibraryManager extends Map<String, AbstractLibrary> {
 
@@ -43,36 +45,22 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 		LibraryManager manager = getInstance();
 		if (manager == null)
 			return;
-		inject(manager, object, object.getClass());
-	}
-
-	static void inject(LibraryManager manager, Object object, Class<?> clazz) {
-		if (clazz == null || clazz.isPrimitive())
-			return;
-		inject(manager, object, clazz.getDeclaredFields());
-		Class<?> nextClazz = clazz.getSuperclass();
-		if (nextClazz == clazz)
-			return;
-		inject(manager, object, nextClazz);
-	}
-
-	static void inject(LibraryManager manager, Object object, Field[] fields) {
-		if (fields == null)
-			return;
-		try {
-			for (Field field : fields) {
+		AnnotationsUtils.injectRecursive(object, new Consumer<Field>() {
+			@Override
+			public void accept(Field field) {
 				Library library = field.getAnnotation(Library.class);
 				if (library == null)
-					continue;
+					return;
 				AbstractLibrary libraryItem = manager.getLibrary(library.value());
 				if (libraryItem == null)
-					continue;
+					return;
 				field.setAccessible(true);
-				field.set(object, libraryItem);
+				try {
+					field.set(object, libraryItem);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
+		});
 	}
-
 }
