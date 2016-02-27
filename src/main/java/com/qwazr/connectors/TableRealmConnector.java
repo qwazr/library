@@ -18,7 +18,6 @@ package com.qwazr.connectors;
 import com.qwazr.database.TableServiceImpl;
 import com.qwazr.database.model.ColumnDefinition;
 import com.qwazr.library.AbstractLibrary;
-import com.qwazr.utils.threads.ThreadUtils;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
@@ -136,7 +135,12 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 
 	private Account authenticationFailure(String msg) {
 		logger.warn(msg);
-		ThreadUtils.sleepMs(2000);
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			if (logger.isWarnEnabled())
+				logger.warn(e.getMessage(), e);
+		}
 		return null;
 	}
 
