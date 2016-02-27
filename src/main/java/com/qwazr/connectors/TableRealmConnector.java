@@ -77,6 +77,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		// This realm only support one type of credential
 		if (!(credential instanceof PasswordCredential))
 			throw new RuntimeException("Unsupported credential type: " + credential.getClass().getName());
+
 		PasswordCredential passwordCredential = (PasswordCredential) credential;
 
 		// We request the database
@@ -102,7 +103,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		}
 
 		// The password is stored hashed
-		String digest = DigestUtils.md5Hex(new String(passwordCredential.getPassword()));
+		String digest = DigestUtils.sha256Hex(new String(passwordCredential.getPassword()));
 		if (!digest.equals(password))
 			return authenticationFailure("Wrong password: " + id);
 
