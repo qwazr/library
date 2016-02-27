@@ -18,12 +18,17 @@ package com.qwazr.connectors;
 import com.qwazr.database.TableServiceImpl;
 import com.qwazr.database.model.ColumnDefinition;
 import com.qwazr.library.AbstractLibrary;
+import com.qwazr.utils.threads.ThreadUtils;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.security.Principal;
 import java.util.HashSet;
@@ -32,6 +37,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class TableRealmConnector extends AbstractLibrary implements IdentityManager {
+
+	private static final Logger logger = LoggerFactory.getLogger(TableRealmConnector.class);
 
 	public final String table_name = null;
 	public final String login_column = null;
@@ -73,9 +80,16 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		PasswordCredential passwordCredential = (PasswordCredential) credential;
 
 		// We request the database
-		final LinkedHashMap<String, Object> row = tableService.getRow(table_name, id, columns);
-		if (row == null)
-			return null;
+		final LinkedHashMap<String, Object> row;
+		try {
+			row = tableService.getRow(table_name, id, columns);
+			if (row == null)
+				return null;
+		} catch (WebApplicationException e) {
+			if (e.getResponse().getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR)
+				return authenticationFailure("Unknown user: " + id);
+			throw e;
+		}
 
 		Object password = row.get(password_column);
 		if (password == null)
@@ -90,7 +104,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		// The password is stored hashed
 		String digest = DigestUtils.md5Hex(new String(passwordCredential.getPassword()));
 		if (!digest.equals(password))
-			return null;
+			return authenticationFailure("Wrong password: " + id);
 
 		//We retrieve the roles
 		Object object = row.get(roles_column);
@@ -117,6 +131,12 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 				return roles;
 			}
 		};
+	}
+
+	private Account authenticationFailure(String msg) {
+		logger.warn(msg);
+		ThreadUtils.sleepMs(2000);
+		return null;
 	}
 
 	@Override
