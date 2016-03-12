@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class AsciiDoctorTool extends AbstractLibrary {
 
@@ -43,6 +44,8 @@ public class AsciiDoctorTool extends AbstractLibrary {
 	public final String[] template_dirs = null;
 	public final String template_engine = null;
 
+	public final List<String> required_libraries = null;
+
 	//Attributes
 	public final HashMap<String, Object> attributes = null;
 
@@ -55,6 +58,10 @@ public class AsciiDoctorTool extends AbstractLibrary {
 	@Override
 	public void load(File dataDir) {
 		asciidoctor = Asciidoctor.Factory.create();
+		if (required_libraries != null)
+			for (String library : required_libraries)
+				asciidoctor.requireLibrary(library);
+
 		options = new Options();
 		if (to_file != null)
 			options.setToFile(to_file);
@@ -88,6 +95,14 @@ public class AsciiDoctorTool extends AbstractLibrary {
 			options.setTemplateEngine(template_engine);
 		if (attributes != null)
 			options.setAttributes(attributes);
+	}
+
+	@Override
+	public void close() {
+		if (asciidoctor != null) {
+			asciidoctor.shutdown();
+			asciidoctor = null;
+		}
 	}
 
 	public String convertFile(File file) {
