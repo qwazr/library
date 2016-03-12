@@ -17,10 +17,7 @@ package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
-import org.asciidoctor.AsciiDocDirectoryWalker;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Options;
-import org.asciidoctor.SafeMode;
+import org.asciidoctor.*;
 
 import java.io.File;
 import java.io.IOException;
