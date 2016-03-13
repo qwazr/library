@@ -102,9 +102,10 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		}
 
 		// The password is stored hashed
-		String digest = DigestUtils.sha256Hex(new String(passwordCredential.getPassword()));
+		final String passwd = new String(passwordCredential.getPassword());
+		String digest = DigestUtils.sha256Hex(passwd);
 		if (!digest.equals(password))
-			return authenticationFailure("Wrong password: " + id);
+			return authenticationFailure("Wrong password: " + id + " " + digest + '/' + passwd + '/' + password);
 
 		//We retrieve the roles
 		Object object = row.get(roles_column);

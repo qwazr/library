@@ -49,10 +49,14 @@ public class FreeMarkerTool extends AbstractLibrary {
 	private final static String DEFAULT_CONTENT_TYPE = "text/html";
 
 	public FreeMarkerTool() {
+		this(null);
+	}
+
+	public FreeMarkerTool(Boolean use_classloader) {
 		output_encoding = null;
 		default_encoding = null;
 		default_content_type = null;
-		use_classloader = null;
+		this.use_classloader = use_classloader;
 	}
 
 	@Override
