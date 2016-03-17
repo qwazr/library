@@ -73,7 +73,7 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 			inputStream = new FileInputStream(configurationFile);
 		else
 			inputStream = Resources.getResourceAsStream(ClassLoaderManager.classLoader,
-					configuration_resource != null ? configuration_resource : default_configuration);
+							configuration_resource != null ? configuration_resource : default_configuration);
 		try {
 			if (environment != null) {
 				if (props != null)
