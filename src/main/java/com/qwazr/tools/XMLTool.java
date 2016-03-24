@@ -156,6 +156,21 @@ public class XMLTool extends AbstractLibrary {
 	}
 
 	/**
+	 * Parse an XML document using its URL and build a DOM object
+	 *
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
+	 */
+	public Document domParseURL(String url) throws IOException, SAXException, ParserConfigurationException {
+		DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
+		docBuilder.setErrorHandler(ToolErrorHandler.INSTANCE);
+		return docBuilder.parse(url);
+	}
+
+	/**
 	 * Generate an XML string from an Object using JAXB
 	 *
 	 * @param object the object to serialize
