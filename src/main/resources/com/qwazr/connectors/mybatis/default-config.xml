@@ -5,7 +5,7 @@
 <configuration>
     <environments default="primary">
         <environment id="primary">
-            <transactionManager type="JDBC"/>
+            <transactionManager type="MANAGED"/>
             <dataSource type="POOLED">
                 <property name="driver" value="${driver}"/>
                 <property name="url" value="${url}"/>
