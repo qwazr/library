@@ -12,6 +12,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -220,6 +222,36 @@ public class ExcelTool extends AbstractLibrary {
 						addCell(row.getObject(colName));
 				});
 			});
+		}
+
+		/**
+		 * Fill the content of a sheet with a SQL resultSet. The fisrt row show the column definition.
+		 *
+		 * @param sheetName the name of the sheet
+		 * @param resultSet the rows to copy
+		 */
+		public void createSheetAndFill(final String sheetName, final java.sql.ResultSet resultSet) throws SQLException {
+
+			activeSheetAndSetPos(sheetName, 0, 0);
+
+			addRow();
+
+			final ResultSetMetaData metaData = resultSet.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			for (int i = 1; i <= columnCount; i++)
+				addCell(metaData.getColumnLabel(i));
+
+			while (resultSet.next()) {
+				addRow();
+				xpos.set(0);
+				for (int i = 1; i <= columnCount; i++) {
+					Object value = resultSet.getObject(i);
+					if (resultSet.wasNull())
+						xpos.incrementAndGet();
+					else
+						addCell(value);
+				}
+			}
 		}
 
 		/**
