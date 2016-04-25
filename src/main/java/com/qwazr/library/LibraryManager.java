@@ -45,21 +45,18 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 		LibraryManager manager = getInstance();
 		if (manager == null)
 			return;
-		AnnotationsUtils.injectRecursive(object, new Consumer<Field>() {
-			@Override
-			public void accept(Field field) {
-				Library library = field.getAnnotation(Library.class);
-				if (library == null)
-					return;
-				AbstractLibrary libraryItem = manager.getLibrary(library.value());
-				if (libraryItem == null)
-					return;
-				field.setAccessible(true);
-				try {
-					field.set(object, libraryItem);
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
+		AnnotationsUtils.browseFieldsRecursive(object.getClass(), field -> {
+			Library library = field.getAnnotation(Library.class);
+			if (library == null)
+				return;
+			AbstractLibrary libraryItem = manager.getLibrary(library.value());
+			if (libraryItem == null)
+				return;
+			field.setAccessible(true);
+			try {
+				field.set(object, libraryItem);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
 			}
 		});
 	}
