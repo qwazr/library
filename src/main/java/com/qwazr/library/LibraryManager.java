@@ -18,14 +18,13 @@ package com.qwazr.library;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.file.TrackedDirectory;
+import com.qwazr.utils.server.GenericServer;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.function.Consumer;
 
-public interface LibraryManager extends Map<String, AbstractLibrary> {
+public interface LibraryManager extends Map<String, AbstractLibrary>, GenericServer.IdentityManagerProvider {
 
 	static void load(File dataDirectory, TrackedDirectory etcTracker) throws IOException {
 		LibraryManagerImpl.load(dataDirectory, etcTracker);
@@ -60,4 +59,5 @@ public interface LibraryManager extends Map<String, AbstractLibrary> {
 			}
 		});
 	}
+
 }

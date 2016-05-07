@@ -21,6 +21,7 @@ import com.qwazr.utils.ReadOnlyMap;
 import com.qwazr.utils.file.TrackedDirectory;
 import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.json.JsonMapper;
+import io.undertow.security.idm.IdentityManager;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +162,16 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 			IOUtils.close(map.values());
 			throw e;
 		}
+	}
+
+	@Override
+	public IdentityManager getIdentityManager(String realm) throws IOException {
+		AbstractLibrary library = get(realm);
+		if (library == null)
+			throw new IOException("No realm connector with this name: " + realm);
+		if (!(library instanceof IdentityManager))
+			throw new IOException("This is a not a realm connector: " + realm);
+		return (IdentityManager) library;
 	}
 
 }
