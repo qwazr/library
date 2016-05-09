@@ -20,15 +20,14 @@ import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.IOUtils.CloseableContext;
+import com.qwazr.utils.StringUtils;
+import com.qwazr.utils.SubstitutedVariables;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Objects;
@@ -44,6 +43,8 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 
 	public final String environment = null;
 
+	public final String properties_file = null;
+
 	public final Map<String, String> properties = null;
 
 	private SqlSessionFactory sqlSessionFactory = null;
@@ -55,26 +56,32 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 
 		final File configurationFile;
 		if (configuration_file != null) {
-			configurationFile = new File(configuration_file);
+			configurationFile = new File(SubstitutedVariables.propertyAndEnvironmentSubstitute(configuration_file));
 			if (!configurationFile.exists())
-				throw new RuntimeException("The configuration file " + configuration_file + " does not exist");
+				throw new RuntimeException("The configuration file " + configurationFile.getPath() + " does not exist");
 		} else
 			configurationFile = null;
-		final Properties props;
+		Properties props = null;
+		if (!StringUtils.isEmpty(properties_file)) {
+			File propFile = new File(SubstitutedVariables.propertyAndEnvironmentSubstitute(properties_file));
+			if (propFile.exists() && propFile.isFile()) {
+				props = new Properties();
+				try (FileReader reader = new FileReader(propFile)) {
+					props.load(reader);
+				}
+			} else
+				logger.warn("The property file does not exit: " + properties_file);
+		}
 		if (properties != null) {
-			props = new Properties();
+			props = props == null ? new Properties() : null;
 			props.putAll(properties);
 		} else
 			props = null;
 
 		final SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-		final InputStream inputStream;
-		if (configurationFile != null)
-			inputStream = new FileInputStream(configurationFile);
-		else
-			inputStream = Resources.getResourceAsStream(ClassLoaderManager.classLoader,
-							configuration_resource != null ? configuration_resource : default_configuration);
-		try {
+		try (final InputStream inputStream = configurationFile != null ? new FileInputStream(configurationFile)
+				: Resources.getResourceAsStream(ClassLoaderManager.classLoader,
+				configuration_resource != null ? configuration_resource : default_configuration)) {
 			if (environment != null) {
 				if (props != null)
 					sqlSessionFactory = builder.build(inputStream, environment, props);
@@ -86,8 +93,6 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 				else
 					sqlSessionFactory = builder.build(inputStream);
 			}
-		} finally {
-			IOUtils.close(inputStream);
 		}
 	}
 
