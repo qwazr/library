@@ -21,9 +21,7 @@ import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.qwazr.connectors.CassandraConnector;
 import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
-import com.qwazr.utils.threads.ThreadUtils;
-import com.qwazr.utils.threads.ThreadUtils.CallableExceptionCatcher;
-import com.qwazr.utils.threads.ThreadUtils.ProcedureExceptionCatcher;
+import com.qwazr.utils.concurrent.ThreadUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,8 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -76,22 +72,17 @@ public class CassandraTest extends AbstractLibraryTest {
 
 	@Test
 	public void test_10_transaction() throws Exception {
-		ExecutorService executor = Executors.newFixedThreadPool(10);
 		try {
 			cassandra.execute("SELECT count(*) FROM qwazr_connector_test.test").all();
 			finalTime = System.currentTimeMillis() + 10000;
-			List<ProcedureExceptionCatcher> threadList = new ArrayList<ProcedureExceptionCatcher>();
+			List<ThreadUtils.ParallelRunnable> threadList = new ArrayList<>();
 			for (int i = 0; i < 50; i++) {
 				threadList.add(new InsertThread());
 				threadList.add(new SelectUpdateThread());
 			}
-			ThreadUtils.invokeAndJoin(executor, threadList);
-			for (CallableExceptionCatcher<?> callable : threadList)
-				callable.checkException();
+			ThreadUtils.parallel(threadList);
 		} catch (NoHostAvailableException e) {
 			logger.warning("Bypass (no cassandra host is running)");
-		} finally {
-			executor.shutdown();
 		}
 	}
 
@@ -110,10 +101,10 @@ public class CassandraTest extends AbstractLibraryTest {
 
 	private String INSERT = "INSERT INTO qwazr_connector_test.test " + "(item_id, cat_id) VALUES (now(), ?)";
 
-	private class InsertThread extends ProcedureExceptionCatcher {
+	private class InsertThread implements ThreadUtils.ParallelRunnable {
 
 		@Override
-		public void execute() throws Exception {
+		public void run() throws Exception {
 			long id = Thread.currentThread().getId();
 			logger.info("Starts - id: " + id);
 			int count = 0;
@@ -129,10 +120,10 @@ public class CassandraTest extends AbstractLibraryTest {
 
 	private String UPDATE = "UPDATE qwazr_connector_test.test" + " SET status='ok' WHERE item_id=?";
 
-	private class SelectUpdateThread extends ProcedureExceptionCatcher {
+	private class SelectUpdateThread implements ThreadUtils.ParallelRunnable {
 
 		@Override
-		public void execute() throws Exception {
+		public void run() throws Exception {
 			long id = Thread.currentThread().getId();
 			logger.info("Starts - id: " + id);
 			int count = 0;

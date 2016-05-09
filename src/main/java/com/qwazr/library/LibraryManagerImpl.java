@@ -18,7 +18,6 @@ package com.qwazr.library;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
-import com.qwazr.utils.file.TrackedDirectory;
 import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.json.JsonMapper;
 import io.undertow.security.idm.IdentityManager;
@@ -63,14 +62,11 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	@Override
 	public void close() {
-		mapLock.w.lock();
-		try {
+		mapLock.write(() -> {
 			libraryFileMap.clear();
 			IOUtils.close(this.values());
 			setMap(Collections.emptyMap());
-		} finally {
-			mapLock.w.unlock();
-		}
+		});
 	}
 
 	public AbstractLibrary getLibrary(String name) {
@@ -91,12 +87,12 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		if (!"json".equals(extension))
 			return;
 		switch (changeReason) {
-			case UPDATED:
-				loadLibrarySet(jsonFile);
-				break;
-			case DELETED:
-				unloadLibrarySet(jsonFile);
-				break;
+		case UPDATED:
+			loadLibrarySet(jsonFile);
+			break;
+		case DELETED:
+			unloadLibrarySet(jsonFile);
+			break;
 		}
 	}
 
@@ -113,13 +109,10 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 			if (logger.isInfoEnabled())
 				logger.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 
-			mapLock.w.lock();
-			try {
+			mapLock.writeEx(() -> {
 				libraryFileMap.put(jsonFile, buildAndLoad(configuration.library));
 				buildGlobalMap();
-			} finally {
-				mapLock.w.unlock();
-			}
+			});
 
 		} catch (IOException e) {
 			if (logger.isErrorEnabled())
@@ -129,19 +122,15 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	}
 
 	private void unloadLibrarySet(File jsonFile) {
-		final Map<String, AbstractLibrary> map;
-		mapLock.w.lock();
-		try {
-			map = libraryFileMap.remove(jsonFile);
+		mapLock.write(() -> {
+			final Map<String, AbstractLibrary> map = libraryFileMap.remove(jsonFile);
 			if (map == null)
 				return;
 			if (logger.isInfoEnabled())
 				logger.info("Unload library configuration file: " + jsonFile.getAbsolutePath());
 			buildGlobalMap();
-		} finally {
-			mapLock.w.unlock();
-		}
-		IOUtils.close(map.values());
+			IOUtils.close(map.values());
+		});
 	}
 
 	private void buildGlobalMap() {
