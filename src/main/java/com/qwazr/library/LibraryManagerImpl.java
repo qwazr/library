@@ -38,7 +38,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	static volatile LibraryManagerImpl INSTANCE = null;
 
-	static synchronized void load(File dataDirectory, TrackedDirectory etcTracker) throws IOException {
+	static synchronized void load(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
 		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker);
@@ -47,12 +47,12 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	private final File rootDirectory;
 
-	private final TrackedDirectory etcTracker;
+	private final TrackedInterface etcTracker;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, AbstractLibrary>> libraryFileMap;
 
-	private LibraryManagerImpl(File dataDirectory, TrackedDirectory etcTracker) throws IOException {
+	private LibraryManagerImpl(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
 		this.rootDirectory = dataDirectory;
 		this.libraryFileMap = new HashMap<>();
 		this.etcTracker = etcTracker;
@@ -91,12 +91,12 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		if (!"json".equals(extension))
 			return;
 		switch (changeReason) {
-		case UPDATED:
-			loadLibrarySet(jsonFile);
-			break;
-		case DELETED:
-			unloadLibrarySet(jsonFile);
-			break;
+			case UPDATED:
+				loadLibrarySet(jsonFile);
+				break;
+			case DELETED:
+				unloadLibrarySet(jsonFile);
+				break;
 		}
 	}
 
