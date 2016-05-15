@@ -16,15 +16,12 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.qwazr.library.AbstractLibrary;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 import java.io.File;
@@ -34,24 +31,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XPathTool extends AbstractLibrary {
+public class XPathTool extends AbstractXmlFactoryTool {
 
 	private final static XPathFactory xPathFactory = XPathFactory.newInstance();
-	private final static DocumentBuilderFactory docFactory;
-
-	static {
-		docFactory = DocumentBuilderFactory.newInstance();
-	}
 
 	private XPath xPath;
 	private volatile Map<String, XPathExpression> xPathMap;
 
 	@Override
-	public void load(File parentDir) {
+	public void load(final File parentDir) {
+		super.load(parentDir);
 		synchronized (xPathFactory) {
 			xPath = xPathFactory.newXPath();
 		}
-		xPathMap = new HashMap<String, XPathExpression>();
+		xPathMap = new HashMap<>();
 	}
 
 	@Override
@@ -117,11 +110,7 @@ public class XPathTool extends AbstractLibrary {
 		private final Document document;
 
 		private XPathDocument(File file) throws ParserConfigurationException, SAXException, IOException {
-			final DocumentBuilder builder;
-			synchronized (docFactory) {
-				builder = docFactory.newDocumentBuilder();
-			}
-			document = builder.parse(file);
+			document = getNewDocumentBuilder().parse(file);
 		}
 
 		private Object xpath(String xpath_expression, Object object, QName xPathResult)

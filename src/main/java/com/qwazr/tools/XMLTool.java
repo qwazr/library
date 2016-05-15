@@ -16,36 +16,32 @@
 package com.qwazr.tools;
 
 import com.jamesmurty.utils.XMLBuilder2;
-import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.XmlMapper;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 
-public class XMLTool extends AbstractLibrary {
+public class XMLTool extends AbstractXmlFactoryTool {
 
-	private static final Logger logger = LoggerFactory.getLogger(XMLTool.class);
-
-	private SAXParserFactory saxParserFactory;
-	private DocumentBuilderFactory documentBuilderFactory;
+	private SAXParserFactory saxParserFactory = null;
 
 	@Override
-	public void load(File parentDir) {
+	final public void load(final File parentDir) {
+		super.load(parentDir);
 		saxParserFactory = SAXParserFactory.newInstance();
-		saxParserFactory.setNamespaceAware(true);
-		documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setNamespaceAware(true);
+		if (namespace_aware != null)
+			saxParserFactory.setNamespaceAware(namespace_aware);
+		if (x_include_aware != null)
+			saxParserFactory.setXIncludeAware(x_include_aware);
 	}
 
 	/**
@@ -118,11 +114,9 @@ public class XMLTool extends AbstractLibrary {
 	 * @throws ParserConfigurationException if any XML error occurs
 	 */
 	public Document domParseString(String xmlString) throws IOException, SAXException, ParserConfigurationException {
-		DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
-		docBuilder.setErrorHandler(ToolErrorHandler.INSTANCE);
-		InputSource input = new InputSource();
+		final InputSource input = new InputSource();
 		input.setCharacterStream(new StringReader(xmlString));
-		return docBuilder.parse(input);
+		return getNewDocumentBuilder().parse(input);
 	}
 
 	/**
@@ -135,9 +129,7 @@ public class XMLTool extends AbstractLibrary {
 	 * @throws SAXException                 if any XML error occurs
 	 */
 	public Document domParseFile(String file) throws ParserConfigurationException, IOException, SAXException {
-		DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
-		docBuilder.setErrorHandler(ToolErrorHandler.INSTANCE);
-		return docBuilder.parse(file);
+		return getNewDocumentBuilder().parse(file);
 	}
 
 	/**
@@ -150,9 +142,7 @@ public class XMLTool extends AbstractLibrary {
 	 * @throws SAXException                 if any XML error occurs
 	 */
 	public Document domParseStream(InputStream input) throws ParserConfigurationException, IOException, SAXException {
-		DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
-		docBuilder.setErrorHandler(ToolErrorHandler.INSTANCE);
-		return docBuilder.parse(input);
+		return getNewDocumentBuilder().parse(input);
 	}
 
 	/**
@@ -165,9 +155,7 @@ public class XMLTool extends AbstractLibrary {
 	 * @throws ParserConfigurationException
 	 */
 	public Document domParseURL(String url) throws IOException, SAXException, ParserConfigurationException {
-		DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
-		docBuilder.setErrorHandler(ToolErrorHandler.INSTANCE);
-		return docBuilder.parse(url);
+		return getNewDocumentBuilder().parse(url);
 	}
 
 	/**
@@ -198,23 +186,4 @@ public class XMLTool extends AbstractLibrary {
 		XmlMapper.MAPPER.writeValue(writer, object);
 	}
 
-	private static class ToolErrorHandler implements ErrorHandler {
-
-		private static final ToolErrorHandler INSTANCE = new ToolErrorHandler();
-
-		@Override
-		public void warning(SAXParseException exception) throws SAXException {
-			logger.warn(exception.getMessage(), exception);
-		}
-
-		@Override
-		public void error(SAXParseException exception) throws SAXException {
-			logger.error(exception.getMessage(), exception);
-		}
-
-		@Override
-		public void fatalError(SAXParseException exception) throws SAXException {
-			throw exception;
-		}
-	}
 }
