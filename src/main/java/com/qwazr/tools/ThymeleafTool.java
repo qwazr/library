@@ -20,9 +20,9 @@ import com.qwazr.utils.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.WebContext;
+import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
-import org.thymeleaf.templateresolver.TemplateResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +49,7 @@ public class ThymeleafTool extends AbstractLibrary {
 
 		templateEngine = new TemplateEngine();
 
-		final TemplateResolver templateResolver;
+		final AbstractConfigurableTemplateResolver templateResolver;
 		if (use_classloader)
 			templateResolver = new ClassLoaderTemplateResolver();
 		else {
