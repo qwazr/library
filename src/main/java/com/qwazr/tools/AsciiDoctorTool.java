@@ -17,14 +17,11 @@ package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
-import org.asciidoctor.*;
-import org.asciidoctor.ast.Document;
-import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.AsciiDocDirectoryWalker;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Options;
+import org.asciidoctor.SafeMode;
 import org.asciidoctor.ast.DocumentRuby;
-import org.asciidoctor.ast.StructuredDocument;
-import org.asciidoctor.converter.JavaConverterRegistry;
-import org.asciidoctor.extension.JavaExtensionRegistry;
-import org.asciidoctor.extension.RubyExtensionRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +30,6 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AsciiDoctorTool extends AbstractLibrary {
 
