@@ -18,12 +18,22 @@ package com.qwazr.tools;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
 import org.asciidoctor.*;
+import org.asciidoctor.ast.Document;
+import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.ast.DocumentRuby;
+import org.asciidoctor.ast.StructuredDocument;
+import org.asciidoctor.converter.JavaConverterRegistry;
+import org.asciidoctor.extension.JavaExtensionRegistry;
+import org.asciidoctor.extension.RubyExtensionRegistry;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AsciiDoctorTool extends AbstractLibrary {
 
@@ -105,20 +115,110 @@ public class AsciiDoctorTool extends AbstractLibrary {
 		}
 	}
 
+	/**
+	 * Parse the AsciiDoc source input into an Document {@link DocumentRuby} and
+	 * render it to the specified backend format.
+	 * <p>
+	 * Accepts input as File path.
+	 * <p>
+	 * If the :in_place option is true, and the input is a File, the output is
+	 * written to a file adjacent to the input file, having an extension that
+	 * corresponds to the backend format. Otherwise, if the :to_file option is
+	 * specified, the file is written to that file. If :to_file is not an
+	 * absolute path, it is resolved relative to :to_dir, if given, otherwise
+	 * the Document#base_dir. If the target directory does not exist, it will
+	 * not be created unless the :mkdirs option is set to true. If the file
+	 * cannot be written because the target directory does not exist, or because
+	 * it falls outside of the Document#base_dir in safe mode, an IOError is
+	 * raised.
+	 *
+	 * @param file an input Asciidoctor file.
+	 * @return returns nothing if the rendered output String is written to a
+	 * file.
+	 */
 	public String convertFile(File file) {
 		return asciidoctor.convertFile(file, options);
 	}
 
+	/**
+	 * Parses all files added inside a collection.
+	 *
+	 * @param files to be rendered.
+	 *              a Hash of options to control processing (default: {}).
+	 * @return returns an array of 0 positions if the rendered output is written
+	 * to a file.
+	 */
 	public String[] convertFiles(Collection<File> files) {
 		return asciidoctor.convertFiles(files, options);
 	}
 
+	/**
+	 * Parse all AsciiDoc files found in the base directory.
+	 *
+	 * @param baseDir the directory with all files to be rendered.
+	 * @return returns an array of 0 positions if the rendered output is written
+	 * to a file.
+	 */
 	public String[] convertDirectory(String baseDir) {
-		AsciiDocDirectoryWalker directoryWalker = new AsciiDocDirectoryWalker(baseDir);
+		final AsciiDocDirectoryWalker directoryWalker = new AsciiDocDirectoryWalker(baseDir);
 		return asciidoctor.convertDirectory(directoryWalker, options);
 	}
 
+	/**
+	 * Parse all AsciiDoc files found in the base directory.
+	 *
+	 * @param baseDir the directory with all files to be rendered.
+	 * @return returns an array of 0 positions if the rendered output is written
+	 * to a file.
+	 */
 	public String[] convertDirectory(File baseDir) throws IOException {
 		return convertDirectory(baseDir.getCanonicalPath());
 	}
+
+	/**
+	 * Parse the AsciiDoc source input into an Document and
+	 * render it to the specified backend format.
+	 * Accepts input as String object.
+	 *
+	 * @param content the AsciiDoc source as String.
+	 * @return the rendered output String is returned
+	 */
+	public String convert(String content) {
+		return asciidoctor.convert(content, options);
+	}
+
+	/**
+	 * Parse the AsciiDoc source input into an Document {@link DocumentRuby} and
+	 * render it to the specified backend format.
+	 * Accepts input as String object.
+	 *
+	 * @param content the AsciiDoc source as String.
+	 * @param options a Hash of options to control processing (default: {}).
+	 * @return the rendered output String is returned
+	 */
+	public String convert(String content, Options options) {
+		return asciidoctor.convert(content, options);
+	}
+
+	/**
+	 * @return a clone of the current options
+	 */
+	public Options getNewOptions() {
+		return new Options(options.map());
+	}
+
+	/**
+	 * Parse the document read from reader, and rendered result is sent to
+	 * writer.
+	 *
+	 * @param contentReader  where asciidoc content is read.
+	 * @param rendererWriter where rendered content is written. Writer is flushed, but not
+	 *                       closed.
+	 * @throws IOException if an error occurs while writing rendered content, this
+	 *                     exception is thrown.
+	 */
+	public void convert(Reader contentReader, Writer rendererWriter) throws IOException {
+		asciidoctor.convert(contentReader, rendererWriter, options);
+	}
+
 }
