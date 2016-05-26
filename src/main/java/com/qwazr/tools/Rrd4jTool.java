@@ -48,7 +48,7 @@ public class Rrd4jTool extends AbstractLibrary {
 	@Override
 	public void load(File parentDir) throws IOException {
 		Objects.requireNonNull(path, "The path property is required");
-		resolvedPath = SubstitutedVariables.getEnvironmentVariables().substitute(path);
+		resolvedPath = SubstitutedVariables.propertyAndEnvironmentSubstitute(path);
 	}
 
 	protected RrdDef createDef() {
