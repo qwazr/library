@@ -27,7 +27,9 @@ import java.util.List;
 
 public class MarkdownTool extends AbstractLibrary {
 
-	public List<ExtensionEnum> extensions;
+	final public List<ExtensionEnum> extensions = null;
+
+	final public Integer max_parsing_time = null;
 
 	/**
 	 * @see org.pegdown.Extensions
@@ -75,7 +77,10 @@ public class MarkdownTool extends AbstractLibrary {
 		if (extensions != null)
 			for (ExtensionEnum extensionEnum : extensions)
 				extensionsValue |= extensionEnum.ext;
-		pegDownProcessor = new PegDownProcessor(extensionsValue);
+		if (max_parsing_time != null)
+			pegDownProcessor = new PegDownProcessor(extensionsValue, max_parsing_time);
+		else
+			pegDownProcessor = new PegDownProcessor(extensionsValue);
 	}
 
 	public String toHtml(String input) {
