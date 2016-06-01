@@ -107,6 +107,14 @@ public class Rrd4jTool extends AbstractLibrary {
 		return new RrdDatabase(rrdPath, backendFactory, true).rrdDb;
 	}
 
+	/**
+	 * @return the path after resolving the environment variables or properties.
+	 */
+	@JsonIgnore
+	public String getResolvedPath() {
+		return resolvedPath;
+	}
+
 	@JsonIgnore
 	public Sample createSample(RrdDb rrdDb, Long time) throws IOException {
 		final Sample sample;
