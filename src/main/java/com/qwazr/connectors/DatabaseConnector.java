@@ -1,5 +1,5 @@
 /**
- * Copyright 2014-2016 Emmanuel Keller / QWAZR
+ * Copyright 2015-2016 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.qwazr.utils.jdbc.Transaction;
 import com.qwazr.utils.jdbc.connection.ConnectionManager;
 import com.qwazr.utils.jdbc.connection.DataSourceConnection;
 import com.qwazr.utils.jdbc.connection.JDBCConnection;
-import io.undertow.security.idm.IdentityManager;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,21 +129,21 @@ public class DatabaseConnector extends AbstractPasswordLibrary {
 	}
 
 	@JsonIgnore
-	public Transaction getConnection(CloseableContext context) throws SQLException {
-		Transaction transaction = connectionManager.getNewTransaction();
+	public Transaction getConnection(final CloseableContext context) throws SQLException {
+		final Transaction transaction = connectionManager.getNewTransaction();
 		return context.add(transaction);
 	}
 
 	@JsonIgnore
-	public Transaction getConnection(CloseableContext context, boolean autoCommit) throws SQLException {
-		Transaction transaction = connectionManager.getNewTransaction(autoCommit);
+	public Transaction getConnection(final CloseableContext context, final boolean autoCommit) throws SQLException {
+		final Transaction transaction = connectionManager.getNewTransaction(autoCommit);
 		return context.add(transaction);
 	}
 
 	@JsonIgnore
-	public Transaction getConnection(CloseableContext context, boolean autoCommit, int transactionIsolation)
-			throws SQLException {
-		Transaction transaction = connectionManager.getNewTransaction(autoCommit, transactionIsolation);
+	public Transaction getConnection(final CloseableContext context, final boolean autoCommit,
+			final int transactionIsolation) throws SQLException {
+		final Transaction transaction = connectionManager.getNewTransaction(autoCommit, transactionIsolation);
 		return context.add(transaction);
 	}
 
