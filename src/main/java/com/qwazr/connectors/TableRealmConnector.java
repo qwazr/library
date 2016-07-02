@@ -66,12 +66,12 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	}
 
 	@Override
-	public Account verify(Account account) {
+	public Account verify(final Account account) {
 		return account;
 	}
 
 	@Override
-	public Account verify(String id, Credential credential) {
+	public Account verify(final String id, final Credential credential) {
 
 		// This realm only support one type of credential
 		if (!(credential instanceof PasswordCredential))
@@ -108,8 +108,8 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 			return authenticationFailure("Wrong password: " + id + " " + digest + '/' + passwd + '/' + password);
 
 		//We retrieve the roles
-		Object object = row.get(roles_column);
-		LinkedHashSet<String> roles = new LinkedHashSet<String>();
+		final Object object = row.get(roles_column);
+		final LinkedHashSet<String> roles = new LinkedHashSet<>();
 		if (object instanceof String[]) {
 			for (Object o : (String[]) object)
 				roles.add(o.toString());
@@ -119,12 +119,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		return new Account() {
 			@Override
 			public Principal getPrincipal() {
-				return new Principal() {
-					@Override
-					public String getName() {
-						return id;
-					}
-				};
+				return () -> id;
 			}
 
 			@Override
@@ -134,7 +129,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		};
 	}
 
-	private Account authenticationFailure(String msg) {
+	private Account authenticationFailure(final String msg) {
 		logger.warn(msg);
 		try {
 			Thread.sleep(2000);
@@ -146,7 +141,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	}
 
 	@Override
-	public Account verify(Credential credential) {
+	public Account verify(final Credential credential) {
 		return null;
 	}
 }
