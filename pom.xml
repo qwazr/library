@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.4.0</version>
+            <version>3.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -111,12 +111,12 @@
         <dependency>
             <groupId>org.apache.directory.api</groupId>
             <artifactId>api-ldap-client-all</artifactId>
-            <version>1.0.0-M33</version>
+            <version>1.0.0-RC1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.directory.api</groupId>
             <artifactId>api-util</artifactId>
-            <version>1.0.0-M33</version>
+            <version>1.0.0-RC1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -151,7 +151,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.11</version>
+            <version>1.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
