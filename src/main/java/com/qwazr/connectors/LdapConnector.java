@@ -140,7 +140,7 @@ public class LdapConnector extends AbstractPasswordLibrary {
 			return entry;
 		} finally {
 			if (!cursor.isClosed())
-				cursor.close();
+				IOUtils.close(cursor);
 		}
 	}
 
