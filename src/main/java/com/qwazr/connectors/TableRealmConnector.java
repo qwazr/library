@@ -17,6 +17,7 @@ package com.qwazr.connectors;
 
 import com.qwazr.database.TableServiceImpl;
 import com.qwazr.database.model.ColumnDefinition;
+import com.qwazr.database.store.KeyStore;
 import com.qwazr.library.AbstractLibrary;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
@@ -52,7 +53,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		tableService = new TableServiceImpl();
 		Set<String> tables = tableService.list(null, true);
 		if (!tables.contains(table_name)) {
-			tableService.createTable(table_name);
+			tableService.createTable(table_name, KeyStore.Impl.leveldb);
 			tableService.setColumn(table_name, login_column,
 					new ColumnDefinition(ColumnDefinition.Type.STRING, ColumnDefinition.Mode.INDEXED));
 			tableService.setColumn(table_name, password_column,
