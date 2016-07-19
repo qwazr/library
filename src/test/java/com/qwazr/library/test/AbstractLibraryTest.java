@@ -29,7 +29,7 @@ public abstract class AbstractLibraryTest {
 		final LibraryManager libraryManager = LibraryManager.getInstance();
 		if (libraryManager != null)
 			return;
-		TrackedInterface etcTracker = TrackedInterface.build(new File("src/test/resources/etc"), FileFileFilter.FILE);
+		TrackedInterface etcTracker = TrackedInterface.build(new File("src/test/resources/conf"), FileFileFilter.FILE);
 		LibraryManager.load(new File("src/test/resources"), etcTracker);
 		etcTracker.check();
 	}

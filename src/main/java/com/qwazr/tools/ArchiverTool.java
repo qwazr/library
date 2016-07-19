@@ -74,7 +74,7 @@ public class ArchiverTool extends AbstractLibrary {
 		factory = new CompressorStreamFactory();
 	}
 
-	private InputStream getCompressorNewInputStream(InputStream input) throws IOException, CompressorException {
+	private InputStream getCompressorNewInputStream(final InputStream input) throws IOException, CompressorException {
 		if (codec == null)
 			return factory.createCompressorInputStream(input);
 		else
@@ -91,7 +91,7 @@ public class ArchiverTool extends AbstractLibrary {
 	 * @throws CompressorException
 	 */
 	@JsonIgnore
-	public InputStreamReader getCompressorReader(File source, IOUtils.CloseableContext context)
+	public InputStreamReader getCompressorReader(final File source, final IOUtils.CloseableContext context)
 			throws IOException, CompressorException {
 		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(source)));
 		InputStreamReader reader = new InputStreamReader(input);
@@ -100,16 +100,14 @@ public class ArchiverTool extends AbstractLibrary {
 		return reader;
 	}
 
-	public void decompress(File source, File destFile) throws IOException, CompressorException {
-		if (destFile.exists())
+	public void decompress(final File source, final File destFile) throws IOException, CompressorException {
+		if (destFile.exists() && destFile.length() > 0)
 			throw new IOException("The file already exists: " + destFile.getPath());
-		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(source)));
-		try {
+		try (final InputStream input = getCompressorNewInputStream(
+				new BufferedInputStream(new FileInputStream(source)))) {
 			IOUtils.copy(input, destFile);
 		} catch (IOException e) {
 			throw new IOException("Unable to decompress the file: " + source.getPath(), e);
-		} finally {
-			IOUtils.closeQuietly(input);
 		}
 	}
 
@@ -121,12 +119,10 @@ public class ArchiverTool extends AbstractLibrary {
 	 * @throws IOException         related to I/O errors
 	 * @throws CompressorException if any compression error occurs
 	 */
-	public String decompressString(File sourceFile) throws IOException, CompressorException {
-		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
-		try {
+	public String decompressString(final File sourceFile) throws IOException, CompressorException {
+		try (final InputStream input = getCompressorNewInputStream(
+				new BufferedInputStream(new FileInputStream(sourceFile)))) {
 			return IOUtils.toString(input, CharsetUtils.CharsetUTF8);
-		} finally {
-			IOUtils.closeQuietly(input);
 		}
 	}
 
@@ -138,12 +134,11 @@ public class ArchiverTool extends AbstractLibrary {
 	 * @throws IOException         related to I/O errors
 	 * @throws CompressorException if any compression error occurs
 	 */
-	public <T> T decompressJsonClass(File sourceFile, Class<T> valueType) throws IOException, CompressorException {
-		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
-		try {
+	public <T> T decompressJsonClass(final File sourceFile, final Class<T> valueType)
+			throws IOException, CompressorException {
+		try (final InputStream input = getCompressorNewInputStream(
+				new BufferedInputStream(new FileInputStream(sourceFile)))) {
 			return JsonMapper.MAPPER.readValue(input, valueType);
-		} finally {
-			IOUtils.closeQuietly(input);
 		}
 	}
 
@@ -157,13 +152,11 @@ public class ArchiverTool extends AbstractLibrary {
 	 * @throws IOException
 	 * @throws CompressorException
 	 */
-	public <T> T decompressJsonType(File sourceFile, TypeReference<T> typeReference)
+	public <T> T decompressJsonType(final File sourceFile, TypeReference<T> typeReference)
 			throws IOException, CompressorException {
-		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
-		try {
+		try (final InputStream input = getCompressorNewInputStream(
+				new BufferedInputStream(new FileInputStream(sourceFile)))) {
 			return JsonMapper.MAPPER.readValue(input, typeReference);
-		} finally {
-			IOUtils.closeQuietly(input);
 		}
 	}
 
@@ -175,48 +168,46 @@ public class ArchiverTool extends AbstractLibrary {
 	 * @throws IOException
 	 * @throws CompressorException
 	 */
-	public JsonNode decompressJson(File sourceFile) throws IOException, CompressorException {
-		InputStream input = getCompressorNewInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
-		try {
+	public JsonNode decompressJson(final File sourceFile) throws IOException, CompressorException {
+		try (final InputStream input = getCompressorNewInputStream(
+				new BufferedInputStream(new FileInputStream(sourceFile)))) {
 			return JsonMapper.MAPPER.readTree(input);
-		} finally {
-			IOUtils.closeQuietly(input);
 		}
 	}
 
-	public void decompress_dir(File sourceDir, String sourceExtension, File destDir, String destExtension)
+	public void decompress_dir(final File sourceDir, String sourceExtension, final File destDir,
+			final String destExtension)
 			throws IOException, CompressorException {
 		if (!sourceDir.exists())
 			throw new FileNotFoundException("The source directory does not exist: " + sourceDir.getPath());
 		if (!destDir.exists())
 			throw new FileNotFoundException("The destination directory does not exist: " + destDir.getPath());
-		File[] sourceFiles = sourceDir.listFiles();
+		final File[] sourceFiles = sourceDir.listFiles();
 		if (sourceFiles == null)
 			return;
 		for (File sourceFile : sourceFiles) {
 			if (!sourceFile.isFile())
 				continue;
-			String ext = FilenameUtils.getExtension(sourceFile.getName());
+			final String ext = FilenameUtils.getExtension(sourceFile.getName());
 			if (!sourceExtension.equals(ext))
 				continue;
-			String newName = FilenameUtils.getBaseName(sourceFile.getName()) + '.' + destExtension;
-			File destFile = new File(destDir, newName);
+			final String newName = FilenameUtils.getBaseName(sourceFile.getName()) + '.' + destExtension;
+			final File destFile = new File(destDir, newName);
 			if (destFile.exists())
 				continue;
 			decompress(sourceFile, destFile);
 		}
 	}
 
-	public void decompress_dir(String sourcePath, String sourceExtension, String destPath, String destExtension)
+	public void decompress_dir(final String sourcePath, final String sourceExtension, final String destPath,
+			final String destExtension)
 			throws IOException, CompressorException {
 		decompress_dir(new File(sourcePath), sourceExtension, new File(destPath), destExtension);
 	}
 
-	public void extract(File sourceFile, File destDir) throws IOException, ArchiveException {
-		final InputStream is = new BufferedInputStream(new FileInputStream(sourceFile));
-		try {
-			ArchiveInputStream in = new ArchiveStreamFactory().createArchiveInputStream(is);
-			try {
+	public void extract(final File sourceFile, final File destDir) throws IOException, ArchiveException {
+		try (final InputStream is = new BufferedInputStream(new FileInputStream(sourceFile))) {
+			try (final ArchiveInputStream in = new ArchiveStreamFactory().createArchiveInputStream(is)) {
 				ArchiveEntry entry;
 				while ((entry = in.getNextEntry()) != null) {
 					if (!in.canReadEntryData(entry))
@@ -228,25 +219,22 @@ public class ArchiverTool extends AbstractLibrary {
 					if (entry instanceof ZipArchiveEntry)
 						if (((ZipArchiveEntry) entry).isUnixSymlink())
 							continue;
-					File destFile = new File(destDir, entry.getName());
-					File parentDir = destFile.getParentFile();
+					final File destFile = new File(destDir, entry.getName());
+					final File parentDir = destFile.getParentFile();
 					if (!parentDir.exists())
 						parentDir.mkdirs();
 					IOUtils.copy(in, destFile);
 				}
 			} catch (IOException e) {
 				throw new IOException("Unable to extract the archive: " + sourceFile.getPath(), e);
-			} finally {
-				IOUtils.closeQuietly(in);
 			}
 		} catch (ArchiveException e) {
 			throw new ArchiveException("Unable to extract the archive: " + sourceFile.getPath(), e);
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
 	}
 
-	public void extract_dir(File sourceDir, String sourceExtension, File destDir, Boolean logErrorAndContinue)
+	public void extract_dir(final File sourceDir, final String sourceExtension, final File destDir,
+			Boolean logErrorAndContinue)
 			throws IOException, ArchiveException {
 		if (logErrorAndContinue == null)
 			logErrorAndContinue = false;

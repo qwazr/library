@@ -34,7 +34,7 @@ public class ExcelTool extends AbstractLibrary {
 	 * @param closeables an optional autocloseable context
 	 * @return a new builder
 	 */
-	public ExcelBuilder getNewBuilder(boolean xlsx, IOUtils.CloseableContext closeables) {
+	public ExcelBuilder getNewBuilder(final boolean xlsx, final IOUtils.CloseableContext closeables) {
 		ExcelBuilder builder = new ExcelBuilder(xlsx);
 		if (closeables != null)
 			closeables.add(builder);
@@ -74,7 +74,7 @@ public class ExcelTool extends AbstractLibrary {
 		 * @param format the string representation of the format
 		 * @return
 		 */
-		public short getFormat(String format) {
+		public short getFormat(final String format) {
 			return workbook.createDataFormat().getFormat(format);
 		}
 
@@ -83,7 +83,7 @@ public class ExcelTool extends AbstractLibrary {
 		 *
 		 * @param dateFormat the string representation of the format
 		 */
-		public void setDefaultDateFormat(String dateFormat) {
+		public void setDefaultDateFormat(final String dateFormat) {
 			if (dateFormat == null) {
 				defaultDateFormat = null;
 				defaultDateCellStyle = null;
@@ -99,7 +99,7 @@ public class ExcelTool extends AbstractLibrary {
 		 *
 		 * @param numberFormat the string representation of the format
 		 */
-		public void setDefaultNumberFormat(String numberFormat) {
+		public void setDefaultNumberFormat(final String numberFormat) {
 			if (numberFormat == null) {
 				defaultNumberFormat = null;
 				defaultNumberCellStyle = null;
@@ -148,7 +148,7 @@ public class ExcelTool extends AbstractLibrary {
 		 * @param object the content of the cell
 		 * @return the created cell
 		 */
-		public Cell addOneCell(Object object) {
+		public Cell addOneCell(final Object object) {
 			if (object == null) {
 				incCell(1);
 				return null;
@@ -181,7 +181,7 @@ public class ExcelTool extends AbstractLibrary {
 		 *
 		 * @param objects a collection of values
 		 */
-		public void addCell(Object... objects) {
+		public void addCell(final Object... objects) {
 			if (objects == null || objects.length == 0)
 				return;
 			for (Object object : objects)
@@ -194,7 +194,7 @@ public class ExcelTool extends AbstractLibrary {
 		 * @param inc the incrementation step
 		 * @return the new position of the cursor
 		 */
-		public int incCell(int inc) {
+		public int incCell(final int inc) {
 			return xpos.addAndGet(inc);
 		}
 
@@ -261,7 +261,7 @@ public class ExcelTool extends AbstractLibrary {
 		 * @param response
 		 * @throws IOException
 		 */
-		public void send(String fileName, HttpServletResponse response) throws IOException {
+		public void send(final String fileName, final HttpServletResponse response) throws IOException {
 			String mime = workbook instanceof HSSFWorkbook ?
 					"application/vnd.ms-excel" :
 					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";

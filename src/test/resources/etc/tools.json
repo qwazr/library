@@ -95,6 +95,11 @@
         "autolinks"
       ],
       "max_parsing_time": 10000
+    },
+    {
+      "name": "archiver",
+      "class": "com.qwazr.tools.ArchiverTool",
+      "codec": "deflate"
     }
   ]
 }
