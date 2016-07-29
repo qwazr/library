@@ -20,6 +20,7 @@ import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import com.qwazr.utils.StringUtils;
+import com.qwazr.utils.SubstitutedVariables;
 import com.qwazr.utils.jdbc.Transaction;
 import com.qwazr.utils.jdbc.connection.ConnectionManager;
 import com.qwazr.utils.jdbc.connection.DataSourceConnection;
@@ -72,24 +73,25 @@ public class DatabaseConnector extends AbstractPasswordLibrary {
 			if (pool == null) {
 				JDBCConnection cnx = new JDBCConnection();
 				if (!StringUtils.isEmpty(driver))
-					cnx.setDriver(ClassLoaderManager.classLoader, driver);
+					cnx.setDriver(ClassLoaderManager.classLoader,
+							SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
 				if (!StringUtils.isEmpty(url))
-					cnx.setUrl(url);
+					cnx.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
 				if (!StringUtils.isEmpty(username))
-					cnx.setUsername(username);
+					cnx.setUsername(SubstitutedVariables.propertyAndEnvironmentSubstitute(username));
 				if (!StringUtils.isEmpty(password))
-					cnx.setPassword(password);
+					cnx.setPassword(SubstitutedVariables.propertyAndEnvironmentSubstitute(password));
 				connectionManager = cnx;
 			} else {
 				basicDataSource = new BasicDataSource();
 				if (driver != null)
-					basicDataSource.setDriverClassName(driver);
+					basicDataSource.setDriverClassName(SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
 				if (url != null)
-					basicDataSource.setUrl(url);
+					basicDataSource.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
 				if (username != null)
-					basicDataSource.setUsername(username);
+					basicDataSource.setUsername(SubstitutedVariables.propertyAndEnvironmentSubstitute(username));
 				if (password != null)
-					basicDataSource.setPassword(password);
+					basicDataSource.setPassword(SubstitutedVariables.propertyAndEnvironmentSubstitute(password));
 				if (pool.initial_size != null)
 					basicDataSource.setInitialSize(pool.initial_size);
 				if (pool.min_idle != null)
@@ -109,8 +111,7 @@ public class DatabaseConnector extends AbstractPasswordLibrary {
 				connectionManager = new DataSourceConnection(basicDataSource);
 
 			}
-		} catch (InstantiationException | IllegalAccessException
-				| ClassNotFoundException e) {
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			logger.error(e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
