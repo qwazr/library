@@ -16,7 +16,6 @@
 package com.qwazr.tools;
 
 import com.qwazr.library.AbstractLibrary;
-import com.qwazr.utils.IOUtils;
 
 import java.io.*;
 import java.util.Objects;
@@ -121,11 +120,8 @@ public class PropertiesTool extends AbstractLibrary {
 	 * @throws IOException
 	 */
 	private static void loadFromText(Properties properties, File file) throws IOException {
-		FileInputStream fis = new FileInputStream(file);
-		try {
+		try (final FileInputStream fis = new FileInputStream(file)) {
 			properties.load(fis);
-		} finally {
-			IOUtils.closeQuietly(fis);
 		}
 	}
 
@@ -151,11 +147,8 @@ public class PropertiesTool extends AbstractLibrary {
 	}
 
 	private static void loadFromXML(Properties properties, File file) throws IOException {
-		FileInputStream fis = new FileInputStream(file);
-		try {
+		try (final FileInputStream fis = new FileInputStream(file)) {
 			properties.loadFromXML(fis);
-		} finally {
-			IOUtils.closeQuietly(fis);
 		}
 	}
 
@@ -177,11 +170,8 @@ public class PropertiesTool extends AbstractLibrary {
 	 * @throws IOException if any I/O error occurs
 	 */
 	private void storeToText() throws IOException {
-		FileWriter fw = new FileWriter(propertiesFile);
-		try {
+		try (final FileWriter fw = new FileWriter(propertiesFile)) {
 			properties.store(fw, comments);
-		} finally {
-			IOUtils.closeQuietly(fw);
 		}
 	}
 
@@ -191,11 +181,8 @@ public class PropertiesTool extends AbstractLibrary {
 	 * @throws IOException if any I/O error occurs
 	 */
 	private void storeToXML() throws IOException {
-		FileOutputStream fos = new FileOutputStream(propertiesFile);
-		try {
+		try (final FileOutputStream fos = new FileOutputStream(propertiesFile)) {
 			properties.storeToXML(fos, comments, "UTF-8");
-		} finally {
-			IOUtils.closeQuietly(fos);
 		}
 	}
 }
