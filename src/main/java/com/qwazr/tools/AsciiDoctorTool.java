@@ -23,15 +23,12 @@ import org.asciidoctor.Options;
 import org.asciidoctor.SafeMode;
 import org.asciidoctor.ast.DocumentRuby;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class AsciiDoctorTool extends AbstractLibrary {
+public class AsciiDoctorTool extends AbstractLibrary implements Closeable {
 
 	//Options
 	public final Boolean to_file = null;
@@ -56,13 +53,13 @@ public class AsciiDoctorTool extends AbstractLibrary {
 	public final HashMap<String, Object> attributes = null;
 
 	@JsonIgnore
-	private Asciidoctor asciidoctor = null;
+	private volatile Asciidoctor asciidoctor = null;
 
 	@JsonIgnore
-	private Options options = null;
+	private volatile Options options = null;
 
 	@Override
-	public void load(File dataDir) {
+	public void load() {
 		asciidoctor = Asciidoctor.Factory.create();
 		if (required_libraries != null)
 			for (String library : required_libraries)

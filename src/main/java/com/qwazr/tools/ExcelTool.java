@@ -24,9 +24,9 @@ public class ExcelTool extends AbstractLibrary {
 	public final String default_number_format = null;
 
 	@Override
-	public void load(File data_directory) throws IOException {
+	public void load() {
 	}
-
+	
 	/**
 	 * Create a new Excel document builder
 	 *

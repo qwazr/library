@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,16 +32,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XPathTool extends AbstractXmlFactoryTool {
+public class XPathTool extends AbstractXmlFactoryTool implements Closeable {
 
 	private final static XPathFactory xPathFactory = XPathFactory.newInstance();
 
-	private XPath xPath;
-	private volatile Map<String, XPathExpression> xPathMap;
+	@JsonIgnore
+	private final XPath xPath;
 
-	@Override
-	public void load(final File parentDir) {
-		super.load(parentDir);
+	@JsonIgnore
+	private final Map<String, XPathExpression> xPathMap;
+
+	public XPathTool() {
 		synchronized (xPathFactory) {
 			xPath = xPathFactory.newXPath();
 		}
@@ -49,10 +51,7 @@ public class XPathTool extends AbstractXmlFactoryTool {
 
 	@Override
 	public void close() {
-		if (xPathMap != null) {
-			xPathMap.clear();
-			xPathMap = null;
-		}
+		xPathMap.clear();
 	}
 
 	public XPathDocument readDocument(File file) throws ParserConfigurationException, SAXException, IOException {

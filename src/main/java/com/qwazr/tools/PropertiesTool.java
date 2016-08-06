@@ -15,6 +15,7 @@
  **/
 package com.qwazr.tools;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
 
 import java.io.*;
@@ -25,15 +26,23 @@ public class PropertiesTool extends AbstractLibrary {
 
 	final public String path = null;
 
+	@JsonIgnore
 	final public Properties properties = new Properties();
 
-	private boolean isXML;
-	private volatile File propertiesFile;
-	private volatile long lastModified;
-	private volatile String comments;
+	@JsonIgnore
+	private volatile boolean isXML = false;
+
+	@JsonIgnore
+	private volatile File propertiesFile = null;
+
+	@JsonIgnore
+	private volatile long lastModified = 0;
+
+	@JsonIgnore
+	private volatile String comments = null;
 
 	@Override
-	public void load(File parentDir) {
+	public void load() {
 		propertiesFile = path != null ? new File(path) : null;
 		isXML = propertiesFile == null ? false : propertiesFile.getName().endsWith(".xml");
 		comments = null;

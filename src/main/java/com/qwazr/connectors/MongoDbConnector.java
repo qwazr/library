@@ -32,15 +32,16 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
 import javax.script.ScriptException;
-import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MongoDbConnector extends AbstractLibrary {
+public class MongoDbConnector extends AbstractLibrary implements Closeable {
 
-	private MongoClient mongoClient = null;
+	@JsonIgnore
+	private volatile MongoClient mongoClient = null;
 
 	public static class MongoDbCredential {
 
@@ -65,11 +66,11 @@ public class MongoDbConnector extends AbstractLibrary {
 
 	public List<MongoDbCredential> credentials;
 	public List<MongoServerAddress> servers;
-	public Integer port;
+	public final Integer port = null;
 
 	@Override
-	public void load(File data_directory) {
-		List<ServerAddress> serverAddresses = new ArrayList();
+	public void load() {
+		final List<ServerAddress> serverAddresses = new ArrayList();
 		for (MongoServerAddress server : servers) {
 			ServerAddress serverAddress = server.port == null ?
 					new ServerAddress(server.hostname) :
@@ -104,13 +105,13 @@ public class MongoDbConnector extends AbstractLibrary {
 	 * @throws IOException if any I/O error occurs
 	 */
 	@JsonIgnore
-	public MongoDatabase getDatabase(String databaseName) throws IOException {
+	public MongoDatabase getDatabase(final String databaseName) throws IOException {
 		if (StringUtils.isEmpty(databaseName))
 			throw new IOException("No database name.");
 		return mongoClient.getDatabase(databaseName);
 	}
 
-	public void createCollection(String databaseName, String collectionName) throws IOException {
+	public void createCollection(final String databaseName, final String collectionName) throws IOException {
 		if (StringUtils.isEmpty(collectionName))
 			throw new IOException("No collection name.");
 		getDatabase(databaseName).createCollection(collectionName);
@@ -125,7 +126,8 @@ public class MongoDbConnector extends AbstractLibrary {
 	 * @throws IOException if any I/O error occurs
 	 */
 	@JsonIgnore
-	public MongoCollectionDecorator getCollection(String databaseName, String collectionName) throws IOException {
+	public MongoCollectionDecorator getCollection(final String databaseName, final String collectionName)
+			throws IOException {
 		if (StringUtils.isEmpty(collectionName))
 			throw new IOException("No collection name.");
 		return new MongoCollectionDecorator(getDatabase(databaseName).getCollection(collectionName));
@@ -138,7 +140,7 @@ public class MongoDbConnector extends AbstractLibrary {
 	 * @return a Document or NULL if json is empty
 	 */
 	@JsonIgnore
-	public Document getNewDocument(String json) {
+	public Document getNewDocument(final String json) {
 		if (StringUtils.isEmpty(json))
 			return null;
 		return Document.parse(json);
@@ -151,7 +153,7 @@ public class MongoDbConnector extends AbstractLibrary {
 	 * @return a Document or NULL if the MAP is null
 	 */
 	@JsonIgnore
-	public Document getNewDocument(Map<String, Object> map) {
+	public Document getNewDocument(final Map<String, Object> map) {
 		if (map == null)
 			return null;
 		return new Document(map);
@@ -165,7 +167,7 @@ public class MongoDbConnector extends AbstractLibrary {
 	 * @return a new UpdateOptions object
 	 */
 	@JsonIgnore
-	public UpdateOptions getNewUpdateOptions(boolean upsert) {
+	public UpdateOptions getNewUpdateOptions(final boolean upsert) {
 		UpdateOptions updateOptions = new UpdateOptions();
 		updateOptions.upsert(upsert);
 		return updateOptions;
@@ -177,7 +179,7 @@ public class MongoDbConnector extends AbstractLibrary {
 	}
 
 	@JsonIgnore
-	public BulkWriteOptions getNewBulkWriteOptions(boolean ordered) {
+	public BulkWriteOptions getNewBulkWriteOptions(final boolean ordered) {
 		return new BulkWriteOptions().ordered(ordered);
 	}
 
@@ -185,7 +187,7 @@ public class MongoDbConnector extends AbstractLibrary {
 
 		private final MongoCollection<Document> collection;
 
-		private MongoCollectionDecorator(MongoCollection<Document> collection) {
+		private MongoCollectionDecorator(final MongoCollection<Document> collection) {
 			this.collection = collection;
 		}
 
@@ -249,7 +251,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MongoCollection<Document> withCodecRegistry(CodecRegistry codecRegistry) {
+		public MongoCollection<Document> withCodecRegistry(final CodecRegistry codecRegistry) {
 			return collection.withCodecRegistry(codecRegistry);
 		}
 
@@ -257,7 +259,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MongoCollection<Document> withReadPreference(ReadPreference readPreference) {
+		public MongoCollection<Document> withReadPreference(final ReadPreference readPreference) {
 			return collection.withReadPreference(readPreference);
 		}
 
@@ -265,7 +267,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MongoCollection<Document> withWriteConcern(WriteConcern writeConcern) {
+		public MongoCollection<Document> withWriteConcern(final WriteConcern writeConcern) {
 			return collection.withWriteConcern(writeConcern);
 		}
 
@@ -273,7 +275,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MongoCollection<Document> withReadConcern(ReadConcern readConcern) {
+		public MongoCollection<Document> withReadConcern(final ReadConcern readConcern) {
 			return collection.withReadConcern(readConcern);
 		}
 
@@ -289,7 +291,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public long count(Bson filter) {
+		public long count(final Bson filter) {
 			return collection.count(filter);
 		}
 
@@ -297,7 +299,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @param filter An object described as a Map
 		 * @see MongoCollection#count(Bson)
 		 */
-		public long count(Map<String, Object> filter) {
+		public long count(final Map<String, Object> filter) {
 			return collection.count(new Document(filter));
 		}
 
@@ -305,7 +307,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public long count(Bson filter, CountOptions options) {
+		public long count(final Bson filter, final CountOptions options) {
 			return collection.count(filter, options);
 		}
 
@@ -323,7 +325,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @return the number of documents in the collection
 		 * @see MongoCollection#count(Bson, CountOptions)
 		 */
-		public long count(Map<String, Object> filter, CountOptions options) {
+		public long count(final Map<String, Object> filter, final CountOptions options) {
 			return collection.count(new Document(filter), options);
 		}
 
@@ -331,7 +333,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> DistinctIterable<TResult> distinct(String fieldName, Class<TResult> tResultClass) {
+		public <TResult> DistinctIterable<TResult> distinct(final String fieldName, final Class<TResult> tResultClass) {
 			return collection.distinct(fieldName, tResultClass);
 		}
 
@@ -339,8 +341,8 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> DistinctIterable<TResult> distinct(String fieldName, Bson filter,
-				Class<TResult> tResultClass) {
+		public <TResult> DistinctIterable<TResult> distinct(final String fieldName, final Bson filter,
+				final Class<TResult> tResultClass) {
 			return collection.distinct(fieldName, filter, tResultClass);
 		}
 
@@ -356,7 +358,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> FindIterable<TResult> find(Class<TResult> tResultClass) {
+		public <TResult> FindIterable<TResult> find(final Class<TResult> tResultClass) {
 			return collection.find(tResultClass);
 		}
 
@@ -364,7 +366,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FindIterable<Document> find(Bson filter) {
+		public FindIterable<Document> find(final Bson filter) {
 			return collection.find(filter);
 		}
 
@@ -373,7 +375,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @return the find iterable interface
 		 * @see MongoCollection#find(Bson)
 		 */
-		public FindIterable<Document> find(Map<String, Object> filter) {
+		public FindIterable<Document> find(final Map<String, Object> filter) {
 			return collection.find(new Document(filter));
 		}
 
@@ -381,7 +383,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> FindIterable<TResult> find(Bson filter, Class<TResult> tResultClass) {
+		public <TResult> FindIterable<TResult> find(final Bson filter, final Class<TResult> tResultClass) {
 			return collection.find(filter, tResultClass);
 		}
 
@@ -397,8 +399,8 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> AggregateIterable<TResult> aggregate(List<? extends Bson> pipeline,
-				Class<TResult> tResultClass) {
+		public <TResult> AggregateIterable<TResult> aggregate(final List<? extends Bson> pipeline,
+				final Class<TResult> tResultClass) {
 			return collection.aggregate(pipeline, tResultClass);
 		}
 
@@ -406,7 +408,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MapReduceIterable<Document> mapReduce(String mapFunction, String reduceFunction) {
+		public MapReduceIterable<Document> mapReduce(final String mapFunction, final String reduceFunction) {
 			return collection.mapReduce(mapFunction, reduceFunction);
 		}
 
@@ -414,8 +416,8 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> MapReduceIterable<TResult> mapReduce(String mapFunction, String reduceFunction,
-				Class<TResult> tResultClass) {
+		public <TResult> MapReduceIterable<TResult> mapReduce(final String mapFunction, final String reduceFunction,
+				final Class<TResult> tResultClass) {
 			return collection.mapReduce(mapFunction, reduceFunction, tResultClass);
 		}
 
@@ -423,7 +425,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public BulkWriteResult bulkWrite(List<? extends WriteModel<? extends Document>> requests) {
+		public BulkWriteResult bulkWrite(final List<? extends WriteModel<? extends Document>> requests) {
 			return collection.bulkWrite(requests);
 		}
 
@@ -431,8 +433,8 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public BulkWriteResult bulkWrite(List<? extends WriteModel<? extends Document>> requests,
-				BulkWriteOptions options) {
+		public BulkWriteResult bulkWrite(final List<? extends WriteModel<? extends Document>> requests,
+				final BulkWriteOptions options) {
 			return collection.bulkWrite(requests, options);
 		}
 
@@ -442,7 +444,8 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @return the result of the bulk write
 		 * @see MongoCollection#bulkWrite(List, BulkWriteOptions)
 		 */
-		public BulkWriteResult bulkWrite(List<? extends WriteModel<? extends Document>> requests, boolean ordered) {
+		public BulkWriteResult bulkWrite(final List<? extends WriteModel<? extends Document>> requests,
+				final boolean ordered) {
 			return collection.bulkWrite(requests, new BulkWriteOptions().ordered(ordered));
 		}
 
@@ -450,7 +453,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void insertOne(Document document) {
+		public void insertOne(final Document document) {
 			collection.insertOne(document);
 		}
 
@@ -458,7 +461,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void insertOne(Document document, InsertOneOptions insertOneOptions) {
+		public void insertOne(final Document document, final InsertOneOptions insertOneOptions) {
 			collection.insertOne(document, insertOneOptions);
 		}
 
@@ -467,7 +470,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @param bypassDocumentValidation
 		 * @see MongoCollection#insertOne(Object, InsertOneOptions)
 		 */
-		public void insertOne(Map<String, Object> document, boolean bypassDocumentValidation) {
+		public void insertOne(final Map<String, Object> document, final boolean bypassDocumentValidation) {
 			collection.insertOne(new Document(document),
 					new InsertOneOptions().bypassDocumentValidation(bypassDocumentValidation));
 		}
@@ -476,7 +479,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @param document the document to insert
 		 * @see MongoCollection#insertOne(Object)
 		 */
-		public void insertOne(Map<String, Object> document) {
+		public void insertOne(final Map<String, Object> document) {
 			collection.insertOne(new Document(document));
 		}
 
@@ -484,11 +487,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void insertMany(List<? extends Document> tDocuments) {
+		public void insertMany(final List<? extends Document> tDocuments) {
 			collection.insertMany(tDocuments);
 		}
 
-		public List<Document> getNewDocumentList(ScriptObjectMirror documents) throws ScriptException {
+		public List<Document> getNewDocumentList(final ScriptObjectMirror documents) throws ScriptException {
 			if (!documents.isArray())
 				throw new ScriptException("An array is expected, not an object");
 			final List<Document> list = new ArrayList<Document>();
@@ -501,7 +504,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * @throws ScriptException
 		 * @see MongoCollection#insertMany(List)
 		 */
-		public void insertMany(ScriptObjectMirror documents) throws ScriptException {
+		public void insertMany(final ScriptObjectMirror documents) throws ScriptException {
 			collection.insertMany(getNewDocumentList(documents));
 		}
 
@@ -517,7 +520,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void insertMany(List<? extends Document> documents, InsertManyOptions options) {
+		public void insertMany(final List<? extends Document> documents, final InsertManyOptions options) {
 			collection.insertMany(documents, options);
 		}
 
@@ -529,11 +532,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DeleteResult deleteOne(Bson filter) {
+		public DeleteResult deleteOne(final Bson filter) {
 			return collection.deleteOne(filter);
 		}
 
-		public DeleteResult deleteOne(Map<String, Object> filter) {
+		public DeleteResult deleteOne(final Map<String, Object> filter) {
 			return collection.deleteOne(new Document(filter));
 		}
 
@@ -541,11 +544,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DeleteResult deleteMany(Bson filter) {
+		public DeleteResult deleteMany(final Bson filter) {
 			return collection.deleteMany(filter);
 		}
 
-		public DeleteResult deleteMany(Map<String, Object> filter) {
+		public DeleteResult deleteMany(final Map<String, Object> filter) {
 			return collection.deleteMany(new Document(filter));
 		}
 
@@ -553,11 +556,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public UpdateResult replaceOne(Bson filter, Document replacement) {
+		public UpdateResult replaceOne(final Bson filter, final Document replacement) {
 			return collection.replaceOne(filter, replacement);
 		}
 
-		public UpdateResult replaceOne(Map<String, Object> filter, Map<String, Object> replacement) {
+		public UpdateResult replaceOne(final Map<String, Object> filter, final Map<String, Object> replacement) {
 			return collection.replaceOne(new Document(filter), new Document(replacement));
 		}
 
@@ -565,24 +568,26 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public UpdateResult replaceOne(Bson filter, Document replacement, UpdateOptions updateOptions) {
+		public UpdateResult replaceOne(final Bson filter, final Document replacement,
+				final UpdateOptions updateOptions) {
 			return collection.replaceOne(filter, replacement, updateOptions);
 		}
 
-		public UpdateResult replaceOne(Map<String, Object> filter, Map<String, Object> replacement, boolean upsert) {
-			return collection
-					.replaceOne(new Document(filter), new Document(replacement), new UpdateOptions().upsert(upsert));
+		public UpdateResult replaceOne(final Map<String, Object> filter, final Map<String, Object> replacement,
+				final boolean upsert) {
+			return collection.replaceOne(new Document(filter), new Document(replacement),
+					new UpdateOptions().upsert(upsert));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public UpdateResult updateOne(Bson filter, Bson update) {
+		public UpdateResult updateOne(final Bson filter, final Bson update) {
 			return collection.updateOne(filter, update);
 		}
 
-		public UpdateResult updateOne(Map<String, Object> filter, Map<String, Object> update) {
+		public UpdateResult updateOne(final Map<String, Object> filter, final Map<String, Object> update) {
 			return collection.updateOne(new Document(filter), new Document(update));
 		}
 
@@ -590,11 +595,12 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public UpdateResult updateOne(Bson filter, Bson update, UpdateOptions updateOptions) {
+		public UpdateResult updateOne(final Bson filter, Bson update, final UpdateOptions updateOptions) {
 			return collection.updateOne(filter, update, updateOptions);
 		}
 
-		public UpdateResult updateOne(Map<String, Object> filter, Map<String, Object> update, boolean upsert) {
+		public UpdateResult updateOne(final Map<String, Object> filter, final Map<String, Object> update,
+				final boolean upsert) {
 			return collection.updateOne(new Document(filter), new Document(update), new UpdateOptions().upsert(upsert));
 		}
 
@@ -602,11 +608,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public UpdateResult updateMany(Bson filter, Bson update) {
+		public UpdateResult updateMany(final Bson filter, final Bson update) {
 			return collection.updateMany(filter, update);
 		}
 
-		public UpdateResult updateMany(Map<String, Object> filter, Map<String, Object> update) {
+		public UpdateResult updateMany(final Map<String, Object> filter, final Map<String, Object> update) {
 			return collection.updateMany(new Document(filter), new Document(update));
 		}
 
@@ -614,24 +620,25 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public UpdateResult updateMany(Bson filter, Bson update, UpdateOptions updateOptions) {
+		public UpdateResult updateMany(final Bson filter, final Bson update, final UpdateOptions updateOptions) {
 			return collection.updateMany(filter, update, updateOptions);
 		}
 
-		public UpdateResult updateMany(Map<String, Object> filter, Map<String, Object> update, boolean upsert) {
-			return collection
-					.updateMany(new Document(filter), new Document(update), new UpdateOptions().upsert(upsert));
+		public UpdateResult updateMany(final Map<String, Object> filter, final Map<String, Object> update,
+				final boolean upsert) {
+			return collection.updateMany(new Document(filter), new Document(update),
+					new UpdateOptions().upsert(upsert));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Document findOneAndDelete(Bson filter) {
+		public Document findOneAndDelete(final Bson filter) {
 			return collection.findOneAndDelete(filter);
 		}
 
-		public Document findOneAndDelete(Map<String, Object> filter) {
+		public Document findOneAndDelete(final Map<String, Object> filter) {
 			return collection.findOneAndDelete(new Document(filter));
 		}
 
@@ -643,7 +650,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Document findOneAndDelete(Bson filter, FindOneAndDeleteOptions options) {
+		public Document findOneAndDelete(final Bson filter, final FindOneAndDeleteOptions options) {
 			return collection.findOneAndDelete(filter, options);
 		}
 
@@ -651,11 +658,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Document findOneAndReplace(Bson filter, Document replacement) {
+		public Document findOneAndReplace(final Bson filter, final Document replacement) {
 			return collection.findOneAndReplace(filter, replacement);
 		}
 
-		public Document findOneAndReplace(Map<String, Object> filter, Map<String, Object> replacement) {
+		public Document findOneAndReplace(final Map<String, Object> filter, final Map<String, Object> replacement) {
 			return collection.findOneAndReplace(new Document(filter), new Document(replacement));
 		}
 
@@ -663,7 +670,8 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Document findOneAndReplace(Bson filter, Document replacement, FindOneAndReplaceOptions options) {
+		public Document findOneAndReplace(final Bson filter, final Document replacement,
+				final FindOneAndReplaceOptions options) {
 			return collection.findOneAndReplace(filter, replacement, options);
 		}
 
@@ -671,11 +679,11 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Document findOneAndUpdate(Bson filter, Bson update) {
+		public Document findOneAndUpdate(final Bson filter, final Bson update) {
 			return collection.findOneAndUpdate(filter, update);
 		}
 
-		public Document findOneAndUpdate(Map<String, Object> filter, Map<String, Object> update) {
+		public Document findOneAndUpdate(final Map<String, Object> filter, final Map<String, Object> update) {
 			return collection.findOneAndUpdate(new Document(filter), new Document(update));
 		}
 
@@ -683,7 +691,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Document findOneAndUpdate(Bson filter, Bson update, FindOneAndUpdateOptions options) {
+		public Document findOneAndUpdate(final Bson filter, final Bson update, final FindOneAndUpdateOptions options) {
 			return collection.findOneAndUpdate(filter, update, options);
 		}
 
@@ -699,7 +707,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String createIndex(Bson keys) {
+		public String createIndex(final Bson keys) {
 			return collection.createIndex(keys);
 		}
 
@@ -707,7 +715,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String createIndex(Bson keys, IndexOptions indexOptions) {
+		public String createIndex(final Bson keys, final IndexOptions indexOptions) {
 			return collection.createIndex(keys, indexOptions);
 		}
 
@@ -715,7 +723,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public List<String> createIndexes(List<IndexModel> indexes) {
+		public List<String> createIndexes(final List<IndexModel> indexes) {
 			return collection.createIndexes(indexes);
 		}
 
@@ -731,7 +739,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <TResult> ListIndexesIterable<TResult> listIndexes(Class<TResult> tResultClass) {
+		public <TResult> ListIndexesIterable<TResult> listIndexes(final Class<TResult> tResultClass) {
 			return collection.listIndexes(tResultClass);
 		}
 
@@ -739,7 +747,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void dropIndex(String indexName) {
+		public void dropIndex(final String indexName) {
 			collection.dropIndex(indexName);
 		}
 
@@ -747,7 +755,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void dropIndex(Bson keys) {
+		public void dropIndex(final Bson keys) {
 			collection.dropIndex(keys);
 		}
 
@@ -763,7 +771,7 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void renameCollection(MongoNamespace newCollectionNamespace) {
+		public void renameCollection(final MongoNamespace newCollectionNamespace) {
 			collection.renameCollection(newCollectionNamespace);
 		}
 
@@ -771,57 +779,60 @@ public class MongoDbConnector extends AbstractLibrary {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void renameCollection(MongoNamespace newCollectionNamespace,
-				RenameCollectionOptions renameCollectionOptions) {
+		public void renameCollection(final MongoNamespace newCollectionNamespace,
+				final RenameCollectionOptions renameCollectionOptions) {
 			collection.renameCollection(newCollectionNamespace, renameCollectionOptions);
 		}
 	}
 
 	public static class MongoBulk extends ArrayList<WriteModel<Document>> {
 
-		public MongoBulk addDeleteMany(Map<String, Object> filter) {
+		public MongoBulk addDeleteMany(final Map<String, Object> filter) {
 			add(new DeleteManyModel<>(new Document(filter)));
 			return this;
 		}
 
-		public MongoBulk addDeleteOne(Map<String, Object> filter) {
+		public MongoBulk addDeleteOne(final Map<String, Object> filter) {
 			add(new DeleteOneModel<>(new Document(filter)));
 			return this;
 		}
 
-		public MongoBulk addInsertOne(Map<String, Object> document) {
+		public MongoBulk addInsertOne(final Map<String, Object> document) {
 			add(new InsertOneModel(new Document(document)));
 			return this;
 		}
 
-		public MongoBulk addReplaceOne(Map<String, Object> filter, Map<String, Object> replacement) {
+		public MongoBulk addReplaceOne(final Map<String, Object> filter, final Map<String, Object> replacement) {
 			add(new ReplaceOneModel(new Document(filter), new Document(replacement)));
 			return this;
 		}
 
-		public MongoBulk addReplaceOne(Map<String, Object> filter, Map<String, Object> replacement, boolean upsert) {
+		public MongoBulk addReplaceOne(final Map<String, Object> filter, final Map<String, Object> replacement,
+				final boolean upsert) {
 			add(new ReplaceOneModel(new Document(filter), new Document(replacement),
 					new UpdateOptions().upsert(upsert)));
 			return this;
 		}
 
-		public MongoBulk addUpdateOne(Map<String, Object> filter, Map<String, Object> replacement) {
+		public MongoBulk addUpdateOne(final Map<String, Object> filter, final Map<String, Object> replacement) {
 			add(new UpdateOneModel(new Document(filter), new Document(replacement)));
 			return this;
 		}
 
-		public MongoBulk addUpdateOne(Map<String, Object> filter, Map<String, Object> replacement, boolean upsert) {
+		public MongoBulk addUpdateOne(final Map<String, Object> filter, final Map<String, Object> replacement,
+				final boolean upsert) {
 			add(new UpdateOneModel(new Document(filter), new Document(replacement),
 					new UpdateOptions().upsert(upsert)));
 			return this;
 		}
 
-		public MongoBulk addUpdateMany(Map<String, Object> filter, Map<String, Object> replacement) {
+		public MongoBulk addUpdateMany(final Map<String, Object> filter, final Map<String, Object> replacement) {
 			add(new UpdateManyModel(new Document(filter), new Document(replacement)));
 			return this;
 		}
 
-		public MongoBulk addUpdateMany(Map<String, Object> filter, Map<String, Object> replacement, boolean upsert) {
+		public MongoBulk addUpdateMany(final Map<String, Object> filter, final Map<String, Object> replacement,
+				final boolean upsert) {
 			add(new UpdateManyModel(new Document(filter), new Document(replacement),
 					new UpdateOptions().upsert(upsert)));
 			return this;

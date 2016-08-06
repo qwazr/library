@@ -51,9 +51,9 @@ public class CSVTool extends AbstractLibrary {
 	public final Format format = Format.DEFAULT;
 
 	@Override
-	public void load(File parentDir) {
+	public void load() {
 	}
-
+	
 	@JsonIgnore
 	public CSVPrinter getNewPrinter(Appendable appendable, IOUtils.CloseableContext closeable) throws IOException {
 		return getNewPrinter(format.csvFormat, appendable, closeable);

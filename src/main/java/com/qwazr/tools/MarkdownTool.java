@@ -69,10 +69,10 @@ public class MarkdownTool extends AbstractLibrary {
 	}
 
 	@JsonIgnore
-	private PegDownProcessor pegDownProcessor = null;
+	private volatile PegDownProcessor pegDownProcessor = null;
 
 	@Override
-	public void load(File dataDir) {
+	public void load() {
 		int extensionsValue = 0;
 		if (extensions != null)
 			for (ExtensionEnum extensionEnum : extensions)
@@ -87,13 +87,13 @@ public class MarkdownTool extends AbstractLibrary {
 		return pegDownProcessor.markdownToHtml(input);
 	}
 
-	public String toHtml(File file) throws IOException {
+	public String toHtml(final File file) throws IOException {
 		synchronized (pegDownProcessor) {
 			return pegDownProcessor.markdownToHtml(FileUtils.readFileToString(file, "UTF-8"));
 		}
 	}
 
-	public String toHtml(File file, String encoding) throws IOException {
+	public String toHtml(final File file, final String encoding) throws IOException {
 		synchronized (pegDownProcessor) {
 			return pegDownProcessor.markdownToHtml(FileUtils.readFileToString(file, encoding));
 		}

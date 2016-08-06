@@ -18,7 +18,6 @@ package com.qwazr.connectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
-import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import com.qwazr.utils.StringUtils;
 import com.qwazr.utils.SubstitutedVariables;
@@ -35,7 +34,7 @@ import java.util.Properties;
 
 public class MybatisConnector extends AbstractPasswordLibrary {
 
-	private static final Logger logger = LoggerFactory.getLogger(MybatisConnector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MybatisConnector.class);
 
 	public final String configuration_file = null;
 
@@ -47,12 +46,13 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 
 	public final Map<String, String> properties = null;
 
-	private SqlSessionFactory sqlSessionFactory = null;
+	@JsonIgnore
+	private volatile SqlSessionFactory sqlSessionFactory = null;
 
 	private final static String default_configuration = "com/qwazr/connectors/mybatis/default-config.xml";
 
 	@Override
-	public void load(File data_directory) throws IOException {
+	public void load() throws IOException {
 
 		final File configurationFile;
 		if (configuration_file != null) {
@@ -69,8 +69,10 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 				try (FileReader reader = new FileReader(propFile)) {
 					props.load(reader);
 				}
-			} else
-				logger.warn("The property file does not exit: " + properties_file);
+			} else {
+				if (LOGGER.isWarnEnabled())
+					LOGGER.warn("The property file does not exit: " + properties_file);
+			}
 		}
 		if (properties != null) {
 			props = props == null ? new Properties() : null;
@@ -79,9 +81,10 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 			props = null;
 
 		final SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-		try (final InputStream inputStream = configurationFile != null ? new FileInputStream(configurationFile)
-				: Resources.getResourceAsStream(ClassLoaderManager.classLoader,
-				configuration_resource != null ? configuration_resource : default_configuration)) {
+		try (final InputStream inputStream = configurationFile != null ?
+				new FileInputStream(configurationFile) :
+				Resources.getResourceAsStream(ClassLoaderManager.classLoader,
+						configuration_resource != null ? configuration_resource : default_configuration)) {
 			if (environment != null) {
 				if (props != null)
 					sqlSessionFactory = builder.build(inputStream, environment, props);

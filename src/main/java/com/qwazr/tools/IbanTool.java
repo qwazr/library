@@ -19,8 +19,6 @@ import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.StringUtils;
 import org.iban4j.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 public class IbanTool extends AbstractLibrary {
@@ -28,18 +26,17 @@ public class IbanTool extends AbstractLibrary {
 	public final Map<String, String> error_messages = null;
 
 	@Override
-	public void load(File data_directory) throws IOException {
-
+	public void load() {
 	}
 
-	private String getErrorMessage(String key, Iban4jException error) {
+	private String getErrorMessage(final String key, final Iban4jException error) {
 		if (error_messages == null)
 			return error.getLocalizedMessage();
 		String msg = error_messages.get(key);
 		return StringUtils.isEmpty(msg) ? error.getLocalizedMessage() : msg;
 	}
 
-	public String iban_validate_compact(String iban) {
+	public String iban_validate_compact(final String iban) {
 		try {
 			IbanUtil.validate(iban);
 			return null;
@@ -52,7 +49,7 @@ public class IbanTool extends AbstractLibrary {
 		}
 	}
 
-	public String iban_validate_default(String iban) {
+	public String iban_validate_default(final String iban) {
 		try {
 			IbanUtil.validate(iban, IbanFormat.Default);
 			return null;
@@ -65,7 +62,7 @@ public class IbanTool extends AbstractLibrary {
 		}
 	}
 
-	public String bic_validate(String bic) {
+	public String bic_validate(final String bic) {
 		try {
 			BicUtil.validate(bic);
 			return null;

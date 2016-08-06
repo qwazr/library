@@ -42,9 +42,9 @@ import java.util.zip.ZipOutputStream;
 
 public class ArchiverTool extends AbstractLibrary {
 
-	private static final Logger logger = LoggerFactory.getLogger(ArchiverTool.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArchiverTool.class);
 
-	private volatile CompressorStreamFactory factory = null;
+	private final CompressorStreamFactory factory;
 
 	public enum CodecType {
 
@@ -63,15 +63,14 @@ public class ArchiverTool extends AbstractLibrary {
 		}
 	}
 
-	public final CodecType codec;
+	public final CodecType codec = null;
 
 	public ArchiverTool() {
-		codec = null;
+		factory = new CompressorStreamFactory();
 	}
 
 	@Override
-	public void load(File parentDir) {
-		factory = new CompressorStreamFactory();
+	public void load() {
 	}
 
 	private InputStream getCompressorNewInputStream(final InputStream input) throws IOException, CompressorException {
@@ -176,8 +175,7 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void decompress_dir(final File sourceDir, String sourceExtension, final File destDir,
-			final String destExtension)
-			throws IOException, CompressorException {
+			final String destExtension) throws IOException, CompressorException {
 		if (!sourceDir.exists())
 			throw new FileNotFoundException("The source directory does not exist: " + sourceDir.getPath());
 		if (!destDir.exists())
@@ -200,8 +198,7 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void decompress_dir(final String sourcePath, final String sourceExtension, final String destPath,
-			final String destExtension)
-			throws IOException, CompressorException {
+			final String destExtension) throws IOException, CompressorException {
 		decompress_dir(new File(sourcePath), sourceExtension, new File(destPath), destExtension);
 	}
 
@@ -234,8 +231,7 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void extract_dir(final File sourceDir, final String sourceExtension, final File destDir,
-			Boolean logErrorAndContinue)
-			throws IOException, ArchiveException {
+			Boolean logErrorAndContinue) throws IOException, ArchiveException {
 		if (logErrorAndContinue == null)
 			logErrorAndContinue = false;
 		if (!sourceDir.exists())
@@ -255,7 +251,7 @@ public class ArchiverTool extends AbstractLibrary {
 				extract(sourceFile, destDir);
 			} catch (IOException | ArchiveException e) {
 				if (logErrorAndContinue)
-					logger.error(e.getMessage(), e);
+					LOGGER.error(e.getMessage(), e);
 				else
 					throw e;
 			}

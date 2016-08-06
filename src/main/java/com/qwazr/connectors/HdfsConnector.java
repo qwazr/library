@@ -24,12 +24,13 @@ import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class HdfsConnector extends AbstractLibrary {
+public class HdfsConnector extends AbstractLibrary implements Closeable {
 
 	private static final Logger logger = LoggerFactory.getLogger(HdfsConnector.class);
 
@@ -38,13 +39,14 @@ public class HdfsConnector extends AbstractLibrary {
 	public final List<String> config_files = null;
 
 	@JsonIgnore
-	private FileSystem fileSystem;
+	private volatile FileSystem fileSystem = null;
 
 	@JsonIgnore
-	private Configuration configuration;
+	private volatile Configuration configuration = null;
 
 	@Override
-	public void load(File data_directory) {
+	public void load() {
+
 		configuration = new Configuration();
 
 		try {
@@ -68,7 +70,7 @@ public class HdfsConnector extends AbstractLibrary {
 	@Override
 	public void close() {
 		if (fileSystem != null) {
-			IOUtils.close(fileSystem);
+			IOUtils.closeQuietly(fileSystem);
 			fileSystem = null;
 		}
 	}
@@ -147,8 +149,8 @@ public class HdfsConnector extends AbstractLibrary {
 	}
 
 	public File readAsTempFile(Path path, String fileSuffix) throws IOException {
-		File localFile = File
-				.createTempFile("qwazr-hdfs-connector", fileSuffix == null ? StringUtils.EMPTY : fileSuffix);
+		File localFile =
+				File.createTempFile("qwazr-hdfs-connector", fileSuffix == null ? StringUtils.EMPTY : fileSuffix);
 		return readAsFile(path, localFile);
 	}
 

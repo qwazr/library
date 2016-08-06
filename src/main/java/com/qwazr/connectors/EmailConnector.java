@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractPasswordLibrary;
 import org.apache.commons.mail.*;
 
-import java.io.File;
 import java.util.Map;
 
 public class EmailConnector extends AbstractPasswordLibrary {
@@ -33,7 +32,11 @@ public class EmailConnector extends AbstractPasswordLibrary {
 	public final Integer connection_timeout = null;
 	public final Integer timeout = null;
 
-	public void sendEmail(Email email) throws EmailException {
+	@Override
+	public void load() {
+	}
+
+	public void sendEmail(final Email email) throws EmailException {
 		email.setHostName(hostname);
 		if (ssl != null)
 			email.setSSLOnConnect(ssl);
@@ -52,7 +55,7 @@ public class EmailConnector extends AbstractPasswordLibrary {
 		email.send();
 	}
 
-	private void generic_params(Email email, Map<String, Object> params) throws EmailException {
+	private void generic_params(final Email email, final Map<String, Object> params) throws EmailException {
 		Object subject = params.get("subject");
 		if (subject != null)
 			email.setSubject(subject.toString());
@@ -67,36 +70,31 @@ public class EmailConnector extends AbstractPasswordLibrary {
 	}
 
 	@JsonIgnore
-	public SimpleEmail getNewSimpleEmail(Map<String, Object> params) throws EmailException {
+	public SimpleEmail getNewSimpleEmail(final Map<String, Object> params) throws EmailException {
 		SimpleEmail email = new SimpleEmail();
 		generic_params(email, params);
 		return email;
 	}
 
 	@JsonIgnore
-	public HtmlEmail getNewHtmlEmail(Map<String, Object> params) throws EmailException {
+	public HtmlEmail getNewHtmlEmail(final Map<String, Object> params) throws EmailException {
 		HtmlEmail email = new HtmlEmail();
 		generic_params(email, params);
 		return email;
 	}
 
 	@JsonIgnore
-	public ImageHtmlEmail getNewImageHtmlEmail(Map<String, Object> params) throws EmailException {
+	public ImageHtmlEmail getNewImageHtmlEmail(final Map<String, Object> params) throws EmailException {
 		ImageHtmlEmail email = new ImageHtmlEmail();
 		generic_params(email, params);
 		return email;
 	}
 
 	@JsonIgnore
-	public MultiPartEmail getNewMultipartEmail(Map<String, Object> params) throws EmailException {
+	public MultiPartEmail getNewMultipartEmail(final Map<String, Object> params) throws EmailException {
 		MultiPartEmail email = new MultiPartEmail();
 		generic_params(email, params);
 		return email;
 	}
 
-	@Override
-	public void load(File parentDir) {
-
-	}
-	
 }

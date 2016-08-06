@@ -23,11 +23,11 @@ import com.qwazr.utils.cassandra.CassandraCluster;
 import com.qwazr.utils.cassandra.CassandraSession;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
+import java.io.Closeable;
 import java.util.List;
 import java.util.UUID;
 
-public class CassandraConnector extends AbstractPasswordLibrary {
+public class CassandraConnector extends AbstractPasswordLibrary implements Closeable {
 
 	public final List<String> hosts = null;
 
@@ -40,13 +40,13 @@ public class CassandraConnector extends AbstractPasswordLibrary {
 	public final Integer pool_connections = null;
 
 	@JsonIgnore
-	private CassandraCluster cluster = null;
+	private volatile CassandraCluster cluster = null;
 
 	@JsonIgnore
 	private String keyspace = null;
 
 	@Override
-	public void load(File dataDir) {
+	public void load() {
 		cluster = new CassandraCluster(login, password, hosts, timeout_connect_ms, timeout_read_ms, timeout_pool_ms,
 				pool_connections);
 	}
@@ -59,12 +59,12 @@ public class CassandraConnector extends AbstractPasswordLibrary {
 		}
 	}
 
-	public ResultSet executeWithFetchSize(String csql, int fetchSize, Object... values) {
+	public ResultSet executeWithFetchSize(final String csql, final int fetchSize, final Object... values) {
 		CassandraSession session = cluster.getSession(keyspace);
 		return session.executeWithFetchSize(csql, fetchSize, values);
 	}
 
-	public ResultSet execute(String csql, Object... values) {
+	public ResultSet execute(final String csql, final Object... values) {
 		CassandraSession session = cluster.getSession(keyspace);
 		return session.execute(csql, values);
 	}

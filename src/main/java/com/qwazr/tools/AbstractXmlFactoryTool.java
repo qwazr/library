@@ -15,6 +15,7 @@
  **/
 package com.qwazr.tools;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +26,11 @@ import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.util.Map;
 
 public abstract class AbstractXmlFactoryTool extends AbstractLibrary {
 
-	private static final Logger logger = LoggerFactory.getLogger(AbstractXmlFactoryTool.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXmlFactoryTool.class);
 
 	public final Boolean namespace_aware = null;
 	public final Boolean expand_entity_references = null;
@@ -39,10 +39,11 @@ public abstract class AbstractXmlFactoryTool extends AbstractLibrary {
 	public final Boolean coalescing = null;
 	public final Boolean x_include_aware = null;
 
-	private DocumentBuilderFactory documentBuilderFactory = null;
+	@JsonIgnore
+	private volatile DocumentBuilderFactory documentBuilderFactory = null;
 
 	@Override
-	public void load(final File parentDir) {
+	public void load() {
 		documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		if (namespace_aware != null)
 			documentBuilderFactory.setNamespaceAware(namespace_aware);
@@ -79,12 +80,12 @@ public abstract class AbstractXmlFactoryTool extends AbstractLibrary {
 
 		@Override
 		final public void warning(SAXParseException exception) throws SAXException {
-			logger.warn(exception.getMessage(), exception);
+			LOGGER.warn(exception.getMessage(), exception);
 		}
 
 		@Override
 		final public void error(SAXParseException exception) throws SAXException {
-			logger.error(exception.getMessage(), exception);
+			LOGGER.error(exception.getMessage(), exception);
 		}
 
 		@Override

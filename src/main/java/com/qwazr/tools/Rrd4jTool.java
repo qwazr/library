@@ -26,14 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Objects;
 
 public class Rrd4jTool extends AbstractLibrary {
 
-	private static final Logger logger = LoggerFactory.getLogger(Rrd4jTool.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Rrd4jTool.class);
 
 	public final String path = null;
 	public final Long startTime = null;
@@ -43,12 +42,14 @@ public class Rrd4jTool extends AbstractLibrary {
 	public final RrdDataSource[] datasources = null;
 	public final String backendFactory = null;
 
-	private String resolvedPath = null;
+	@JsonIgnore
+	private volatile String resolvedPath = null;
 
 	@Override
-	public void load(File parentDir) throws IOException {
-		Objects.requireNonNull(path, "The path property is required");
-		resolvedPath = SubstitutedVariables.propertyAndEnvironmentSubstitute(path);
+	public void load() {
+		resolvedPath = path == null ?
+				dataDirectory.getAbsolutePath() :
+				SubstitutedVariables.propertyAndEnvironmentSubstitute(path);
 	}
 
 	protected RrdDef createDef() {
@@ -80,14 +81,14 @@ public class Rrd4jTool extends AbstractLibrary {
 	 * @see RrdDb
 	 */
 	@JsonIgnore
-	public RrdDb getDb(IOUtils.CloseableContext closeableContext, boolean readOnly) throws IOException {
+	public RrdDb getDb(final IOUtils.CloseableContext closeableContext, final boolean readOnly) throws IOException {
 		Objects.requireNonNull(closeableContext, "Requires a closeable parameter");
-		RrdDatabase rrdDatabase = null;
+		RrdDatabase rrdDatabase;
 		try {
 			rrdDatabase = new RrdDatabase(resolvedPath, backendFactory, readOnly);
 		} catch (FileNotFoundException e) {
-			if (logger.isInfoEnabled())
-				logger.info("RRD database not found. Create a new one: " + resolvedPath);
+			if (LOGGER.isInfoEnabled())
+				LOGGER.info("RRD database not found. Create a new one: " + resolvedPath);
 			rrdDatabase = new RrdDatabase(createDef(), backendFactory);
 		}
 		closeableContext.add(rrdDatabase);
@@ -201,8 +202,8 @@ public class Rrd4jTool extends AbstractLibrary {
 			try {
 				rrdDb.close();
 			} catch (IOException e) {
-				if (logger.isWarnEnabled())
-					logger.warn(e.getMessage(), e);
+				if (LOGGER.isWarnEnabled())
+					LOGGER.warn(e.getMessage(), e);
 			}
 		}
 	}

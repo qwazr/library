@@ -29,16 +29,17 @@ import java.io.*;
 
 public class ApacheFopTool extends AbstractLibrary {
 
-	private FopFactory fopFactory = null;
-	private File data_directory = null;
+	private final FopFactory fopFactory;
 
-	@Override
-	public void load(File data_directory) throws IOException {
-		this.data_directory = data_directory;
+	public ApacheFopTool() {
 		this.fopFactory = FopFactory.newInstance(new File(".").toURI());
 	}
 
-	public void generatePdf(StreamSource source, File outputFile)
+	@Override
+	public void load() {
+	}
+
+	public void generatePdf(final StreamSource source, final File outputFile)
 			throws IOException, FOPException, TransformerException {
 
 		OutputStream out = null;
@@ -70,11 +71,13 @@ public class ApacheFopTool extends AbstractLibrary {
 		}
 	}
 
-	public void xmlFileToPdf(File input, File output) throws TransformerException, IOException, FOPException {
+	public void xmlFileToPdf(final File input, final File output)
+			throws TransformerException, IOException, FOPException {
 		generatePdf(new StreamSource(input), output);
 	}
 
-	public void xmlStringToPdf(String input, File output) throws TransformerException, IOException, FOPException {
+	public void xmlStringToPdf(final String input, final File output)
+			throws TransformerException, IOException, FOPException {
 		StringReader reader = new StringReader(input);
 		try {
 			generatePdf(new StreamSource(reader), output);
@@ -83,8 +86,9 @@ public class ApacheFopTool extends AbstractLibrary {
 		}
 	}
 
-	public void xmlFileToPdf(String input, String output) throws IOException, FOPException, TransformerException {
-		xmlFileToPdf(new File(data_directory, input), new File(data_directory, output));
+	public void xmlFileToPdf(final String input, final String output)
+			throws IOException, FOPException, TransformerException {
+		xmlFileToPdf(new File(input), new File(output));
 	}
 
 }

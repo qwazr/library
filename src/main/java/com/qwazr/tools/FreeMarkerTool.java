@@ -31,37 +31,22 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FreeMarkerTool extends AbstractLibrary {
+public class FreeMarkerTool extends AbstractLibrary implements Closeable {
 
-	public final String output_encoding;
-	public final String default_encoding;
-	public final String default_content_type;
+	public final String output_encoding = null;
+	public final String default_encoding = null;
+	public final String default_content_type = null;
 
-	public final Boolean use_classloader;
-
-	@JsonIgnore
-	protected Configuration cfg = null;
+	public final Boolean use_classloader = null;
 
 	@JsonIgnore
-	protected File parentDir = null;
+	private volatile Configuration cfg = null;
 
 	private final static String DEFAULT_CHARSET = "UTF-8";
 	private final static String DEFAULT_CONTENT_TYPE = "text/html";
 
-	public FreeMarkerTool() {
-		this(null);
-	}
-
-	public FreeMarkerTool(Boolean use_classloader) {
-		output_encoding = null;
-		default_encoding = null;
-		default_content_type = null;
-		this.use_classloader = use_classloader;
-	}
-
 	@Override
-	public void load(File parentDir) {
-		this.parentDir = parentDir;
+	public void load() {
 		cfg = new Configuration(Configuration.VERSION_2_3_23);
 		cfg.setTemplateLoader(
 				(use_classloader != null && use_classloader) ? new ResourceTemplateLoader() : new FileTemplateLoader());
@@ -74,7 +59,10 @@ public class FreeMarkerTool extends AbstractLibrary {
 
 	@Override
 	public void close() {
-		cfg.clearTemplateCache();
+		if (cfg != null) {
+			cfg.clearTemplateCache();
+			cfg = null;
+		}
 	}
 
 	public void template(String templatePath, Map<String, Object> dataModel, HttpServletResponse response)
@@ -101,39 +89,37 @@ public class FreeMarkerTool extends AbstractLibrary {
 		template(templatePath, variables, response);
 	}
 
-	public String template(String templatePath, Map<String, Object> dataModel) throws TemplateException, IOException {
-		Template template = cfg.getTemplate(templatePath);
-		StringWriter stringWriter = new StringWriter();
-		try {
+	public String template(final String templatePath, final Map<String, Object> dataModel)
+			throws TemplateException, IOException {
+		final Template template = cfg.getTemplate(templatePath);
+		try (final StringWriter stringWriter = new StringWriter()) {
 			template.process(dataModel, stringWriter);
 			return stringWriter.toString();
-		} finally {
-			IOUtils.close(stringWriter);
 		}
 	}
 
 	private class FileTemplateLoader implements TemplateLoader {
 
 		@Override
-		public Object findTemplateSource(String path) throws IOException {
-			File file = new File(parentDir, path);
+		public Object findTemplateSource(final String path) throws IOException {
+			final File file = new File(dataDirectory, path);
 			return file.exists() && file.isFile() ? file : null;
 		}
 
 		@Override
 		@JsonIgnore
-		public long getLastModified(Object templateSource) {
+		public long getLastModified(final Object templateSource) {
 			return ((File) templateSource).lastModified();
 		}
 
 		@Override
 		@JsonIgnore
-		public Reader getReader(Object templateSource, String encoding) throws IOException {
+		public Reader getReader(final Object templateSource, final String encoding) throws IOException {
 			return new FileReader((File) templateSource);
 		}
 
 		@Override
-		public void closeTemplateSource(Object templateSource) throws IOException {
+		public void closeTemplateSource(final Object templateSource) throws IOException {
 			if (templateSource instanceof Closeable)
 				IOUtils.closeQuietly((Closeable) templateSource);
 		}
@@ -143,24 +129,24 @@ public class FreeMarkerTool extends AbstractLibrary {
 	private static class ResourceTemplateLoader implements TemplateLoader {
 
 		@Override
-		public Object findTemplateSource(String path) throws IOException {
+		public Object findTemplateSource(final String path) throws IOException {
 			return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
 		}
 
 		@Override
 		@JsonIgnore
-		public long getLastModified(Object templateSource) {
+		public long getLastModified(final Object templateSource) {
 			return Thread.currentThread().getContextClassLoader().hashCode();
 		}
 
 		@Override
 		@JsonIgnore
-		public Reader getReader(Object templateSource, String encoding) throws IOException {
+		public Reader getReader(final Object templateSource, final String encoding) throws IOException {
 			return new InputStreamReader((InputStream) templateSource);
 		}
 
 		@Override
-		public void closeTemplateSource(Object templateSource) throws IOException {
+		public void closeTemplateSource(final Object templateSource) throws IOException {
 			if (templateSource instanceof Closeable)
 				IOUtils.close((Closeable) templateSource);
 		}

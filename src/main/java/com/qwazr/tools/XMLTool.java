@@ -15,6 +15,7 @@
  **/
 package com.qwazr.tools;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jamesmurty.utils.XMLBuilder2;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.XmlMapper;
@@ -32,11 +33,10 @@ import java.io.*;
 
 public class XMLTool extends AbstractXmlFactoryTool {
 
-	private SAXParserFactory saxParserFactory = null;
+	@JsonIgnore
+	private final SAXParserFactory saxParserFactory;
 
-	@Override
-	final public void load(final File parentDir) {
-		super.load(parentDir);
+	public XMLTool() {
 		saxParserFactory = SAXParserFactory.newInstance();
 		if (namespace_aware != null)
 			saxParserFactory.setNamespaceAware(namespace_aware);

@@ -33,7 +33,7 @@ import java.util.*;
 class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		implements LibraryManager, TrackedInterface.FileChangeConsumer, Closeable {
 
-	private static final Logger logger = LoggerFactory.getLogger(LibraryManagerImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManagerImpl.class);
 
 	static volatile LibraryManagerImpl INSTANCE = null;
 
@@ -44,7 +44,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		etcTracker.register(INSTANCE);
 	}
 
-	private final File rootDirectory;
+	private final File dataDirectory;
 
 	private final TrackedInterface etcTracker;
 
@@ -52,26 +52,27 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	private final Map<File, Map<String, AbstractLibrary>> libraryFileMap;
 
 	private LibraryManagerImpl(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
-		this.rootDirectory = dataDirectory;
+		this.dataDirectory = dataDirectory;
 		this.libraryFileMap = new HashMap<>();
 		this.etcTracker = etcTracker;
-	}
-
-	public void load() throws IOException {
 	}
 
 	@Override
 	public void close() {
 		mapLock.write(() -> {
 			libraryFileMap.clear();
-			IOUtils.close(this.values());
+			IOUtils.closeObjects(this.values());
 			setMap(Collections.emptyMap());
 		});
 	}
 
-	public AbstractLibrary getLibrary(String name) {
+	final public AbstractLibrary getLibrary(final String name) {
 		etcTracker.check();
 		return super.get(name);
+	}
+
+	final public File getDataDirectory() {
+		return dataDirectory;
 	}
 
 	public Map<String, String> getLibraries() {
@@ -106,8 +107,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 				return;
 			}
 
-			if (logger.isInfoEnabled())
-				logger.info("Load library configuration file: " + jsonFile.getAbsolutePath());
+			if (LOGGER.isInfoEnabled())
+				LOGGER.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 
 			mapLock.writeEx(() -> {
 				libraryFileMap.put(jsonFile, buildAndLoad(configuration.library));
@@ -115,8 +116,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 			});
 
 		} catch (IOException e) {
-			if (logger.isErrorEnabled())
-				logger.error(e.getMessage(), e);
+			if (LOGGER.isErrorEnabled())
+				LOGGER.error(e.getMessage(), e);
 			return;
 		}
 	}
@@ -126,10 +127,10 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 			final Map<String, AbstractLibrary> map = libraryFileMap.remove(jsonFile);
 			if (map == null)
 				return;
-			if (logger.isInfoEnabled())
-				logger.info("Unload library configuration file: " + jsonFile.getAbsolutePath());
+			if (LOGGER.isInfoEnabled())
+				LOGGER.info("Unload library configuration file: " + jsonFile.getAbsolutePath());
 			buildGlobalMap();
-			IOUtils.close(map.values());
+			IOUtils.closeObjects(map.values());
 		});
 	}
 
@@ -139,18 +140,18 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		setMap(libraries);
 	}
 
-	private Map<String, AbstractLibrary> buildAndLoad(List<AbstractLibrary> libraries) throws IOException {
+	private Map<String, AbstractLibrary> buildAndLoad(final List<AbstractLibrary> libraries) {
 		final Map<String, AbstractLibrary> map = new HashMap<>();
-		try {
-			for (AbstractLibrary library : libraries) {
-				library.load(rootDirectory);
+		for (AbstractLibrary library : libraries) {
+			try {
+				library.load();
 				map.put(library.name, library);
+			} catch (Exception e) {
+				if (LOGGER.isErrorEnabled())
+					LOGGER.error(e.getMessage(), e);
 			}
-			return map;
-		} catch (IOException e) {
-			IOUtils.close(map.values());
-			throw e;
 		}
+		return map;
 	}
 
 	@Override

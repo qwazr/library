@@ -34,14 +34,14 @@ import org.apache.directory.ldap.client.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LdapConnector extends AbstractPasswordLibrary {
+public class LdapConnector extends AbstractPasswordLibrary implements Closeable {
 
-	private static final Logger logger = LoggerFactory.getLogger(LdapConnector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LdapConnector.class);
 
 	public final String host = null;
 	public final Integer port = null;
@@ -49,11 +49,14 @@ public class LdapConnector extends AbstractPasswordLibrary {
 	public final String base_dn = null;
 	public final Boolean use_pool = null;
 
-	private LdapConnectionPool connectionPool = null;
-	private LdapConnectionConfig config = null;
+	@JsonIgnore
+	private volatile LdapConnectionPool connectionPool = null;
+
+	@JsonIgnore
+	private volatile LdapConnectionConfig config = null;
 
 	@Override
-	public void load(File data_directory) {
+	public void load() {
 		config = new LdapConnectionConfig();
 		if (host != null)
 			config.setLdapHost(host);
@@ -67,12 +70,14 @@ public class LdapConnector extends AbstractPasswordLibrary {
 			ValidatingPoolableLdapConnectionFactory factory = new ValidatingPoolableLdapConnectionFactory(config);
 			connectionPool = new LdapConnectionPool(factory);
 			connectionPool.setTestOnBorrow(true);
-		}
+		} else
+			connectionPool = null;
 	}
 
 	@JsonIgnore
-	public LdapConnection getConnection(IOUtils.CloseableContext context, Long timeOut) throws LdapException {
-		LdapConnection connection = null;
+	public LdapConnection getConnection(final IOUtils.CloseableContext context, final Long timeOut)
+			throws LdapException {
+		LdapConnection connection;
 		if (connectionPool != null)
 			connection = connectionPool.getConnection();
 		else
@@ -178,8 +183,9 @@ public class LdapConnector extends AbstractPasswordLibrary {
 	public void updatePassword(LdapConnection connection, String dn, String passwordAttribute, String clearPassword)
 			throws LdapException {
 		connection.bind();
-		Modification changePassword = new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE,
-				passwordAttribute, getShaPassword(clearPassword));
+		Modification changePassword =
+				new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, passwordAttribute,
+						getShaPassword(clearPassword));
 		connection.modify(dn + ", " + base_dn, changePassword);
 	}
 
@@ -193,12 +199,15 @@ public class LdapConnector extends AbstractPasswordLibrary {
 		return PasswordUtil.createStoragePassword(clearPassword.getBytes(), LdapSecurityConstants.HASH_METHOD_SHA);
 	}
 
-	public void unload() {
+	@Override
+	public void close() {
 		if (connectionPool != null && !connectionPool.isClosed()) {
 			try {
 				connectionPool.close();
+				connectionPool = null;
 			} catch (Exception e) {
-				logger.warn(e.getMessage(), e);
+				if (LOGGER.isWarnEnabled())
+					LOGGER.warn(e.getMessage(), e);
 			}
 		}
 	}

@@ -29,12 +29,12 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.Closeable;
 import java.sql.SQLException;
 
-public class DatabaseConnector extends AbstractPasswordLibrary {
+public class DatabaseConnector extends AbstractPasswordLibrary implements Closeable {
 
-	private static final Logger logger = LoggerFactory.getLogger(DatabaseConnector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConnector.class);
 
 	public final String driver = null;
 
@@ -64,56 +64,53 @@ public class DatabaseConnector extends AbstractPasswordLibrary {
 	}
 
 	@JsonIgnore
-	private ConnectionManager connectionManager = null;
-	private BasicDataSource basicDataSource = null;
+	private volatile ConnectionManager connectionManager = null;
+
+	@JsonIgnore
+	private volatile BasicDataSource basicDataSource = null;
 
 	@Override
-	public void load(File data_directory) {
-		try {
-			if (pool == null) {
-				JDBCConnection cnx = new JDBCConnection();
-				if (!StringUtils.isEmpty(driver))
-					cnx.setDriver(ClassLoaderManager.classLoader,
-							SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
-				if (!StringUtils.isEmpty(url))
-					cnx.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
-				if (!StringUtils.isEmpty(username))
-					cnx.setUsername(SubstitutedVariables.propertyAndEnvironmentSubstitute(username));
-				if (!StringUtils.isEmpty(password))
-					cnx.setPassword(SubstitutedVariables.propertyAndEnvironmentSubstitute(password));
-				connectionManager = cnx;
-			} else {
-				basicDataSource = new BasicDataSource();
-				if (driver != null)
-					basicDataSource.setDriverClassName(SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
-				if (url != null)
-					basicDataSource.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
-				if (username != null)
-					basicDataSource.setUsername(SubstitutedVariables.propertyAndEnvironmentSubstitute(username));
-				if (password != null)
-					basicDataSource.setPassword(SubstitutedVariables.propertyAndEnvironmentSubstitute(password));
-				if (pool.initial_size != null)
-					basicDataSource.setInitialSize(pool.initial_size);
-				if (pool.min_idle != null)
-					basicDataSource.setMinIdle(pool.min_idle);
-				if (pool.max_idle != null)
-					basicDataSource.setMaxIdle(pool.max_idle);
-				if (pool.max_total != null)
-					basicDataSource.setMaxTotal(pool.max_total);
-				if (pool.max_wait_millis != null)
-					basicDataSource.setMaxWaitMillis(pool.max_wait_millis);
-				if (pool.log_abandoned != null)
-					basicDataSource.setLogAbandoned(pool.log_abandoned);
-				if (pool.log_expired_connections != null)
-					basicDataSource.setLogExpiredConnections(pool.log_expired_connections);
-				if (pool.abandoned_usage_tracking != null)
-					basicDataSource.setAbandonedUsageTracking(pool.abandoned_usage_tracking);
-				connectionManager = new DataSourceConnection(basicDataSource);
-
-			}
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			logger.error(e.getMessage(), e);
-			throw new RuntimeException(e);
+	public void load() throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+		if (pool == null) {
+			JDBCConnection cnx = new JDBCConnection();
+			if (!StringUtils.isEmpty(driver))
+				cnx.setDriver(ClassLoaderManager.classLoader,
+						SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
+			if (!StringUtils.isEmpty(url))
+				cnx.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
+			if (!StringUtils.isEmpty(username))
+				cnx.setUsername(SubstitutedVariables.propertyAndEnvironmentSubstitute(username));
+			if (!StringUtils.isEmpty(password))
+				cnx.setPassword(SubstitutedVariables.propertyAndEnvironmentSubstitute(password));
+			connectionManager = cnx;
+			basicDataSource = null;
+		} else {
+			basicDataSource = new BasicDataSource();
+			if (driver != null)
+				basicDataSource.setDriverClassName(SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
+			if (url != null)
+				basicDataSource.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
+			if (username != null)
+				basicDataSource.setUsername(SubstitutedVariables.propertyAndEnvironmentSubstitute(username));
+			if (password != null)
+				basicDataSource.setPassword(SubstitutedVariables.propertyAndEnvironmentSubstitute(password));
+			if (pool.initial_size != null)
+				basicDataSource.setInitialSize(pool.initial_size);
+			if (pool.min_idle != null)
+				basicDataSource.setMinIdle(pool.min_idle);
+			if (pool.max_idle != null)
+				basicDataSource.setMaxIdle(pool.max_idle);
+			if (pool.max_total != null)
+				basicDataSource.setMaxTotal(pool.max_total);
+			if (pool.max_wait_millis != null)
+				basicDataSource.setMaxWaitMillis(pool.max_wait_millis);
+			if (pool.log_abandoned != null)
+				basicDataSource.setLogAbandoned(pool.log_abandoned);
+			if (pool.log_expired_connections != null)
+				basicDataSource.setLogExpiredConnections(pool.log_expired_connections);
+			if (pool.abandoned_usage_tracking != null)
+				basicDataSource.setAbandonedUsageTracking(pool.abandoned_usage_tracking);
+			connectionManager = new DataSourceConnection(basicDataSource);
 		}
 	}
 
@@ -123,8 +120,9 @@ public class DatabaseConnector extends AbstractPasswordLibrary {
 			try {
 				if (!basicDataSource.isClosed())
 					basicDataSource.close();
+				basicDataSource = null;
 			} catch (SQLException e) {
-				logger.error(e.getMessage(), e);
+				LOGGER.error(e.getMessage(), e);
 			}
 		}
 	}

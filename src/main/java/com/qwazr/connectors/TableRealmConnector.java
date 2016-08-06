@@ -15,6 +15,7 @@
  **/
 package com.qwazr.connectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.database.TableServiceImpl;
 import com.qwazr.database.model.ColumnDefinition;
 import com.qwazr.database.store.KeyStore;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.io.File;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -38,18 +38,21 @@ import java.util.Set;
 
 public class TableRealmConnector extends AbstractLibrary implements IdentityManager {
 
-	private static final Logger logger = LoggerFactory.getLogger(TableRealmConnector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TableRealmConnector.class);
 
 	public final String table_name = null;
 	public final String login_column = null;
 	public final String password_column = null;
 	public final String roles_column = null;
 
-	private TableServiceImpl tableService = null;
-	private Set<String> columns = null;
+	@JsonIgnore
+	private volatile TableServiceImpl tableService = null;
+
+	@JsonIgnore
+	private volatile Set<String> columns = null;
 
 	@Override
-	public void load(File parentDir) {
+	public void load() {
 		tableService = new TableServiceImpl();
 		Set<String> tables = tableService.list(null, true);
 		if (!tables.contains(table_name)) {
@@ -131,12 +134,13 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	}
 
 	private Account authenticationFailure(final String msg) {
-		logger.warn(msg);
+		if (LOGGER.isWarnEnabled())
+			LOGGER.warn(msg);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			if (logger.isWarnEnabled())
-				logger.warn(e.getMessage(), e);
+			if (LOGGER.isWarnEnabled())
+				LOGGER.warn(e.getMessage(), e);
 		}
 		return null;
 	}

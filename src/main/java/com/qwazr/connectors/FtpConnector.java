@@ -37,14 +37,14 @@ public class FtpConnector extends AbstractPasswordLibrary {
 	public final Integer keep_alive_timeout = null;
 	public final Integer control_keep_alive_timeout = null;
 
-	private static final Logger logger = LoggerFactory.getLogger(FtpConnector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FtpConnector.class);
 
 	@Override
-	public void load(File parentDir) {
+	public void load() {
 	}
 
 	@JsonIgnore
-	public FTPSession getNewSession(IOUtils.CloseableContext context) {
+	public FTPSession getNewSession(final IOUtils.CloseableContext context) {
 		FTPSession ftpSession = new FTPSession();
 		if (context != null)
 			context.add(ftpSession);
@@ -86,7 +86,7 @@ public class FtpConnector extends AbstractPasswordLibrary {
 		 * @param file   the destination file
 		 * @throws IOException
 		 */
-		public void retrieve(String remote, File file, Boolean binary) throws IOException {
+		public void retrieve(final String remote, final File file, final Boolean binary) throws IOException {
 			if (binary != null) {
 				if (binary) {
 					if (!ftp.setFileType(FTP.BINARY_FILE_TYPE))
@@ -107,11 +107,11 @@ public class FtpConnector extends AbstractPasswordLibrary {
 			ftp.completePendingCommand();
 		}
 
-		public void retrieve(FTPFile remote, File file, Boolean binary) throws IOException {
+		public void retrieve(final FTPFile remote, final File file, final Boolean binary) throws IOException {
 			retrieve(remote.getName(), file, binary);
 		}
 
-		public void retrieve(FTPFile remote, String local_path, Boolean binary) throws IOException {
+		public void retrieve(final FTPFile remote, final String local_path, final Boolean binary) throws IOException {
 			retrieve(remote.getName(), new File(local_path), binary);
 		}
 
@@ -119,8 +119,8 @@ public class FtpConnector extends AbstractPasswordLibrary {
 			retrieve(remote, new File(local_path), binary);
 		}
 
-		public void sync_files(ScriptObjectMirror browser, String remote_path, File localDirectory,
-				Boolean downloadOnlyIfNotExists, Boolean binary) throws IOException {
+		public void sync_files(final ScriptObjectMirror browser, final String remote_path, final File localDirectory,
+				final Boolean downloadOnlyIfNotExists, final Boolean binary) throws IOException {
 
 			final boolean file_method = browser != null ? browser.hasMember("file") : false;
 			final boolean dir_method = browser != null ? browser.hasMember("directory") : false;
@@ -156,13 +156,13 @@ public class FtpConnector extends AbstractPasswordLibrary {
 					continue;
 				File localFile = new File(localDirectory, remoteName);
 				if (file_method)
-					if (Boolean.FALSE
-							.equals(browser.callMember("file", remote_path + '/' + remoteName, localFile.exists())))
+					if (Boolean.FALSE.equals(
+							browser.callMember("file", remote_path + '/' + remoteName, localFile.exists())))
 						continue;
 				if (downloadOnlyIfNotExists != null && downloadOnlyIfNotExists && localFile.exists())
 					continue;
-				if (logger.isInfoEnabled())
-					logger.info("FTP download: " + hostname + '/' + remote_path + '/' + remoteName);
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("FTP download: " + hostname + '/' + remote_path + '/' + remoteName);
 				retrieve(remoteFile, localFile, binary);
 			}
 			for (Map.Entry<FTPFile, File> entry : remoteDirs.entrySet())
@@ -186,7 +186,8 @@ public class FtpConnector extends AbstractPasswordLibrary {
 			try {
 				ftp.disconnect();
 			} catch (IOException e) {
-				logger.warn(e.getMessage(), e);
+				if (LOGGER.isWarnEnabled())
+					LOGGER.warn(e.getMessage(), e);
 			}
 		}
 	}

@@ -23,9 +23,9 @@ import java.io.File;
 public class FileCrawlerTool extends AbstractLibrary {
 
 	@Override
-	public void load(File parentDir) {
+	public void load() {
 	}
-
+	
 	public void browse(String path, int max_depth, ScriptObjectMirror browser) {
 		new Browser(browser, max_depth, new File(path));
 	}

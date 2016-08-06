@@ -34,13 +34,13 @@ public class ProcessTool extends AbstractLibrary {
 	final public String working_directory = null;
 
 	@Override
-	public void load(File parentDir) {
+	public void load() {
 	}
 
-	public Process execute(File workingDirectory, List<String> commandAndArgs, Map<String, String> env, File outputFile,
-			File errorFile) throws IOException {
+	public Process execute(final File workingDirectory, final List<String> commandAndArgs,
+			final Map<String, String> env, final File outputFile, final File errorFile) throws IOException {
 
-		List<String> commandsAndArgs = new ArrayList<String>();
+		final List<String> commandsAndArgs = new ArrayList<>();
 		if (commandAndArgs != null && !commandAndArgs.isEmpty())
 			commandsAndArgs.addAll(commandAndArgs);
 		else if (commands != null)
@@ -105,7 +105,7 @@ public class ProcessTool extends AbstractLibrary {
 	 * @throws ScriptException if any Javascript error occurs
 	 * @throws IOException     if any I/O error occurs
 	 */
-	public Process execute(ScriptObjectMirror som) throws ScriptException, IOException {
+	public Process execute(final ScriptObjectMirror som) throws ScriptException, IOException {
 
 		// Extract the working directoru
 		String workingDirectory = (String) som.get("working_directory");

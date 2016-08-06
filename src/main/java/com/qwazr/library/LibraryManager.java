@@ -17,7 +17,6 @@ package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.AnnotationsUtils;
-import com.qwazr.utils.file.TrackedDirectory;
 import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.server.GenericServer;
 
@@ -39,17 +38,19 @@ public interface LibraryManager extends Map<String, AbstractLibrary>, GenericSer
 
 	Map<String, String> getLibraries();
 
+	File getDataDirectory();
+
 	static void inject(Object object) {
 		if (object == null)
 			return;
-		LibraryManager manager = getInstance();
+		final LibraryManager manager = getInstance();
 		if (manager == null)
 			return;
 		AnnotationsUtils.browseFieldsRecursive(object.getClass(), field -> {
-			Library library = field.getAnnotation(Library.class);
+			final Library library = field.getAnnotation(Library.class);
 			if (library == null)
 				return;
-			AbstractLibrary libraryItem = manager.getLibrary(library.value());
+			final AbstractLibrary libraryItem = manager.getLibrary(library.value());
 			if (libraryItem == null)
 				return;
 			field.setAccessible(true);

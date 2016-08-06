@@ -15,6 +15,7 @@
  **/
 package com.qwazr.tools;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.StringUtils;
 import org.thymeleaf.TemplateEngine;
@@ -26,14 +27,15 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class ThymeleafTool extends AbstractLibrary {
+public class ThymeleafTool extends AbstractLibrary implements Closeable {
 
+	@JsonIgnore
 	private TemplateEngine templateEngine = null;
 
 	public final Boolean use_classloader = false;
@@ -45,7 +47,7 @@ public class ThymeleafTool extends AbstractLibrary {
 	public final String suffix = null;
 
 	@Override
-	public void load(File data_directory) throws IOException {
+	public void load() {
 
 		templateEngine = new TemplateEngine();
 
@@ -54,7 +56,7 @@ public class ThymeleafTool extends AbstractLibrary {
 			templateResolver = new ClassLoaderTemplateResolver();
 		else {
 			templateResolver = new FileTemplateResolver();
-			templateResolver.setPrefix(StringUtils.ensureSuffix(data_directory.getAbsolutePath(), "/"));
+			templateResolver.setPrefix(StringUtils.ensureSuffix(dataDirectory.getAbsolutePath(), "/"));
 		}
 		if (cache_enabled != null)
 			templateResolver.setCacheable(cache_enabled);
@@ -70,6 +72,14 @@ public class ThymeleafTool extends AbstractLibrary {
 			templateResolver.setTemplateMode(template_mode);
 
 		templateEngine.setTemplateResolver(templateResolver);
+	}
+
+	@Override
+	public void close() {
+		if (templateEngine != null) {
+			templateEngine.clearTemplateCache();
+			templateEngine = null;
+		}
 	}
 
 	private void checkLoaded() {
