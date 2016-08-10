@@ -41,7 +41,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
 		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker);
-		etcTracker.register(INSTANCE);
+		if (etcTracker != null)
+			etcTracker.register(INSTANCE);
 	}
 
 	private final File dataDirectory;
@@ -67,7 +68,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	}
 
 	final public AbstractLibrary getLibrary(final String name) {
-		etcTracker.check();
+		if (etcTracker != null)
+			etcTracker.check();
 		return super.get(name);
 	}
 
@@ -76,7 +78,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	}
 
 	public Map<String, String> getLibraries() {
-		etcTracker.check();
+		if (etcTracker != null)
+			etcTracker.check();
 		final Map<String, String> map = new LinkedHashMap<>();
 		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
 		return map;
@@ -84,7 +87,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	@Override
 	public void accept(TrackedInterface.ChangeReason changeReason, File jsonFile) {
-		String extension = FilenameUtils.getExtension(jsonFile.getName());
+		final String extension = FilenameUtils.getExtension(jsonFile.getName());
 		if (!"json".equals(extension))
 			return;
 		switch (changeReason) {
@@ -156,7 +159,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	@Override
 	public IdentityManager getIdentityManager(String realm) throws IOException {
-		AbstractLibrary library = get(realm);
+		final AbstractLibrary library = get(realm);
 		if (library == null)
 			throw new IOException("No realm connector with this name: " + realm);
 		if (!(library instanceof IdentityManager))
