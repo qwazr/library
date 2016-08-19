@@ -17,11 +17,11 @@ package com.qwazr.library;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LibraryConfiguration {
 
-	public List<AbstractLibrary> library;
+	public LinkedHashMap<String, LibraryInterface> library;
 
 }

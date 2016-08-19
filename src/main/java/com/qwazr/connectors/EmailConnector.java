@@ -32,10 +32,6 @@ public class EmailConnector extends AbstractPasswordLibrary {
 	public final Integer connection_timeout = null;
 	public final Integer timeout = null;
 
-	@Override
-	public void load() {
-	}
-
 	public void sendEmail(final Email email) throws EmailException {
 		email.setHostName(hostname);
 		if (ssl != null)

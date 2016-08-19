@@ -49,10 +49,6 @@ public class CSVTool extends AbstractLibrary {
 	}
 
 	public final Format format = Format.DEFAULT;
-
-	@Override
-	public void load() {
-	}
 	
 	@JsonIgnore
 	public CSVPrinter getNewPrinter(Appendable appendable, IOUtils.CloseableContext closeable) throws IOException {

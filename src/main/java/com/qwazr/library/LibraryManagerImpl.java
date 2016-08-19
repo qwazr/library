@@ -28,9 +28,12 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
+class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 		implements LibraryManager, TrackedInterface.FileChangeConsumer, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManagerImpl.class);
@@ -50,7 +53,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	private final TrackedInterface etcTracker;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
-	private final Map<File, Map<String, AbstractLibrary>> libraryFileMap;
+	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
 	private LibraryManagerImpl(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
 		this.dataDirectory = dataDirectory;
@@ -67,7 +70,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		});
 	}
 
-	final public AbstractLibrary getLibrary(final String name) {
+	final public LibraryInterface getLibrary(final String name) {
 		if (etcTracker != null)
 			etcTracker.check();
 		return super.get(name);
@@ -91,12 +94,12 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 		if (!"json".equals(extension))
 			return;
 		switch (changeReason) {
-		case UPDATED:
-			loadLibrarySet(jsonFile);
-			break;
-		case DELETED:
-			unloadLibrarySet(jsonFile);
-			break;
+			case UPDATED:
+				loadLibrarySet(jsonFile);
+				break;
+			case DELETED:
+				unloadLibrarySet(jsonFile);
+				break;
 		}
 	}
 
@@ -114,7 +117,8 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 				LOGGER.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 
 			mapLock.writeEx(() -> {
-				libraryFileMap.put(jsonFile, buildAndLoad(configuration.library));
+				loadLibraries(configuration.library);
+				libraryFileMap.put(jsonFile, configuration.library);
 				buildGlobalMap();
 			});
 
@@ -127,7 +131,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 
 	private void unloadLibrarySet(File jsonFile) {
 		mapLock.write(() -> {
-			final Map<String, AbstractLibrary> map = libraryFileMap.remove(jsonFile);
+			final Map<String, LibraryInterface> map = libraryFileMap.remove(jsonFile);
 			if (map == null)
 				return;
 			if (LOGGER.isInfoEnabled())
@@ -138,28 +142,25 @@ class LibraryManagerImpl extends ReadOnlyMap<String, AbstractLibrary>
 	}
 
 	private void buildGlobalMap() {
-		final Map<String, AbstractLibrary> libraries = new HashMap<>();
+		final Map<String, LibraryInterface> libraries = new HashMap<>();
 		libraryFileMap.forEach((file, libraryMap) -> libraries.putAll(libraryMap));
 		setMap(libraries);
 	}
 
-	private Map<String, AbstractLibrary> buildAndLoad(final List<AbstractLibrary> libraries) {
-		final Map<String, AbstractLibrary> map = new HashMap<>();
-		for (AbstractLibrary library : libraries) {
+	private void loadLibraries(final Map<String, LibraryInterface> libraries) {
+		libraries.forEach((name, library) -> {
 			try {
 				library.load();
-				map.put(library.name, library);
 			} catch (Exception e) {
 				if (LOGGER.isErrorEnabled())
 					LOGGER.error(e.getMessage(), e);
 			}
-		}
-		return map;
+		});
 	}
 
 	@Override
 	public IdentityManager getIdentityManager(String realm) throws IOException {
-		final AbstractLibrary library = get(realm);
+		final LibraryInterface library = get(realm);
 		if (library == null)
 			throw new IOException("No realm connector with this name: " + realm);
 		if (!(library instanceof IdentityManager))

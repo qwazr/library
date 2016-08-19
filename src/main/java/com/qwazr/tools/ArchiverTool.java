@@ -69,10 +69,6 @@ public class ArchiverTool extends AbstractLibrary {
 		factory = new CompressorStreamFactory();
 	}
 
-	@Override
-	public void load() {
-	}
-
 	private InputStream getCompressorNewInputStream(final InputStream input) throws IOException, CompressorException {
 		if (codec == null)
 			return factory.createCompressorInputStream(input);

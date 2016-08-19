@@ -25,10 +25,6 @@ public class IbanTool extends AbstractLibrary {
 
 	public final Map<String, String> error_messages = null;
 
-	@Override
-	public void load() {
-	}
-
 	private String getErrorMessage(final String key, final Iban4jException error) {
 		if (error_messages == null)
 			return error.getLocalizedMessage();

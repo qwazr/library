@@ -33,13 +33,11 @@ Here is an example of **etc/global.json** configuration file:
 
 ```json
 {
-  "library": [
-    {
-      "name": "freemarker",
+  "library": {
+    "freemarker": {
       "class": "com.qwazr.tools.FreeMarkerTool"
     },
-    {
-      "name": "markdown",
+    "markdown": {
       "class": "com.qwazr.tools.MarkdownTool",
       "extensions": [
         "hardwraps",
@@ -48,12 +46,11 @@ Here is an example of **etc/global.json** configuration file:
         "atxheaderspace"
       ]
     },
-    {
-      "name": "properties",
+    "properties": {
       "class": "com.qwazr.tools.PropertiesTool",
       "path": "site.properties"
     }
-  ]
+  }
 }
 ```
 

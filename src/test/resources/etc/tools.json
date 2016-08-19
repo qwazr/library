@@ -1,7 +1,6 @@
 {
-  "library": [
-    {
-      "name": "rrd_memory",
+  "library": {
+    "rrd_memory": {
       "class": "com.qwazr.tools.Rrd4jTool",
       "path": "memory.rrd",
       "backendFactory": "MEMORY",
@@ -47,31 +46,26 @@
         }
       ]
     },
-    {
-      "name": "xml",
+    "xml": {
       "class": "com.qwazr.tools.XMLTool"
     },
-    {
-      "name": "csv",
+    "csv": {
       "class": "com.qwazr.tools.CSVTool"
     },
-    {
-      "name": "freemarker_classloader",
+    "freemarker_classloader": {
       "class": "com.qwazr.tools.FreeMarkerTool",
       "use_classloader": true,
       "output_encoding": "UTF-8",
       "default_encoding": "UTF-8",
       "default_content_type": "TEXT/HTML"
     },
-    {
-      "name": "freemarker_files",
+    "freemarker_files": {
       "class": "com.qwazr.tools.FreeMarkerTool",
       "output_encoding": "UTF-8",
       "default_encoding": "UTF-8",
       "default_content_type": "TEXT/HTML"
     },
-    {
-      "name": "thymeleaf_classloader",
+    "thymeleaf_classloader": {
       "class": "com.qwazr.tools.ThymeleafTool",
       "use_classloader": true,
       "cache_enabled": true,
@@ -79,16 +73,14 @@
       "template_mode": "XHTML",
       "suffix": ".html"
     },
-    {
-      "name": "thymeleaf_files",
+    "thymeleaf_files": {
       "class": "com.qwazr.tools.ThymeleafTool",
       "cache_enabled": false,
       "character_encoding": "UTF-8",
       "suffix": ".html",
       "template_mode": "XHTML"
     },
-    {
-      "name": "markdown",
+    "markdown": {
       "class": "com.qwazr.tools.MarkdownTool",
       "extensions": [
         "fenced_code_blocks",
@@ -96,10 +88,9 @@
       ],
       "max_parsing_time": 10000
     },
-    {
-      "name": "archiver",
+    "archiver": {
       "class": "com.qwazr.tools.ArchiverTool",
       "codec": "deflate"
     }
-  ]
+  }
 }

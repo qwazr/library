@@ -35,10 +35,6 @@ public class ApacheFopTool extends AbstractLibrary {
 		this.fopFactory = FopFactory.newInstance(new File(".").toURI());
 	}
 
-	@Override
-	public void load() {
-	}
-
 	public void generatePdf(final StreamSource source, final File outputFile)
 			throws IOException, FOPException, TransformerException {
 

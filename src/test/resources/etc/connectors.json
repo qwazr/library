@@ -1,7 +1,6 @@
 {
-  "library": [
-    {
-      "name": "cassandra",
+  "library": {
+    "cassandra": {
       "class": "com.qwazr.connectors.CassandraConnector",
       "hosts": [
         "localhost"
@@ -10,16 +9,14 @@
       "timeout_read_ms": 60000,
       "timeout_pool_ms": 10000
     },
-    {
-      "name": "hdfs",
+    "hdfs": {
       "class": "com.qwazr.connectors.HdfsConnector",
       "config_path": "src/test/resources/hadoop",
       "config_files": [
         "core-site.xml"
       ]
     },
-    {
-      "name": "ldap",
+    "ldap": {
       "class": "com.qwazr.connectors.LdapConnector",
       "host": "loclahost",
       "port": 389,
@@ -27,23 +24,20 @@
       "username": "cn=admin,dc=qwazr,dc=net",
       "password": "test"
     },
-    {
-      "name": "ftp",
+    "ftp": {
       "class": "com.qwazr.connectors.FtpConnector",
       "username": "anonymous",
       "password": "test@qwazr.com",
       "hostname": "ftp.qwazr.com"
     },
-    {
-      "name": "mysql",
+    "mysql": {
       "class": "com.qwazr.connectors.DatabaseConnector",
       "driver": "com.mysql.jdbc.Driver",
       "url": "jdbc:mysql://localhost:3306/test?autoReconnect=true",
       "username": "test",
       "password": "test"
     },
-    {
-      "name": "mybatis_default",
+    "mybatis_default": {
       "class": "com.qwazr.connectors.MybatisConnector",
       "properties": {
         "driver": "com.mysql.jdbc.Driver",
@@ -52,8 +46,7 @@
         "password": "test"
       }
     },
-    {
-      "name": "mybatis_file",
+    "mybatis_file": {
       "class": "com.qwazr.connectors.MybatisConnector",
       "configuration_file": "src/main/resources/com/qwazr/connectors/mybatis/default-config.xml",
       "properties": {
@@ -63,8 +56,7 @@
         "password": "test"
       }
     },
-    {
-      "name": "mongo",
+    "mongo": {
       "class": "com.qwazr.connectors.MongoDbConnector",
       "servers": [
         {
@@ -80,5 +72,5 @@
         }
       ]
     }
-  ]
+  }
 }

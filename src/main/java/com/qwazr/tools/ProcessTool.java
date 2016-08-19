@@ -33,10 +33,6 @@ public class ProcessTool extends AbstractLibrary {
 	final public Map<String, String> environment_variables = null;
 	final public String working_directory = null;
 
-	@Override
-	public void load() {
-	}
-
 	public Process execute(final File workingDirectory, final List<String> commandAndArgs,
 			final Map<String, String> env, final File outputFile, final File errorFile) throws IOException {
 

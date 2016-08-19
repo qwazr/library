@@ -16,42 +16,10 @@
 package com.qwazr.library;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.qwazr.connectors.*;
-import com.qwazr.tools.*;
 
 import java.io.File;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-@JsonSubTypes({ @Type(value = CassandraConnector.class),
-		@Type(value = DatabaseConnector.class),
-		@Type(value = EmailConnector.class),
-		@Type(value = FtpConnector.class),
-		@Type(value = HdfsConnector.class),
-		@Type(value = LdapConnector.class),
-		@Type(value = MongoDbConnector.class),
-		@Type(value = MybatisConnector.class),
-		@Type(value = TableRealmConnector.class),
-		@Type(value = AsciiDoctorTool.class),
-		@Type(value = ApacheFopTool.class),
-		@Type(value = ArchiverTool.class),
-		@Type(value = CSVTool.class),
-		@Type(value = FileCrawlerTool.class),
-		@Type(value = ExcelTool.class),
-		@Type(value = FreeMarkerTool.class),
-		@Type(value = IbanTool.class),
-		@Type(value = MarkdownTool.class),
-		@Type(value = ProcessTool.class),
-		@Type(value = PropertiesTool.class),
-		@Type(value = Rrd4jTool.class),
-		@Type(value = ThymeleafTool.class),
-		@Type(value = XMLTool.class),
-		@Type(value = XPathTool.class) })
-public abstract class AbstractLibrary {
-
-	public final String name = null;
+public abstract class AbstractLibrary implements LibraryInterface {
 
 	@JsonIgnore
 	protected final File dataDirectory;
@@ -59,7 +27,5 @@ public abstract class AbstractLibrary {
 	public AbstractLibrary() {
 		this.dataDirectory = LibraryManager.getInstance().getDataDirectory();
 	}
-
-	public abstract void load() throws Exception;
 
 }

@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-public interface LibraryManager extends Map<String, AbstractLibrary>, GenericServer.IdentityManagerProvider {
+public interface LibraryManager extends Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider {
 
 	static void load(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
 		LibraryManagerImpl.load(dataDirectory, etcTracker);
@@ -34,7 +34,7 @@ public interface LibraryManager extends Map<String, AbstractLibrary>, GenericSer
 		return LibraryManagerImpl.INSTANCE;
 	}
 
-	<T extends AbstractLibrary> T getLibrary(String name);
+	<T extends LibraryInterface> T getLibrary(String name);
 
 	Map<String, String> getLibraries();
 
@@ -50,7 +50,7 @@ public interface LibraryManager extends Map<String, AbstractLibrary>, GenericSer
 			final Library library = field.getAnnotation(Library.class);
 			if (library == null)
 				return;
-			final AbstractLibrary libraryItem = manager.getLibrary(library.value());
+			final LibraryInterface libraryItem = manager.getLibrary(library.value());
 			if (libraryItem == null)
 				return;
 			field.setAccessible(true);

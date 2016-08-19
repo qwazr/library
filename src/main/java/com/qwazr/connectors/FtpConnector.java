@@ -38,11 +38,7 @@ public class FtpConnector extends AbstractPasswordLibrary {
 	public final Integer control_keep_alive_timeout = null;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FtpConnector.class);
-
-	@Override
-	public void load() {
-	}
-
+	
 	@JsonIgnore
 	public FTPSession getNewSession(final IOUtils.CloseableContext context) {
 		FTPSession ftpSession = new FTPSession();
