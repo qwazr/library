@@ -40,6 +40,12 @@ public interface LibraryManager extends Map<String, LibraryInterface>, GenericSe
 
 	File getDataDirectory();
 
+	static <T> T newInstance(final Class<T> clazz) throws ReflectiveOperationException {
+		final T instance = clazz.newInstance();
+		inject(instance);
+		return instance;
+	}
+
 	static void inject(Object object) {
 		if (object == null)
 			return;
