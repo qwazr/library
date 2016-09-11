@@ -17,12 +17,13 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public class ExcelTool extends AbstractLibrary {
 
 	public final String default_date_format = null;
 	public final String default_number_format = null;
-	
+
 	/**
 	 * Create a new Excel document builder
 	 *
@@ -197,10 +198,12 @@ public class ExcelTool extends AbstractLibrary {
 		/**
 		 * Fill the content of a sheet with a Cassandra resultSet. The fisrt row show the column definition.
 		 *
-		 * @param sheetName the name of the sheet
-		 * @param resultSet the rows to copy
+		 * @param sheetName   the name of the sheet
+		 * @param resultSet   the rows to copy
+		 * @param rowCallback a callback function called on each row
 		 */
-		public void createSheetAndFill(final String sheetName, final ResultSet resultSet) {
+		public void createSheetAndFill(final String sheetName, final ResultSet resultSet,
+				final BiConsumer<ExcelBuilder, com.datastax.driver.core.Row> rowCallback) {
 
 			activeSheetAndSetPos(sheetName, 0, 0);
 
@@ -217,16 +220,30 @@ public class ExcelTool extends AbstractLibrary {
 					else
 						addCell(row.getObject(colName));
 				});
+				if (rowCallback != null)
+					rowCallback.accept(this, row);
 			});
+		}
+
+		/**
+		 * Fill the content of a sheet with a Cassandra resultSet. The fisrt row show the column definition.
+		 *
+		 * @param sheetName the name of the sheet
+		 * @param resultSet the rows to copy
+		 */
+		public void createSheetAndFill(final String sheetName, final ResultSet resultSet) {
+			createSheetAndFill(sheetName, resultSet, null);
 		}
 
 		/**
 		 * Fill the content of a sheet with a SQL resultSet. The fisrt row show the column definition.
 		 *
-		 * @param sheetName the name of the sheet
-		 * @param resultSet the rows to copy
+		 * @param sheetName   the name of the sheet
+		 * @param resultSet   the rows to copy
+		 * @param rowCallback a callback function called on each row
 		 */
-		public void createSheetAndFill(final String sheetName, final java.sql.ResultSet resultSet) throws SQLException {
+		public void createSheetAndFill(final String sheetName, final java.sql.ResultSet resultSet,
+				final BiConsumer<ExcelBuilder, java.sql.ResultSet> rowCallback) throws SQLException {
 
 			activeSheetAndSetPos(sheetName, 0, 0);
 
@@ -247,7 +264,19 @@ public class ExcelTool extends AbstractLibrary {
 					else
 						addCell(value);
 				}
+				if (rowCallback != null)
+					rowCallback.accept(this, resultSet);
 			}
+		}
+
+		/**
+		 * Fill the content of a sheet with a SQL resultSet. The fisrt row show the column definition.
+		 *
+		 * @param sheetName the name of the sheet
+		 * @param resultSet the rows to copy
+		 */
+		public void createSheetAndFill(final String sheetName, final java.sql.ResultSet resultSet) throws SQLException {
+			createSheetAndFill(sheetName, resultSet, null);
 		}
 
 		/**
