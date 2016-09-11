@@ -209,6 +209,8 @@ public class ExcelTool extends AbstractLibrary {
 
 			addRow();
 			resultSet.getColumnDefinitions().forEach(colDef -> addCell(colDef.getName()));
+			if (rowCallback != null)
+				rowCallback.accept(this, null);
 
 			resultSet.forEach(row -> {
 				addRow();
@@ -253,6 +255,8 @@ public class ExcelTool extends AbstractLibrary {
 			int columnCount = metaData.getColumnCount();
 			for (int i = 1; i <= columnCount; i++)
 				addCell(metaData.getColumnLabel(i));
+			if (rowCallback != null)
+				rowCallback.accept(this, null);
 
 			while (resultSet.next()) {
 				addRow();
