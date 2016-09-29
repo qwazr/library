@@ -22,7 +22,8 @@ my-app
 ```
 
 Configuration files are loaded if theirs names matches any wildcard pattern in the QWAZR_ETC environment variable.:
-```QWAZR_ETC="dev-*"```
+
+    QWAZR_ETC="dev-*"
 
 ### The content of a configuration file
 
