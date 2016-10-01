@@ -15,6 +15,7 @@
  **/
 package com.qwazr.library.test;
 
+import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.LibraryManager;
 import com.qwazr.utils.file.TrackedInterface;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -28,8 +29,10 @@ public abstract class AbstractLibraryTest {
 		final LibraryManager libraryManager = LibraryManager.getInstance();
 		if (libraryManager != null)
 			return;
-		TrackedInterface etcTracker = TrackedInterface.build(new File("src/test/resources/etc"), FileFileFilter.FILE);
-		LibraryManager.load(new File("src/test/resources"), etcTracker);
+		final File dataDir = new File("src/test/resources");
+		ClassLoaderManager.load(dataDir, null);
+		final TrackedInterface etcTracker = TrackedInterface.build(new File(dataDir, "etc"), FileFileFilter.FILE);
+		LibraryManager.load(dataDir, etcTracker);
 		etcTracker.check();
 	}
 
