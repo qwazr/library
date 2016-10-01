@@ -15,6 +15,8 @@
  **/
 package com.qwazr.library;
 
+import com.qwazr.classloader.ClassFactory;
+import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
@@ -34,7 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
-		implements LibraryManager, TrackedInterface.FileChangeConsumer, Closeable {
+		implements LibraryManager, TrackedInterface.FileChangeConsumer, ClassFactory, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManagerImpl.class);
 
@@ -46,6 +48,7 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker);
 		if (etcTracker != null)
 			etcTracker.register(INSTANCE);
+		ClassLoaderManager.getInstance().register(INSTANCE);
 	}
 
 	private final File dataDirectory;
@@ -88,18 +91,22 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 		return map;
 	}
 
+	final public <T> T newInstance(final Class<T> clazz) throws ReflectiveOperationException {
+		return clazz == null ? null : LibraryManager.newInstance(clazz);
+	}
+
 	@Override
 	public void accept(TrackedInterface.ChangeReason changeReason, File jsonFile) {
 		final String extension = FilenameUtils.getExtension(jsonFile.getName());
 		if (!"json".equals(extension))
 			return;
 		switch (changeReason) {
-			case UPDATED:
-				loadLibrarySet(jsonFile);
-				break;
-			case DELETED:
-				unloadLibrarySet(jsonFile);
-				break;
+		case UPDATED:
+			loadLibrarySet(jsonFile);
+			break;
+		case DELETED:
+			unloadLibrarySet(jsonFile);
+			break;
 		}
 	}
 
