@@ -23,12 +23,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MarkdownTest extends AbstractLibraryTest {
 
 	@Library("markdown")
 	private MarkdownTool markdownTool;
+
+	@Library("markdown_bootstrap")
+	private MarkdownTool markdownBoostrapTool;
 
 	@Before
 	public void before() throws IOException {
@@ -37,10 +41,32 @@ public class MarkdownTest extends AbstractLibraryTest {
 	}
 
 	@Test
-	public void convert() throws IOException, TemplateException {
+	public void convertString() throws IOException, TemplateException {
 		Assert.assertNotNull(markdownTool);
 		String html = markdownTool.toHtml("#Test");
 		Assert.assertNotNull(html);
 		Assert.assertTrue(html.contains("<h1>Test</h1>"));
+	}
+
+	final static String TABLE_MD_PATH = "src/test/resources/com/qwazr/library/test/markdown/table.md";
+
+	@Test
+	public void customHtmlSerializer() throws IOException, TemplateException {
+		Assert.assertNotNull(markdownBoostrapTool);
+		String html = markdownBoostrapTool.toHtml(new File(TABLE_MD_PATH));
+		Assert.assertNotNull(html);
+		Assert.assertTrue(html.contains("<table class=\"table\">"));
+	}
+
+	@Test
+	public void converResource() throws IOException {
+		Assert.assertNotNull(markdownBoostrapTool);
+		Assert.assertNotNull(markdownBoostrapTool.resourceToHtml("com/qwazr/library/test/markdown/table.md"));
+	}
+
+	@Test
+	public void convertPath() throws IOException {
+		Assert.assertNotNull(markdownBoostrapTool);
+		Assert.assertNotNull(markdownBoostrapTool.toHtml(TABLE_MD_PATH));
 	}
 }

@@ -88,6 +88,13 @@
       ],
       "max_parsing_time": 10000
     },
+    "markdown_bootstrap": {
+      "class": "com.qwazr.tools.MarkdownTool",
+      "extensions": [
+        "tables"
+      ],
+      "html_serializer_class": "com.qwazr.tools.MarkdownTool$BootstrapHtmlSerializer"
+    },
     "archiver": {
       "class": "com.qwazr.tools.ArchiverTool",
       "codec": "deflate"

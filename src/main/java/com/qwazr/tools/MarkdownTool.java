@@ -16,20 +16,31 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractLibrary;
+import com.qwazr.utils.IOUtils;
+import com.qwazr.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
+import org.pegdown.*;
+import org.pegdown.ast.RootNode;
+import org.pegdown.ast.TableNode;
+import org.pegdown.plugins.ToHtmlSerializerPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 public class MarkdownTool extends AbstractLibrary {
 
 	final public List<ExtensionEnum> extensions = null;
 
-	final public Integer max_parsing_time = null;
+	final public Long max_parsing_time = null;
+
+	final public String html_serializer_class = null;
 
 	/**
 	 * @see org.pegdown.Extensions
@@ -68,34 +79,98 @@ public class MarkdownTool extends AbstractLibrary {
 		}
 	}
 
+	private final static String DEFAULT_CHARSET = "UTF-8";
+
 	@JsonIgnore
-	private volatile PegDownProcessor pegDownProcessor = null;
+	private volatile MarkdownProcessor markdownProcesser = null;
 
 	@Override
-	public void load() {
+	public void load() throws ClassNotFoundException, NoSuchMethodException {
 		int extensionsValue = 0;
 		if (extensions != null)
 			for (ExtensionEnum extensionEnum : extensions)
 				extensionsValue |= extensionEnum.ext;
-		if (max_parsing_time != null)
-			pegDownProcessor = new PegDownProcessor(extensionsValue, max_parsing_time);
-		else
-			pegDownProcessor = new PegDownProcessor(extensionsValue);
+		final Class<? extends ToHtmlSerializer> htmlSerializerClass =
+				StringUtils.isEmpty(html_serializer_class) ? null : ClassLoaderManager.findClass(html_serializer_class);
+		markdownProcesser = new MarkdownProcessor(htmlSerializerClass, extensionsValue, max_parsing_time);
 	}
 
 	public String toHtml(String input) {
-		return pegDownProcessor.markdownToHtml(input);
+		return markdownProcesser.markdownToHtml(input);
 	}
 
-	public String toHtml(final File file) throws IOException {
-		synchronized (pegDownProcessor) {
-			return pegDownProcessor.markdownToHtml(FileUtils.readFileToString(file, "UTF-8"));
+	public String fileToHtml(final String path, final String encoding) throws IOException {
+		return toHtml(Paths.get(path).toFile(), encoding);
+	}
+
+	public String fileToHtml(final String path) throws IOException {
+		return toHtml(Paths.get(path).toFile(), DEFAULT_CHARSET);
+	}
+
+	public String resourceToHtml(final String resourceName, final String encoding) throws IOException {
+		try (final InputStream input = ClassLoaderManager.getResourceAsStream(resourceName)) {
+			return markdownProcesser.markdownToHtml(IOUtils.toString(input, encoding));
 		}
 	}
 
+	public String resourceToHtml(final String res) throws IOException {
+		return resourceToHtml(res, DEFAULT_CHARSET);
+	}
+
+	public String toHtml(final File file) throws IOException {
+		return markdownProcesser.markdownToHtml(FileUtils.readFileToString(file, DEFAULT_CHARSET));
+	}
+
 	public String toHtml(final File file, final String encoding) throws IOException {
-		synchronized (pegDownProcessor) {
-			return pegDownProcessor.markdownToHtml(FileUtils.readFileToString(file, encoding));
+		return markdownProcesser.markdownToHtml(FileUtils.readFileToString(file, encoding));
+	}
+
+	private class MarkdownProcessor extends PegDownProcessor {
+
+		private final Constructor<? extends ToHtmlSerializer> htmlSerializerConstructor;
+
+		private MarkdownProcessor(final Class<? extends ToHtmlSerializer> htmlSerializerClass,
+				final int extensionsValue, final Long maxParsingTime) throws NoSuchMethodException {
+			super(extensionsValue, maxParsingTime == null ? PegDownProcessor.DEFAULT_MAX_PARSING_TIME : maxParsingTime);
+			this.htmlSerializerConstructor = htmlSerializerClass == null ?
+					null :
+					htmlSerializerClass.getConstructor(LinkRenderer.class, Map.class, List.class);
+		}
+
+		@Override
+		public synchronized String markdownToHtml(char[] markdownSource, LinkRenderer linkRenderer,
+				Map<String, VerbatimSerializer> verbatimSerializerMap, List<ToHtmlSerializerPlugin> plugins) {
+			if (htmlSerializerConstructor == null)
+				return super.markdownToHtml(markdownSource, linkRenderer, verbatimSerializerMap, plugins);
+			// Synchronized because PegDownProcessor is not thread safe
+			try {
+				RootNode astRoot = parseMarkdown(markdownSource);
+				return htmlSerializerConstructor.newInstance(linkRenderer, verbatimSerializerMap, plugins)
+						.toHtml(astRoot);
+			} catch (ParsingTimeoutException e) {
+				return null;
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public static class BootstrapHtmlSerializer extends ToHtmlSerializer {
+
+		public BootstrapHtmlSerializer(final LinkRenderer linkRenderer,
+				final Map<String, VerbatimSerializer> verbatimSerializers, final List<ToHtmlSerializerPlugin> plugins) {
+			super(linkRenderer, verbatimSerializers, plugins);
+		}
+
+		@Override
+		public void visit(TableNode node) {
+			currentTableNode = node;
+			printer.print("<table");
+			printAttribute("class", "table");
+			printer.print('>').indent(+2);
+			visitChildren(node);
+			printer.indent(-2).println().print('<').print('/').print("table").print('>');
+			currentTableNode = null;
 		}
 	}
 }
