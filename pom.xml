@@ -74,12 +74,12 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.39</version>
+            <version>5.1.40</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4.1210.jre7</version>
+            <version>9.4.1211.jre7</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jtds</groupId>
@@ -209,7 +209,7 @@
         <dependency>
             <groupId>org.rrd4j</groupId>
             <artifactId>rrd4j</artifactId>
-            <version>2.2.1</version>
+            <version>3.0</version>
         </dependency>
         <dependency>
             <groupId>org.iban4j</groupId>
@@ -219,7 +219,7 @@
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
-            <version>3.0.1.RELEASE</version>
+            <version>3.0.2.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>com.qwazr</groupId>
