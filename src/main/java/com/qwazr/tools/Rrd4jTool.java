@@ -18,6 +18,7 @@ package com.qwazr.tools;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
+import com.qwazr.utils.StringUtils;
 import com.qwazr.utils.SubstitutedVariables;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Objects;
@@ -88,7 +90,8 @@ public class Rrd4jTool extends AbstractLibrary {
 			rrdDatabase = new RrdDatabase(resolvedPath, backendFactory, readOnly);
 		} catch (FileNotFoundException e) {
 			if (LOGGER.isInfoEnabled())
-				LOGGER.info("RRD database not found. Create a new one: " + resolvedPath);
+				LOGGER.info("RRD database not found. Create a new one: " + resolvedPath == null ? StringUtils.EMPTY :
+						new File(resolvedPath).getAbsolutePath());
 			rrdDatabase = new RrdDatabase(createDef(), backendFactory);
 		}
 		closeableContext.add(rrdDatabase);
