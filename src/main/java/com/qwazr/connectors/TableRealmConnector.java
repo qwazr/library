@@ -16,7 +16,7 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.qwazr.database.TableServiceImpl;
+import com.qwazr.database.TableServiceInterface;
 import com.qwazr.database.model.ColumnDefinition;
 import com.qwazr.database.store.KeyStore;
 import com.qwazr.library.AbstractLibrary;
@@ -30,10 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class TableRealmConnector extends AbstractLibrary implements IdentityManager {
@@ -46,14 +47,14 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	public final String roles_column = null;
 
 	@JsonIgnore
-	private volatile TableServiceImpl tableService = null;
+	private volatile TableServiceInterface tableService = null;
 
 	@JsonIgnore
 	private volatile Set<String> columns = null;
 
 	@Override
-	public void load() {
-		tableService = new TableServiceImpl();
+	public void load() throws URISyntaxException {
+		tableService = TableServiceInterface.getClient();
 		Set<String> tables = tableService.list(null, true);
 		if (!tables.contains(table_name)) {
 			tableService.createTable(table_name, KeyStore.Impl.leveldb);
@@ -84,7 +85,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 		PasswordCredential passwordCredential = (PasswordCredential) credential;
 
 		// We request the database
-		final LinkedHashMap<String, Object> row;
+		final Map<String, Object> row;
 		try {
 			row = tableService.getRow(table_name, id, columns);
 			if (row == null)
