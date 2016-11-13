@@ -55,7 +55,7 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	@Override
 	public void load() throws URISyntaxException {
 		tableService = TableServiceInterface.getClient();
-		Set<String> tables = tableService.list(null, true);
+		final Set<String> tables = tableService.list();
 		if (!tables.contains(table_name)) {
 			tableService.createTable(table_name, KeyStore.Impl.leveldb);
 			tableService.setColumn(table_name, login_column,
