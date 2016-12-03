@@ -22,6 +22,7 @@ import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
 import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.json.JsonMapper;
+import com.qwazr.utils.server.ServerBuilder;
 import io.undertow.security.idm.IdentityManager;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -42,26 +43,23 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 
 	static volatile LibraryManagerImpl INSTANCE = null;
 
-	static synchronized void load(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
+	static synchronized void load(final ServerBuilder serverBuilder) throws IOException {
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
-		INSTANCE = new LibraryManagerImpl(dataDirectory, etcTracker);
-		if (etcTracker != null)
-			etcTracker.register(INSTANCE);
+		INSTANCE = new LibraryManagerImpl(serverBuilder.getServerConfiguration().dataDirectory);
 		ClassLoaderManager.getInstance().register(INSTANCE);
+		serverBuilder.registerEtcTracker(INSTANCE);
+		serverBuilder.registerWebService(LibraryServiceImpl.class);
 	}
 
 	private final File dataDirectory;
 
-	private final TrackedInterface etcTracker;
-
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
-	private LibraryManagerImpl(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
+	private LibraryManagerImpl(final File dataDirectory) throws IOException {
 		this.dataDirectory = dataDirectory;
 		this.libraryFileMap = new HashMap<>();
-		this.etcTracker = etcTracker;
 	}
 
 	@Override
@@ -74,8 +72,6 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 	}
 
 	final public LibraryInterface getLibrary(final String name) {
-		if (etcTracker != null)
-			etcTracker.check();
 		return super.get(name);
 	}
 
@@ -84,8 +80,6 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 	}
 
 	public Map<String, String> getLibraries() {
-		if (etcTracker != null)
-			etcTracker.check();
 		final Map<String, String> map = new LinkedHashMap<>();
 		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
 		return map;

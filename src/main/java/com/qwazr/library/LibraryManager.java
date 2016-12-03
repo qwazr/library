@@ -17,8 +17,8 @@ package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.AnnotationsUtils;
-import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.server.GenericServer;
+import com.qwazr.utils.server.ServerBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +26,8 @@ import java.util.Map;
 
 public interface LibraryManager extends Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider {
 
-	static void load(final File dataDirectory, final TrackedInterface etcTracker) throws IOException {
-		LibraryManagerImpl.load(dataDirectory, etcTracker);
+	static void load(final ServerBuilder serverBuilder) throws IOException {
+		LibraryManagerImpl.load(serverBuilder);
 	}
 
 	static LibraryManager getInstance() {
