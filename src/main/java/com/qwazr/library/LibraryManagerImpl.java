@@ -20,40 +20,35 @@ import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
-import com.qwazr.utils.file.TrackedInterface;
 import com.qwazr.utils.json.JsonMapper;
 import com.qwazr.utils.server.ServerBuilder;
 import com.qwazr.utils.server.ServerConfiguration;
 import io.undertow.security.idm.IdentityManager;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
-		implements LibraryManager, TrackedInterface.FileChangeConsumer, ClassFactory, Closeable {
+		implements LibraryManager, ClassFactory, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManagerImpl.class);
 
 	static volatile LibraryManagerImpl INSTANCE = null;
 
-	static synchronized void load(final ServerBuilder builder, final ServerConfiguration configuration)
-			throws IOException {
+	static synchronized void load(final ServerBuilder builder, final ServerConfiguration configuration,
+			final Collection<File> etcFiles) throws IOException {
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
 		INSTANCE = new LibraryManagerImpl(configuration);
 		ClassLoaderManager.getInstance().register(INSTANCE);
-		if (builder != null) {
-			builder.registerEtcTracker(INSTANCE);
+		if (builder != null)
 			builder.registerWebService(LibraryServiceImpl.class);
-		}
+		if (etcFiles != null)
+			etcFiles.forEach(INSTANCE::loadLibrarySet);
 	}
 
 	private final File dataDirectory;
@@ -93,21 +88,6 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 		return clazz == null ? null : LibraryManager.newInstance(clazz);
 	}
 
-	@Override
-	public void accept(TrackedInterface.ChangeReason changeReason, File jsonFile) {
-		final String extension = FilenameUtils.getExtension(jsonFile.getName());
-		if (!"json".equals(extension))
-			return;
-		switch (changeReason) {
-		case UPDATED:
-			loadLibrarySet(jsonFile);
-			break;
-		case DELETED:
-			unloadLibrarySet(jsonFile);
-			break;
-		}
-	}
-
 	private void loadLibrarySet(File jsonFile) {
 		try {
 			final LibraryConfiguration configuration;
@@ -130,7 +110,6 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 		} catch (IOException e) {
 			if (LOGGER.isErrorEnabled())
 				LOGGER.error(e.getMessage(), e);
-			return;
 		}
 	}
 

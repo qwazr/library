@@ -24,6 +24,7 @@ import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
 abstract class AbstractLibraryTest {
@@ -51,9 +52,9 @@ abstract class AbstractLibraryTest {
 
 		@Override
 		protected void build(final ExecutorService executorService, final ServerBuilder builder,
-				final ServerConfiguration configuration) throws IOException {
+				final ServerConfiguration configuration, final Collection<File> etcFiles) throws IOException {
 			ClassLoaderManager.load(configuration.dataDirectory, null);
-			LibraryManager.load(builder, configuration);
+			LibraryManager.load(builder, configuration, etcFiles);
 		}
 	}
 

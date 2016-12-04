@@ -23,12 +23,14 @@ import com.qwazr.utils.server.ServerConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 public interface LibraryManager extends Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider {
 
-	static void load(final ServerBuilder builder, final ServerConfiguration configuration) throws IOException {
-		LibraryManagerImpl.load(builder, configuration);
+	static void load(final ServerBuilder builder, final ServerConfiguration configuration,
+			final Collection<File> etcFiles) throws IOException {
+		LibraryManagerImpl.load(builder, configuration, etcFiles);
 	}
 
 	static LibraryManager getInstance() {
