@@ -15,12 +15,10 @@
  **/
 package com.qwazr.library.test;
 
-import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.ThymeleafTool;
 import freemarker.template.TemplateException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -38,12 +36,6 @@ public class ThymeleafTest extends AbstractLibraryTest {
 
 	@Library("thymeleaf_files")
 	private ThymeleafTool thymeleaf_files;
-
-	@Before
-	public void before() throws IOException {
-		super.before();
-		LibraryManager.inject(this);
-	}
 
 	private Map<String, Object> getVariables() {
 		Map<String, Object> variables = new HashMap<>();

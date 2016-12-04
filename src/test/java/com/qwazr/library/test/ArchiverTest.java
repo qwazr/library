@@ -33,12 +33,6 @@ public class ArchiverTest extends AbstractLibraryTest {
 	@Library("archiver")
 	private ArchiverTool archiver;
 
-	@Before
-	public void before() throws IOException {
-		super.before();
-		LibraryManager.inject(this);
-	}
-
 	private final static String TEST_STRING = "TEST_COMPRESSION";
 
 	@Test

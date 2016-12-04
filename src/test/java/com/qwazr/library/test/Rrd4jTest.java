@@ -15,12 +15,10 @@
  **/
 package com.qwazr.library.test;
 
-import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.Rrd4jTool;
 import com.qwazr.utils.IOUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.Sample;
@@ -31,12 +29,6 @@ public class Rrd4jTest extends AbstractLibraryTest {
 
 	@Library("rrd_memory")
 	private Rrd4jTool rrd_memory;
-
-	@Before
-	public void before() throws IOException {
-		super.before();
-		LibraryManager.inject(this);
-	}
 
 	@Test
 	public void rrd4j() throws IOException {

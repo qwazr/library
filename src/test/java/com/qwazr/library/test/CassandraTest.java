@@ -43,12 +43,6 @@ public class CassandraTest extends AbstractLibraryTest {
 	@Library("cassandra")
 	private CassandraConnector cassandra;
 
-	@Before
-	public void before() throws IOException {
-		super.before();
-		LibraryManager.inject(this);
-	}
-
 	private final static String CREATE_SCHEMA = "CREATE KEYSPACE qwazr_connector_test WITH REPLICATION "
 			+ "= { 'class' : 'SimpleStrategy', 'replication_factor' : 3 }";
 

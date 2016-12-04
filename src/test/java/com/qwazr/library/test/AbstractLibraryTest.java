@@ -17,26 +17,38 @@ package com.qwazr.library.test;
 
 import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.LibraryManager;
-import com.qwazr.utils.file.TrackedInterface;
+import com.qwazr.utils.server.GenericServer;
 import com.qwazr.utils.server.ServerBuilder;
 import com.qwazr.utils.server.ServerConfiguration;
-import org.apache.commons.io.filefilter.FileFileFilter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
-public abstract class AbstractLibraryTest {
+abstract class AbstractLibraryTest {
 
-	protected void before() throws IOException {
-		final LibraryManager libraryManager = LibraryManager.getInstance();
-		if (libraryManager != null)
-			return;
-		final File dataDir = new File("src/test/resources");
-		final ServerConfiguration serverConfiguration = ServerConfiguration.of().data(dataDir).build();
-		final ServerBuilder serverBuilder = new ServerBuilder<>(serverConfiguration);
-		ClassLoaderManager.load(dataDir, null);
-		LibraryManager.load(serverBuilder);
-		serverBuilder.
+	AbstractLibraryTest() {
+		if (GenericServer.getInstance() == null)
+			try {
+				new Server();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		LibraryManager.inject(this);
+	}
+
+	private static class Server extends GenericServer {
+
+		private Server() throws IOException {
+			super(ServerConfiguration.of().data(new File("src/test/etc")).build());
+		}
+
+		@Override
+		protected void build(final ExecutorService executorService, final ServerBuilder builder,
+				final ServerConfiguration configuration) throws IOException {
+			ClassLoaderManager.load(configuration.dataDirectory, null);
+			LibraryManager.load(builder, configuration);
+		}
 	}
 
 }

@@ -15,17 +15,15 @@
  **/
 package com.qwazr.library.test;
 
-import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.FreeMarkerTool;
 import freemarker.template.TemplateException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FreemarkerTest extends AbstractLibraryTest {
 
@@ -37,12 +35,6 @@ public class FreemarkerTest extends AbstractLibraryTest {
 
 	@Library("freemarker_files")
 	private FreeMarkerTool freemarker_files;
-
-	@Before
-	public void before() throws IOException {
-		super.before();
-		LibraryManager.inject(this);
-	}
 
 	private Map<String, Object> getVariables() {
 		Map<String, Object> variables = new HashMap<>();

@@ -19,6 +19,7 @@ import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.server.GenericServer;
 import com.qwazr.utils.server.ServerBuilder;
+import com.qwazr.utils.server.ServerConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +27,8 @@ import java.util.Map;
 
 public interface LibraryManager extends Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider {
 
-	static void load(final ServerBuilder serverBuilder) throws IOException {
-		LibraryManagerImpl.load(serverBuilder);
+	static void load(final ServerBuilder builder, final ServerConfiguration configuration) throws IOException {
+		LibraryManagerImpl.load(builder, configuration);
 	}
 
 	static LibraryManager getInstance() {

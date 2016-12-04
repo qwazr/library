@@ -15,12 +15,10 @@
  **/
 package com.qwazr.library.test;
 
-import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.MarkdownTool;
 import freemarker.template.TemplateException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -33,12 +31,6 @@ public class MarkdownTest extends AbstractLibraryTest {
 
 	@Library("markdown_bootstrap")
 	private MarkdownTool markdownBoostrapTool;
-
-	@Before
-	public void before() throws IOException {
-		super.before();
-		LibraryManager.inject(this);
-	}
 
 	@Test
 	public void convertString() throws IOException, TemplateException {
