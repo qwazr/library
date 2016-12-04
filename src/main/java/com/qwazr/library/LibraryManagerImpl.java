@@ -48,8 +48,12 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 			throws IOException {
 		if (INSTANCE != null)
 			throw new IOException("Already loaded");
-		INSTANCE = new LibraryManagerImpl(builder, configuration);
+		INSTANCE = new LibraryManagerImpl(configuration);
 		ClassLoaderManager.getInstance().register(INSTANCE);
+		if (builder != null) {
+			builder.registerEtcTracker(INSTANCE);
+			builder.registerWebService(LibraryServiceImpl.class);
+		}
 	}
 
 	private final File dataDirectory;
@@ -57,14 +61,9 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
-	private LibraryManagerImpl(final ServerBuilder builder, final ServerConfiguration configuration)
-			throws IOException {
+	private LibraryManagerImpl(final ServerConfiguration configuration) throws IOException {
 		this.dataDirectory = configuration.dataDirectory;
 		this.libraryFileMap = new HashMap<>();
-		if (builder != null) {
-			builder.registerEtcTracker(this);
-			builder.registerWebService(LibraryServiceImpl.class);
-		}
 	}
 
 	@Override

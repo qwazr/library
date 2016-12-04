@@ -20,6 +20,7 @@ import com.qwazr.library.LibraryManager;
 import com.qwazr.utils.server.GenericServer;
 import com.qwazr.utils.server.ServerBuilder;
 import com.qwazr.utils.server.ServerConfiguration;
+import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,20 +28,25 @@ import java.util.concurrent.ExecutorService;
 
 abstract class AbstractLibraryTest {
 
-	AbstractLibraryTest() {
-		if (GenericServer.getInstance() == null)
+	@Before
+	public void before() {
+		if (GenericServer.getInstance() == null) {
 			try {
 				new Server();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+		}
 		LibraryManager.inject(this);
 	}
 
 	private static class Server extends GenericServer {
 
 		private Server() throws IOException {
-			super(ServerConfiguration.of().data(new File("src/test/etc")).build());
+			super(ServerConfiguration.of()
+					.data(new File("src/test/resources"))
+					.etcDirectory(new File("src/test/resources/etc"))
+					.build());
 		}
 
 		@Override
