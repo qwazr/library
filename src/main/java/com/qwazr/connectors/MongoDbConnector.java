@@ -529,6 +529,14 @@ public class MongoDbConnector extends AbstractLibrary implements Closeable {
 		}
 
 		/**
+		 * @return a new DeleteOptions instance
+		 * @see DeleteOptions
+		 */
+		public DeleteOptions getNewDeleteOptions() {
+			return new DeleteOptions();
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -536,8 +544,17 @@ public class MongoDbConnector extends AbstractLibrary implements Closeable {
 			return collection.deleteOne(filter);
 		}
 
+		@Override
+		public DeleteResult deleteOne(Bson bson, DeleteOptions deleteOptions) {
+			return collection.deleteOne(bson, deleteOptions);
+		}
+
 		public DeleteResult deleteOne(final Map<String, Object> filter) {
 			return collection.deleteOne(new Document(filter));
+		}
+
+		public DeleteResult deleteOne(final Map<String, Object> filter, final DeleteOptions deleteOptions) {
+			return collection.deleteOne(new Document(filter), deleteOptions);
 		}
 
 		/**
@@ -548,8 +565,17 @@ public class MongoDbConnector extends AbstractLibrary implements Closeable {
 			return collection.deleteMany(filter);
 		}
 
+		@Override
+		public DeleteResult deleteMany(Bson bson, DeleteOptions deleteOptions) {
+			return collection.deleteMany(bson, deleteOptions);
+		}
+
 		public DeleteResult deleteMany(final Map<String, Object> filter) {
 			return collection.deleteMany(new Document(filter));
+		}
+
+		public DeleteResult deleteMany(final Map<String, Object> filter, final DeleteOptions deleteOptions) {
+			return collection.deleteMany(new Document(filter), deleteOptions);
 		}
 
 		/**
