@@ -1,6 +1,11 @@
 QWAZR Library
 ================
 
+[![Build Status](https://travis-ci.org/qwazr/library.svg?branch=master)](https://travis-ci.org/qwazr/library)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.qwazr/qwazr-library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.qwazr/qwazr-library)
+[![Coverage Status](https://coveralls.io/repos/github/qwazr/library/badge.svg?branch=master)](https://coveralls.io/github/qwazr/library?branch=master)
+
+
 The library is a set of tools and connectors available in a QWAZR application.
 
 ### Location of the configuration files
