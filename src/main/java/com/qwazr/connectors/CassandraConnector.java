@@ -18,9 +18,9 @@ package com.qwazr.connectors;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.connectors.cassandra.CassandraCluster;
+import com.qwazr.connectors.cassandra.CassandraSession;
 import com.qwazr.library.AbstractPasswordLibrary;
-import com.qwazr.utils.cassandra.CassandraCluster;
-import com.qwazr.utils.cassandra.CassandraSession;
 import org.apache.commons.io.IOUtils;
 
 import java.io.Closeable;

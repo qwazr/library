@@ -8,3 +8,5 @@ release.properties
 /.classpath
 /.project
 /target/
+qwazr-library.iml
+.idea
