@@ -15,8 +15,8 @@
  **/
 package com.qwazr.library;
 
-import com.qwazr.utils.server.ServiceInterface;
-import com.qwazr.utils.server.ServiceName;
+import com.qwazr.server.ServiceInterface;
+import com.qwazr.server.ServiceName;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;

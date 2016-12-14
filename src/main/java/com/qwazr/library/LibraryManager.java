@@ -17,9 +17,9 @@ package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.AnnotationsUtils;
-import com.qwazr.utils.server.GenericServer;
-import com.qwazr.utils.server.ServerBuilder;
-import com.qwazr.utils.server.ServerConfiguration;
+import com.qwazr.server.GenericServer;
+import com.qwazr.server.ServerBuilder;
+import com.qwazr.server.configuration.ServerConfiguration;
 
 import java.io.File;
 import java.io.IOException;

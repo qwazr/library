@@ -17,12 +17,13 @@ package com.qwazr.library;
 
 import com.qwazr.classloader.ClassFactory;
 import com.qwazr.classloader.ClassLoaderManager;
+import com.qwazr.server.GenericServer;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
 import com.qwazr.utils.json.JsonMapper;
-import com.qwazr.utils.server.ServerBuilder;
-import com.qwazr.utils.server.ServerConfiguration;
+import com.qwazr.server.ServerBuilder;
+import com.qwazr.server.configuration.ServerConfiguration;
 import io.undertow.security.idm.IdentityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ import java.io.IOException;
 import java.util.*;
 
 class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
-		implements LibraryManager, ClassFactory, Closeable {
+		implements LibraryManager, GenericServer.IdentityManagerProvider, ClassFactory, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManagerImpl.class);
 
@@ -45,8 +46,10 @@ class LibraryManagerImpl extends ReadOnlyMap<String, LibraryInterface>
 			throw new IOException("Already loaded");
 		INSTANCE = new LibraryManagerImpl(configuration);
 		ClassLoaderManager.getInstance().register(INSTANCE);
-		if (builder != null)
+		if (builder != null) {
 			builder.registerWebService(LibraryServiceImpl.class);
+			builder.setIdentityManagerProvider(INSTANCE);
+		}
 		if (etcFiles != null)
 			etcFiles.forEach(INSTANCE::loadLibrarySet);
 	}

@@ -17,9 +17,9 @@ package com.qwazr.library.test;
 
 import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.LibraryManager;
-import com.qwazr.utils.server.GenericServer;
-import com.qwazr.utils.server.ServerBuilder;
-import com.qwazr.utils.server.ServerConfiguration;
+import com.qwazr.server.GenericServer;
+import com.qwazr.server.ServerBuilder;
+import com.qwazr.server.configuration.ServerConfiguration;
 import org.junit.Before;
 
 import java.io.File;

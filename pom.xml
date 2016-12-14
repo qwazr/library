@@ -17,10 +17,6 @@
     <dependencies>
         <dependency>
             <groupId>com.qwazr</groupId>
-            <artifactId>qwazr-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.qwazr</groupId>
             <artifactId>qwazr-database</artifactId>
         </dependency>
         <dependency>
