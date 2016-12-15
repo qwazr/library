@@ -29,16 +29,28 @@ import java.util.Map;
 
 public class FtpConnector extends AbstractPasswordLibrary {
 
-	public final String hostname = null;
-	public final String username = null;
-	public final Boolean ssl = null;
-	public final Integer connect_time_out = null;
-	public final Integer data_timeout = null;
-	public final Integer keep_alive_timeout = null;
-	public final Integer control_keep_alive_timeout = null;
+	public final String hostname;
+	public final String username;
+	public final Boolean ssl;
+	public final Boolean passive_mode;
+	public final Integer connect_time_out;
+	public final Integer data_timeout;
+	public final Integer keep_alive_timeout;
+	public final Integer control_keep_alive_timeout;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FtpConnector.class);
-	
+
+	public FtpConnector() {
+		hostname = null;
+		username = null;
+		ssl = null;
+		passive_mode = null;
+		connect_time_out = null;
+		data_timeout = null;
+		keep_alive_timeout = null;
+		control_keep_alive_timeout = null;
+	}
+
 	@JsonIgnore
 	public FTPSession getNewSession(final IOUtils.CloseableContext context) {
 		FTPSession ftpSession = new FTPSession();
@@ -75,6 +87,13 @@ public class FtpConnector extends AbstractPasswordLibrary {
 			return ftp;
 		}
 
+		private void checkPassiveMode() {
+			if (passive_mode != null && passive_mode)
+				ftp.enterLocalPassiveMode();
+			else
+				ftp.enterLocalActiveMode();
+		}
+
 		/**
 		 * Download the file if any
 		 *
@@ -92,6 +111,7 @@ public class FtpConnector extends AbstractPasswordLibrary {
 						throw new IOException("FTP cannot be set to ASCII mode");
 				}
 			}
+			checkPassiveMode();
 			InputStream is = ftp.retrieveFileStream(remote);
 			if (is == null)
 				throw new FileNotFoundException("FTP file not found: " + hostname + "/" + remote);
@@ -126,6 +146,7 @@ public class FtpConnector extends AbstractPasswordLibrary {
 				throw new FileNotFoundException("The destination directory does not exist: " + localDirectory);
 			if (!localDirectory.isDirectory())
 				throw new IOException("The destination path is not a directory: " + localDirectory);
+			checkPassiveMode();
 			FTPFile[] remoteFiles = ftp.listFiles();
 			if (remoteFiles == null)
 				return;
