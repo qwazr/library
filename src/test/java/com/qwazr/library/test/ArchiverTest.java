@@ -15,13 +15,11 @@
  **/
 package com.qwazr.library.test;
 
-import com.qwazr.library.LibraryManager;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.ArchiverTool;
 import com.qwazr.utils.IOUtils;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;

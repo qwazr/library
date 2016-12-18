@@ -47,14 +47,13 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	public final String roles_column = null;
 
 	@JsonIgnore
-	private volatile TableServiceInterface tableService = null;
+	private volatile TableServiceInterface tableService;
 
 	@JsonIgnore
-	private volatile Set<String> columns = null;
+	private volatile Set<String> columns;
 
-	@Override
 	public void load() throws URISyntaxException {
-		tableService = TableServiceInterface.getClient();
+		tableService = libraryManager.getTableService();
 		final Set<String> tables = tableService.list();
 		if (!tables.contains(table_name)) {
 			tableService.createTable(table_name, KeyStore.Impl.leveldb);
@@ -150,4 +149,5 @@ public class TableRealmConnector extends AbstractLibrary implements IdentityMana
 	public Account verify(final Credential credential) {
 		return null;
 	}
+
 }

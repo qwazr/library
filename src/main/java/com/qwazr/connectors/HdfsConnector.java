@@ -41,13 +41,10 @@ public class HdfsConnector extends AbstractLibrary implements Closeable {
 	@JsonIgnore
 	private volatile FileSystem fileSystem = null;
 
-	@JsonIgnore
-	private volatile Configuration configuration = null;
-
 	@Override
 	public void load() {
 
-		configuration = new Configuration();
+		final Configuration configuration = new Configuration();
 
 		try {
 			if (config_files != null) {

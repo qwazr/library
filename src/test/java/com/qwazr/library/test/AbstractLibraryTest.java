@@ -17,44 +17,50 @@ package com.qwazr.library.test;
 
 import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.LibraryManager;
+import com.qwazr.server.BaseServer;
 import com.qwazr.server.GenericServer;
-import com.qwazr.server.ServerBuilder;
 import com.qwazr.server.configuration.ServerConfiguration;
 import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.concurrent.ExecutorService;
 
 abstract class AbstractLibraryTest {
 
+	private static TestServer INSTANCE;
+
 	@Before
 	public void before() {
-		if (GenericServer.getInstance() == null) {
+		if (INSTANCE == null) {
 			try {
-				new Server();
+				INSTANCE = new TestServer();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		LibraryManager.inject(this);
+		INSTANCE.libraryManager.inject(this);
 	}
 
-	private static class Server extends GenericServer {
+	private static class TestServer implements BaseServer {
 
-		private Server() throws IOException {
-			super(ServerConfiguration.of()
+		private final GenericServer server;
+		private final LibraryManager libraryManager;
+
+		private TestServer() throws IOException {
+			final ServerConfiguration configuration = ServerConfiguration.of()
 					.data(new File("src/test/resources"))
 					.etcDirectory(new File("src/test/resources/etc"))
-					.build());
+					.build();
+			final GenericServer.Builder builder = GenericServer.of(configuration);
+			final ClassLoaderManager classLoaderManager =
+					new ClassLoaderManager(builder.getConfiguration().dataDirectory, Thread.currentThread());
+			libraryManager = new LibraryManager(classLoaderManager, null, builder);
+			server = builder.build();
 		}
 
 		@Override
-		protected void build(final ExecutorService executorService, final ServerBuilder builder,
-				final ServerConfiguration configuration, final Collection<File> etcFiles) throws IOException {
-			ClassLoaderManager.load(configuration.dataDirectory, null);
-			LibraryManager.load(builder, configuration, etcFiles);
+		public GenericServer getServer() {
+			return server;
 		}
 	}
 

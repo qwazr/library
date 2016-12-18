@@ -64,9 +64,8 @@ public class MongoDbConnector extends AbstractLibrary implements Closeable {
 		final public Integer port = null;
 	}
 
-	public List<MongoDbCredential> credentials;
-	public List<MongoServerAddress> servers;
-	public final Integer port = null;
+	public final List<MongoDbCredential> credentials = null;
+	public final List<MongoServerAddress> servers = null;
 
 	@Override
 	public void load() {
@@ -86,7 +85,6 @@ public class MongoDbConnector extends AbstractLibrary implements Closeable {
 						credential.password.toCharArray()));
 			mongoClient = new MongoClient(serverAddresses, mongoCredentials);
 		}
-
 	}
 
 	@Override

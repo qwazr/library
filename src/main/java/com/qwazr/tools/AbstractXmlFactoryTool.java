@@ -40,10 +40,9 @@ public abstract class AbstractXmlFactoryTool extends AbstractLibrary {
 	public final Boolean x_include_aware = null;
 
 	@JsonIgnore
-	private volatile DocumentBuilderFactory documentBuilderFactory = null;
+	private final DocumentBuilderFactory documentBuilderFactory;
 
-	@Override
-	public void load() {
+	public AbstractXmlFactoryTool() {
 		documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		if (namespace_aware != null)
 			documentBuilderFactory.setNamespaceAware(namespace_aware);

@@ -16,12 +16,16 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
-import org.pegdown.*;
+import org.pegdown.Extensions;
+import org.pegdown.LinkRenderer;
+import org.pegdown.ParsingTimeoutException;
+import org.pegdown.PegDownProcessor;
+import org.pegdown.ToHtmlSerializer;
+import org.pegdown.VerbatimSerializer;
 import org.pegdown.ast.RootNode;
 import org.pegdown.ast.TableNode;
 import org.pegdown.plugins.ToHtmlSerializerPlugin;
@@ -82,7 +86,7 @@ public class MarkdownTool extends AbstractLibrary {
 	private final static String DEFAULT_CHARSET = "UTF-8";
 
 	@JsonIgnore
-	private volatile MarkdownProcessor markdownProcesser = null;
+	private volatile MarkdownProcessor markdownProcessor;
 
 	@Override
 	public void load() throws ClassNotFoundException, NoSuchMethodException {
@@ -90,13 +94,14 @@ public class MarkdownTool extends AbstractLibrary {
 		if (extensions != null)
 			for (ExtensionEnum extensionEnum : extensions)
 				extensionsValue |= extensionEnum.ext;
-		final Class<? extends ToHtmlSerializer> htmlSerializerClass =
-				StringUtils.isEmpty(html_serializer_class) ? null : ClassLoaderManager.findClass(html_serializer_class);
-		markdownProcesser = new MarkdownProcessor(htmlSerializerClass, extensionsValue, max_parsing_time);
+		final Class<? extends ToHtmlSerializer> htmlSerializerClass = StringUtils.isEmpty(html_serializer_class) ?
+				null :
+				libraryManager.getClassLoaderManager().findClass(html_serializer_class);
+		markdownProcessor = new MarkdownProcessor(htmlSerializerClass, extensionsValue, max_parsing_time);
 	}
 
 	public String toHtml(String input) {
-		return markdownProcesser.markdownToHtml(input);
+		return markdownProcessor.markdownToHtml(input);
 	}
 
 	public String fileToHtml(final String path, final String encoding) throws IOException {
@@ -108,8 +113,8 @@ public class MarkdownTool extends AbstractLibrary {
 	}
 
 	public String resourceToHtml(final String resourceName, final String encoding) throws IOException {
-		try (final InputStream input = ClassLoaderManager.getResourceAsStream(resourceName)) {
-			return markdownProcesser.markdownToHtml(IOUtils.toString(input, encoding));
+		try (final InputStream input = libraryManager.getClassLoaderManager().getResourceAsStream(resourceName)) {
+			return markdownProcessor.markdownToHtml(IOUtils.toString(input, encoding));
 		}
 	}
 
@@ -118,11 +123,11 @@ public class MarkdownTool extends AbstractLibrary {
 	}
 
 	public String toHtml(final File file) throws IOException {
-		return markdownProcesser.markdownToHtml(FileUtils.readFileToString(file, DEFAULT_CHARSET));
+		return markdownProcessor.markdownToHtml(FileUtils.readFileToString(file, DEFAULT_CHARSET));
 	}
 
 	public String toHtml(final File file, final String encoding) throws IOException {
-		return markdownProcesser.markdownToHtml(FileUtils.readFileToString(file, encoding));
+		return markdownProcessor.markdownToHtml(FileUtils.readFileToString(file, encoding));
 	}
 
 	private class MarkdownProcessor extends PegDownProcessor {

@@ -30,19 +30,18 @@ public class PropertiesTool extends AbstractLibrary {
 	final public Properties properties = new Properties();
 
 	@JsonIgnore
-	private volatile boolean isXML = false;
+	private final boolean isXML;
 
 	@JsonIgnore
-	private volatile File propertiesFile = null;
+	private final File propertiesFile;
 
 	@JsonIgnore
 	private volatile long lastModified = 0;
 
 	@JsonIgnore
-	private volatile String comments = null;
+	private final String comments;
 
-	@Override
-	public void load() {
+	public PropertiesTool() {
 		propertiesFile = path != null ? new File(path) : null;
 		isXML = propertiesFile == null ? false : propertiesFile.getName().endsWith(".xml");
 		comments = null;

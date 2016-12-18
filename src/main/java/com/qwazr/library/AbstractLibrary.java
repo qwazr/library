@@ -15,17 +15,12 @@
  **/
 package com.qwazr.library;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.io.File;
-
 public abstract class AbstractLibrary implements LibraryInterface {
 
-	@JsonIgnore
-	protected final File dataDirectory;
+	protected volatile LibraryManager libraryManager;
 
-	public AbstractLibrary() {
-		this.dataDirectory = LibraryManager.getInstance().getDataDirectory();
+	@Override
+	final public void load(final LibraryManager libraryManager) {
+		this.libraryManager = libraryManager;
 	}
-
 }

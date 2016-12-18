@@ -15,16 +15,34 @@
  **/
 package com.qwazr.library;
 
+import com.qwazr.server.AbstractServiceImpl;
+
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
-public class LibraryServiceImpl implements LibraryServiceInterface {
+public class LibraryServiceImpl extends AbstractServiceImpl implements LibraryServiceInterface {
+
+	private volatile LibraryManager libraryManager;
+
+	public LibraryServiceImpl(final LibraryManager libraryManager) {
+		this.libraryManager = libraryManager;
+	}
+
+	public LibraryServiceImpl() {
+		this(null);
+	}
+
+	@PostConstruct
+	public void init() {
+		libraryManager = getContextAttribute(LibraryManager.class);
+	}
 
 	public Map<String, String> getLibraries() {
-		return LibraryManager.getInstance().getLibraries();
+		return libraryManager.getLibraries();
 	}
 
 	public AbstractLibrary getLibrary(String libraryName) {
-		return LibraryManager.getInstance().getLibrary(libraryName);
+		return libraryManager.getLibrary(libraryName);
 	}
 
 }

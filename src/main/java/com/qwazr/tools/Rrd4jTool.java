@@ -22,7 +22,13 @@ import com.qwazr.utils.StringUtils;
 import com.qwazr.utils.SubstitutedVariables;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
-import org.rrd4j.core.*;
+import org.rrd4j.core.ArcDef;
+import org.rrd4j.core.DsDef;
+import org.rrd4j.core.RrdBackendFactory;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.Sample;
+import org.rrd4j.core.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +51,12 @@ public class Rrd4jTool extends AbstractLibrary {
 	public final String backendFactory = null;
 
 	@JsonIgnore
-	private volatile String resolvedPath = null;
+	private volatile String resolvedPath;
 
 	@Override
 	public void load() {
 		resolvedPath = path == null ?
-				dataDirectory.getAbsolutePath() :
+				libraryManager.getDataDirectory().getAbsolutePath() :
 				SubstitutedVariables.propertyAndEnvironmentSubstitute(path);
 	}
 
@@ -90,7 +96,8 @@ public class Rrd4jTool extends AbstractLibrary {
 			rrdDatabase = new RrdDatabase(resolvedPath, backendFactory, readOnly);
 		} catch (FileNotFoundException e) {
 			if (LOGGER.isInfoEnabled())
-				LOGGER.info("RRD database not found. Create a new one: " + resolvedPath == null ? StringUtils.EMPTY :
+				LOGGER.info("RRD database not found. Create a new one: " + resolvedPath == null ?
+						StringUtils.EMPTY :
 						new File(resolvedPath).getAbsolutePath());
 			rrdDatabase = new RrdDatabase(createDef(), backendFactory);
 		}

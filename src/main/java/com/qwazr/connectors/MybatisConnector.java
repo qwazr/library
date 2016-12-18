@@ -16,17 +16,25 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import com.qwazr.utils.StringUtils;
 import com.qwazr.utils.SubstitutedVariables;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.*;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Objects;
@@ -53,7 +61,6 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 
 	@Override
 	public void load() throws IOException {
-
 		final File configurationFile;
 		if (configuration_file != null) {
 			configurationFile = new File(SubstitutedVariables.propertyAndEnvironmentSubstitute(configuration_file));
@@ -83,7 +90,7 @@ public class MybatisConnector extends AbstractPasswordLibrary {
 		final SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
 		try (final InputStream inputStream = configurationFile != null ?
 				new FileInputStream(configurationFile) :
-				Resources.getResourceAsStream(ClassLoaderManager.classLoader,
+				Resources.getResourceAsStream(libraryManager.getClassLoaderManager().getClassLoader(),
 						configuration_resource != null ? configuration_resource : default_configuration)) {
 			if (environment != null) {
 				if (props != null)

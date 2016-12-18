@@ -36,7 +36,7 @@ import java.util.Objects;
 public class ThymeleafTool extends AbstractLibrary implements Closeable {
 
 	@JsonIgnore
-	private TemplateEngine templateEngine = null;
+	private volatile TemplateEngine templateEngine = null;
 
 	public final Boolean use_classloader = false;
 	public final Boolean cache_enabled = false;
@@ -56,7 +56,8 @@ public class ThymeleafTool extends AbstractLibrary implements Closeable {
 			templateResolver = new ClassLoaderTemplateResolver();
 		else {
 			templateResolver = new FileTemplateResolver();
-			templateResolver.setPrefix(StringUtils.ensureSuffix(dataDirectory.getAbsolutePath(), "/"));
+			templateResolver.setPrefix(
+					StringUtils.ensureSuffix(libraryManager.getDataDirectory().getAbsolutePath(), "/"));
 		}
 		if (cache_enabled != null)
 			templateResolver.setCacheable(cache_enabled);

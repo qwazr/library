@@ -26,9 +26,11 @@ import javax.ws.rs.Produces;
 import java.util.Map;
 
 @Path("/library")
-@RolesAllowed("library")
-@ServiceName("library")
+@RolesAllowed(LibraryServiceInterface.SERVICE_NAME)
+@ServiceName(LibraryServiceInterface.SERVICE_NAME)
 public interface LibraryServiceInterface extends ServiceInterface {
+
+	String SERVICE_NAME = "library";
 
 	@GET
 	@Path("/")

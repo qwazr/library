@@ -56,10 +56,9 @@ public class AsciiDoctorTool extends AbstractLibrary implements Closeable {
 	private volatile Asciidoctor asciidoctor = null;
 
 	@JsonIgnore
-	private volatile Options options = null;
+	private final Options options;
 
-	@Override
-	public void load() {
+	public AsciiDoctorTool() {
 		asciidoctor = Asciidoctor.Factory.create();
 		if (required_libraries != null)
 			for (String library : required_libraries)

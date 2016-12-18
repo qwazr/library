@@ -26,7 +26,14 @@ import freemarker.template.TemplateExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +109,7 @@ public class FreeMarkerTool extends AbstractLibrary implements Closeable {
 
 		@Override
 		public Object findTemplateSource(final String path) throws IOException {
-			final File file = new File(dataDirectory, path);
+			final File file = new File(libraryManager.getDataDirectory(), path);
 			return file.exists() && file.isFile() ? file : null;
 		}
 

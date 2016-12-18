@@ -22,7 +22,7 @@ import com.qwazr.connectors.*;
 import com.qwazr.tools.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-@JsonSubTypes({@Type(value = CassandraConnector.class),
+@JsonSubTypes({ @Type(value = CassandraConnector.class),
 		@Type(value = DatabaseConnector.class),
 		@Type(value = EmailConnector.class),
 		@Type(value = FtpConnector.class),
@@ -45,10 +45,12 @@ import com.qwazr.tools.*;
 		@Type(value = Rrd4jTool.class),
 		@Type(value = ThymeleafTool.class),
 		@Type(value = XMLTool.class),
-		@Type(value = XPathTool.class)})
+		@Type(value = XPathTool.class) })
 public interface LibraryInterface {
+
+	default void load(final LibraryManager libraryManager) throws Exception {
+	}
 
 	default void load() throws Exception {
 	}
-
 }

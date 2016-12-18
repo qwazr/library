@@ -16,8 +16,8 @@
 package com.qwazr.connectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractPasswordLibrary;
+import com.qwazr.library.LibraryManager;
 import com.qwazr.utils.IOUtils.CloseableContext;
 import com.qwazr.utils.StringUtils;
 import com.qwazr.utils.SubstitutedVariables;
@@ -74,7 +74,7 @@ public class DatabaseConnector extends AbstractPasswordLibrary implements Closea
 		if (pool == null) {
 			JDBCConnection cnx = new JDBCConnection();
 			if (!StringUtils.isEmpty(driver))
-				cnx.setDriver(ClassLoaderManager.classLoader,
+				cnx.setDriver(libraryManager.getClassLoaderManager().getClassLoader(),
 						SubstitutedVariables.propertyAndEnvironmentSubstitute(driver));
 			if (!StringUtils.isEmpty(url))
 				cnx.setUrl(SubstitutedVariables.propertyAndEnvironmentSubstitute(url));
