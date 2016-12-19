@@ -51,7 +51,7 @@ abstract class AbstractLibraryTest {
 					.data(new File("src/test/resources"))
 					.etcDirectory(new File("src/test/resources/etc"))
 					.build();
-			final GenericServer.Builder builder = GenericServer.of(configuration);
+			final GenericServer.Builder builder = GenericServer.of(configuration, null);
 			final ClassLoaderManager classLoaderManager =
 					new ClassLoaderManager(builder.getConfiguration().dataDirectory, Thread.currentThread());
 			libraryManager = new LibraryManager(classLoaderManager, null, builder);
