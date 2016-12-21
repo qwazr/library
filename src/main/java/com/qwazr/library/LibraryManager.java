@@ -29,6 +29,7 @@ import io.undertow.security.idm.IdentityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, ClassFactory, Closeable {
@@ -127,6 +129,16 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 				throw new RuntimeException(e);
 			}
 		});
+	}
+
+	static public void inject(final ServletContext context, final Object object) {
+		if (object == null)
+			return;
+		Objects.requireNonNull(context,
+				"Cannot inject libraries to " + object.getClass().getName() + ", the context is null");
+		final LibraryManager libraryManager = (LibraryManager) context.getAttribute(LibraryManager.class.getName());
+		Objects.requireNonNull(libraryManager, "No library manager found in this context");
+		libraryManager.inject(object);
 	}
 
 	private void loadLibrarySet(final File jsonFile) {
