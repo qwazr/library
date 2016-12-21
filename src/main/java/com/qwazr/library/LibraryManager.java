@@ -106,12 +106,25 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		return map;
 	}
 
+	/**
+	 * Create a new object using a public empty constructor and inject the library objects in the annotated properties
+	 *
+	 * @param clazz
+	 * @param <T>
+	 * @return
+	 * @throws ReflectiveOperationException
+	 */
 	final public <T> T newInstance(final Class<T> clazz) throws ReflectiveOperationException {
 		final T instance = clazz.newInstance();
 		inject(instance);
 		return instance;
 	}
 
+	/**
+	 * Inject the library objects in the annotated properties
+	 *
+	 * @param object
+	 */
 	final public void inject(final Object object) {
 		if (object == null)
 			return;
@@ -131,12 +144,29 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		});
 	}
 
+	/**
+	 * Return the LibraryManager instance from the ServletContext
+	 *
+	 * @param context
+	 * @return
+	 */
+	static public LibraryManager getInstance(final ServletContext context) {
+		Objects.requireNonNull(context, "Cannot find a Library instance, the context is null");
+		return GenericServer.getContextAttribute(context, LibraryManager.class);
+	}
+
+	/**
+	 * Inject the library object in the annotated property of the given object.
+	 * <p>
+	 * The LibraryManager instance is extracted from the ServletContext
+	 *
+	 * @param context
+	 * @param object
+	 */
 	static public void inject(final ServletContext context, final Object object) {
 		if (object == null)
 			return;
-		Objects.requireNonNull(context,
-				"Cannot inject libraries to " + object.getClass().getName() + ", the context is null");
-		final LibraryManager libraryManager = (LibraryManager) context.getAttribute(LibraryManager.class.getName());
+		final LibraryManager libraryManager = getInstance(context);
 		Objects.requireNonNull(libraryManager, "No library manager found in this context");
 		libraryManager.inject(object);
 	}
@@ -192,7 +222,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	}
 
 	@Override
-	public IdentityManager getIdentityManager(String realm) throws IOException {
+	public IdentityManager getIdentityManager(final String realm) throws IOException {
 		final LibraryInterface library = get(realm);
 		if (library == null)
 			throw new IOException("No realm connector with this name: " + realm);
