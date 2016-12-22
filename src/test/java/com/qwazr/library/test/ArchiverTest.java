@@ -18,6 +18,7 @@ package com.qwazr.library.test;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.ArchiverTool;
 import com.qwazr.utils.IOUtils;
+import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,6 +32,9 @@ public class ArchiverTest extends AbstractLibraryTest {
 	@Library("archiver")
 	private ArchiverTool archiver;
 
+	@Library("gzip_archiver")
+	private ArchiverTool gzipArchiver;
+
 	private final static String TEST_STRING = "TEST_COMPRESSION";
 
 	@Test
@@ -42,5 +46,21 @@ public class ArchiverTest extends AbstractLibraryTest {
 		File clearFile = Files.createTempFile("archiverToolTest", ".txt").toFile();
 		archiver.decompress(zipFile, clearFile);
 		Assert.assertEquals(TEST_STRING, IOUtils.readFileAsString(clearFile));
+	}
+
+	@Test
+	public void extractDir() throws IOException, ArchiveException, CompressorException {
+		File destDir = Files.createTempDirectory("archiverToolTest").toFile();
+
+		Assert.assertNotNull(gzipArchiver);
+		gzipArchiver.decompress_dir("src/test/resources/com/qwazr/library/test/archiver", "gz",
+				destDir.getAbsolutePath());
+		Assert.assertTrue(new File(destDir, "test1.tar").exists());
+		Assert.assertTrue(new File(destDir, "test2.tar").exists());
+
+		Assert.assertNotNull(archiver);
+		archiver.extract_dir(destDir.getPath(), "tar", destDir.getAbsolutePath(), false);
+		Assert.assertTrue(new File(destDir, "test1").exists());
+		Assert.assertTrue(new File(destDir, "test2").exists());
 	}
 }

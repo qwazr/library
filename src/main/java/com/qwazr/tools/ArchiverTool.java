@@ -185,7 +185,9 @@ public class ArchiverTool extends AbstractLibrary {
 			final String ext = FilenameUtils.getExtension(sourceFile.getName());
 			if (!sourceExtension.equals(ext))
 				continue;
-			final String newName = FilenameUtils.getBaseName(sourceFile.getName()) + '.' + destExtension;
+			String newName = FilenameUtils.getBaseName(sourceFile.getName());
+			if (destExtension != null)
+				newName += '.' + destExtension;
 			final File destFile = new File(destDir, newName);
 			if (destFile.exists())
 				continue;
@@ -198,6 +200,11 @@ public class ArchiverTool extends AbstractLibrary {
 		decompress_dir(new File(sourcePath), sourceExtension, new File(destPath), destExtension);
 	}
 
+	public void decompress_dir(final String sourcePath, final String sourceExtension, final String destPath)
+			throws IOException, CompressorException {
+		decompress_dir(sourcePath, sourceExtension, destPath, null);
+	}
+
 	public void extract(final File sourceFile, final File destDir) throws IOException, ArchiveException {
 		try (final InputStream is = new BufferedInputStream(new FileInputStream(sourceFile))) {
 			try (final ArchiveInputStream in = new ArchiveStreamFactory().createArchiveInputStream(is)) {
@@ -206,7 +213,11 @@ public class ArchiverTool extends AbstractLibrary {
 					if (!in.canReadEntryData(entry))
 						continue;
 					if (entry.isDirectory()) {
-						new File(destDir, entry.getName()).mkdir();
+						File newDir = new File(destDir, entry.getName());
+						if (newDir.exists() && newDir.isDirectory())
+							continue;
+						if (!newDir.mkdir())
+							throw new IOException("Can't create directory : " + newDir.getPath());
 						continue;
 					}
 					if (entry instanceof ZipArchiveEntry)
@@ -215,8 +226,14 @@ public class ArchiverTool extends AbstractLibrary {
 					final File destFile = new File(destDir, entry.getName());
 					final File parentDir = destFile.getParentFile();
 					if (!parentDir.exists())
-						parentDir.mkdirs();
+						if (!parentDir.mkdirs())
+							throw new IOException("Can't create directory : " + parentDir.getPath());
+					final long entryLastModified = entry.getLastModifiedDate().getTime();
+					if (destFile.exists() && destFile.isFile() && destFile.lastModified() == entryLastModified
+							&& entry.getSize() == destFile.length())
+						continue;
 					IOUtils.copy(in, destFile);
+					destFile.setLastModified(entryLastModified);
 				}
 			} catch (IOException e) {
 				throw new IOException("Unable to extract the archive: " + sourceFile.getPath(), e);
@@ -227,26 +244,24 @@ public class ArchiverTool extends AbstractLibrary {
 	}
 
 	public void extract_dir(final File sourceDir, final String sourceExtension, final File destDir,
-			Boolean logErrorAndContinue) throws IOException, ArchiveException {
-		if (logErrorAndContinue == null)
-			logErrorAndContinue = false;
+			final Boolean logErrorAndContinue) throws IOException, ArchiveException {
 		if (!sourceDir.exists())
 			throw new FileNotFoundException("The source directory does not exist: " + sourceDir.getPath());
 		if (!destDir.exists())
 			throw new FileNotFoundException("The destination directory does not exist: " + destDir.getPath());
-		File[] sourceFiles = sourceDir.listFiles();
+		final File[] sourceFiles = sourceDir.listFiles();
 		if (sourceFiles == null)
 			return;
 		for (File sourceFile : sourceFiles) {
 			if (!sourceFile.isFile())
 				continue;
-			String ext = FilenameUtils.getExtension(sourceFile.getName());
+			final String ext = FilenameUtils.getExtension(sourceFile.getName());
 			if (!sourceExtension.equals(ext))
 				continue;
 			try {
 				extract(sourceFile, destDir);
 			} catch (IOException | ArchiveException e) {
-				if (logErrorAndContinue)
+				if (logErrorAndContinue != null && logErrorAndContinue)
 					LOGGER.error(e.getMessage(), e);
 				else
 					throw e;

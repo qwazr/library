@@ -98,6 +98,10 @@
     "archiver": {
       "class": "com.qwazr.tools.ArchiverTool",
       "codec": "deflate"
+    },
+    "gzip_archiver": {
+      "class": "com.qwazr.tools.ArchiverTool",
+      "codec": "gzip"
     }
   }
 }
