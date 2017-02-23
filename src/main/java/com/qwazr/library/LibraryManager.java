@@ -115,7 +115,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	 * @throws ReflectiveOperationException
 	 */
 	final public <T> T newInstance(final Class<T> clazz) throws ReflectiveOperationException {
-		final T instance = clazz.newInstance();
+		final T instance = classLoaderManager != null ? classLoaderManager.newInstance(clazz) : clazz.newInstance();
 		inject(instance);
 		return instance;
 	}
