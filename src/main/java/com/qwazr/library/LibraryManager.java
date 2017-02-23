@@ -15,12 +15,12 @@
  **/
 package com.qwazr.library;
 
-import com.qwazr.classloader.ClassFactory;
 import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.database.TableServiceInterface;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.server.GenericServer;
 import com.qwazr.utils.AnnotationsUtils;
+import com.qwazr.utils.ClassLoaderUtils;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
-		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, ClassFactory, Closeable {
+		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, ClassLoaderUtils.ClassFactory,
+		Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManager.class);
 
@@ -115,7 +116,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	 * @throws ReflectiveOperationException
 	 */
 	final public <T> T newInstance(final Class<T> clazz) throws ReflectiveOperationException {
-		final T instance = classLoaderManager != null ? classLoaderManager.newInstance(clazz) : clazz.newInstance();
+		final T instance = clazz.newInstance();
 		inject(instance);
 		return instance;
 	}
