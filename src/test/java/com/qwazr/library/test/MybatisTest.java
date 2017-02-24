@@ -15,7 +15,6 @@
  **/
 package com.qwazr.library.test;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 import com.qwazr.connectors.MybatisConnector;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.utils.IOUtils;
@@ -27,6 +26,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLNonTransientConnectionException;
 
 public class MybatisTest extends AbstractLibraryTest {
 
@@ -44,7 +44,7 @@ public class MybatisTest extends AbstractLibraryTest {
 		} catch (PersistenceException e) {
 			// It is okay to not be able to establish a mysql connection for this test
 			// Any other exception is an error
-			if (e.getCause() instanceof MySQLNonTransientConnectionException)
+			if (e.getCause() instanceof SQLNonTransientConnectionException)
 				return;
 			throw e;
 		} finally {
