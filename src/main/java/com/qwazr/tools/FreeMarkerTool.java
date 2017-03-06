@@ -16,6 +16,7 @@
 package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.IOUtils;
 import freemarker.cache.TemplateLoader;
@@ -55,8 +56,9 @@ public class FreeMarkerTool extends AbstractLibrary implements Closeable {
 	@Override
 	public void load() {
 		cfg = new Configuration(Configuration.VERSION_2_3_23);
-		cfg.setTemplateLoader(
-				(use_classloader != null && use_classloader) ? new ResourceTemplateLoader() : new FileTemplateLoader());
+		cfg.setTemplateLoader((use_classloader != null && use_classloader) ?
+				new ResourceTemplateLoader(libraryManager.getClassLoaderManager()) :
+				new FileTemplateLoader());
 		cfg.setOutputEncoding(output_encoding == null ? DEFAULT_CHARSET : output_encoding);
 		cfg.setDefaultEncoding(default_encoding == null ? DEFAULT_CHARSET : default_encoding);
 		cfg.setLocalizedLookup(false);
@@ -135,15 +137,27 @@ public class FreeMarkerTool extends AbstractLibrary implements Closeable {
 
 	private static class ResourceTemplateLoader implements TemplateLoader {
 
+		private final ClassLoaderManager classLoaderManager;
+
+		private ResourceTemplateLoader(ClassLoaderManager classLoaderManager) {
+			this.classLoaderManager = classLoaderManager;
+		}
+
+		private ClassLoader getClassLoader() {
+			return classLoaderManager == null ?
+					Thread.currentThread().getContextClassLoader() :
+					classLoaderManager.getClassLoader();
+		}
+
 		@Override
 		public Object findTemplateSource(final String path) throws IOException {
-			return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+			return getClassLoader().getResourceAsStream(path);
 		}
 
 		@Override
 		@JsonIgnore
 		public long getLastModified(final Object templateSource) {
-			return Thread.currentThread().getContextClassLoader().hashCode();
+			return getClassLoader().hashCode();
 		}
 
 		@Override
