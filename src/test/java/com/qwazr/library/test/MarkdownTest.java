@@ -26,39 +26,42 @@ import java.io.IOException;
 
 public class MarkdownTest extends AbstractLibraryTest {
 
-	@Library("markdown")
-	private MarkdownTool markdownTool;
+	@Library("markdown_extensions")
+	private MarkdownTool markdownExtensionsTool;
+
+	@Library("markdown_default")
+	private MarkdownTool markdownDefaultTool;
 
 	@Library("markdown_bootstrap")
-	private MarkdownTool markdownBoostrapTool;
+	private MarkdownTool markdownBootstrapTool;
 
 	@Test
 	public void convertString() throws IOException, TemplateException {
-		Assert.assertNotNull(markdownTool);
-		String html = markdownTool.toHtml("#Test");
+		Assert.assertNotNull(markdownExtensionsTool);
+		String html = markdownExtensionsTool.toHtml("# Test");
 		Assert.assertNotNull(html);
-		Assert.assertTrue(html.contains("<h1>Test</h1>"));
+		Assert.assertEquals("<h1 id=\"test\">Test</h1>\n", html);
 	}
 
 	final static String TABLE_MD_PATH = "src/test/resources/com/qwazr/library/test/markdown/table.md";
 
 	@Test
-	public void customHtmlSerializer() throws IOException, TemplateException {
-		Assert.assertNotNull(markdownBoostrapTool);
-		String html = markdownBoostrapTool.toHtml(new File(TABLE_MD_PATH));
+	public void customAttributeProvider() throws IOException, TemplateException {
+		Assert.assertNotNull(markdownBootstrapTool);
+		String html = markdownBootstrapTool.toHtml(new File(TABLE_MD_PATH));
 		Assert.assertNotNull(html);
-		Assert.assertTrue(html.contains("<table class=\"table\">"));
+		Assert.assertTrue(html.startsWith("<table class=\"table\">"));
 	}
 
 	@Test
 	public void converResource() throws IOException {
-		Assert.assertNotNull(markdownBoostrapTool);
-		Assert.assertNotNull(markdownBoostrapTool.resourceToHtml("com/qwazr/library/test/markdown/table.md"));
+		Assert.assertNotNull(markdownDefaultTool);
+		Assert.assertNotNull(markdownDefaultTool.resourceToHtml("com/qwazr/library/test/markdown/table.md"));
 	}
 
 	@Test
 	public void convertPath() throws IOException {
-		Assert.assertNotNull(markdownBoostrapTool);
-		Assert.assertNotNull(markdownBoostrapTool.toHtml(TABLE_MD_PATH));
+		Assert.assertNotNull(markdownDefaultTool);
+		Assert.assertNotNull(markdownDefaultTool.toHtml(TABLE_MD_PATH));
 	}
 }

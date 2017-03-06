@@ -17,91 +17,98 @@ package com.qwazr.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.qwazr.library.AbstractLibrary;
-import com.qwazr.utils.IOUtils;
-import com.qwazr.utils.StringUtils;
-import org.apache.commons.io.FileUtils;
-import org.pegdown.Extensions;
-import org.pegdown.LinkRenderer;
-import org.pegdown.ParsingTimeoutException;
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ToHtmlSerializer;
-import org.pegdown.VerbatimSerializer;
-import org.pegdown.ast.RootNode;
-import org.pegdown.ast.TableNode;
-import org.pegdown.plugins.ToHtmlSerializerPlugin;
+import org.commonmark.Extension;
+import org.commonmark.ext.autolink.AutolinkExtension;
+import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
+import org.commonmark.ext.heading.anchor.HeadingAnchorExtension;
+import org.commonmark.ext.ins.InsExtension;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.AttributeProvider;
+import org.commonmark.renderer.html.AttributeProviderContext;
+import org.commonmark.renderer.html.AttributeProviderFactory;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
 public class MarkdownTool extends AbstractLibrary {
 
-	final public List<ExtensionEnum> extensions = null;
+	final public LinkedHashSet<ExtensionEnum> extensions = null;
 
-	final public Long max_parsing_time = null;
+	final public String attribute_provider_class = null;
 
-	final public String html_serializer_class = null;
-
-	/**
-	 * @see org.pegdown.Extensions
-	 */
 	public enum ExtensionEnum {
 
-		none(Extensions.NONE),
-		smarts(Extensions.SMARTS),
-		quotes(Extensions.QUOTES),
-		smartypants(Extensions.SMARTYPANTS),
-		abbrevations(Extensions.ABBREVIATIONS),
-		hardwraps(Extensions.HARDWRAPS),
-		autolinks(Extensions.AUTOLINKS),
-		tables(Extensions.TABLES),
-		definitions(Extensions.DEFINITIONS),
-		fenced_code_blocks(Extensions.FENCED_CODE_BLOCKS),
-		wikilinks(Extensions.WIKILINKS),
-		strikethrough(Extensions.STRIKETHROUGH),
-		anchorlinks(Extensions.ANCHORLINKS),
-		all(Extensions.ALL),
-		suppress_html_blocks(Extensions.SUPPRESS_HTML_BLOCKS),
-		suppress_inline_html(Extensions.SUPPRESS_INLINE_HTML),
-		suppress_all_html(Extensions.SUPPRESS_ALL_HTML),
-		atxheaderspace(Extensions.ATXHEADERSPACE),
-		forcelistitempara(Extensions.FORCELISTITEMPARA),
-		relaxedhrules(Extensions.RELAXEDHRULES),
-		tasklistitems(Extensions.TASKLISTITEMS),
-		extanchorlinks(Extensions.EXTANCHORLINKS),
-		all_optionals(Extensions.ALL_OPTIONALS),
-		all_with_optionals(Extensions.ALL_WITH_OPTIONALS);
+		autolinks(AutolinkExtension.create()),
+		tables(TablesExtension.create()),
+		strikethrough(StrikethroughExtension.create()),
+		heading_anchor(HeadingAnchorExtension.create()),
+		ins(InsExtension.create()),
+		yaml_front_matter(YamlFrontMatterExtension.create());
 
-		private final int ext;
+		private final Extension extension;
 
-		ExtensionEnum(int ext) {
-			this.ext = ext;
+		ExtensionEnum(Extension extension) {
+			this.extension = extension;
 		}
 	}
 
 	private final static String DEFAULT_CHARSET = "UTF-8";
 
 	@JsonIgnore
-	private volatile MarkdownProcessor markdownProcessor;
+	private volatile Parser parser;
+
+	@JsonIgnore
+	private volatile HtmlRenderer renderer;
 
 	@Override
 	public void load() throws ClassNotFoundException, NoSuchMethodException {
-		int extensionsValue = 0;
+
+		final List<Extension> extensionsList = new ArrayList<>(extensions == null ? 0 : extensions.size());
 		if (extensions != null)
 			for (ExtensionEnum extensionEnum : extensions)
-				extensionsValue |= extensionEnum.ext;
-		final Class<? extends ToHtmlSerializer> htmlSerializerClass = StringUtils.isEmpty(html_serializer_class) ?
-				null :
-				libraryManager.getClassLoaderManager().findClass(html_serializer_class);
-		markdownProcessor = new MarkdownProcessor(htmlSerializerClass, extensionsValue, max_parsing_time);
+				extensionsList.add(extensionEnum.extension);
+		final HtmlRenderer.Builder rendererBuilder = HtmlRenderer.builder();
+		final Parser.Builder parserBuilder = Parser.builder();
+		if (!extensionsList.isEmpty()) {
+			rendererBuilder.extensions(extensionsList);
+			parserBuilder.extensions(extensionsList);
+		}
+		if (attribute_provider_class != null) {
+			rendererBuilder.attributeProviderFactory(context -> {
+				try {
+					return libraryManager.getClassLoaderManager().newInstance(attribute_provider_class);
+				} catch (IOException | ReflectiveOperationException e) {
+					throw new RuntimeException(e);
+				}
+			});
+		}
+		parser = parserBuilder.build();
+		renderer = rendererBuilder.build();
 	}
 
-	public String toHtml(String input) {
-		return markdownProcessor.markdownToHtml(input);
+	public String toHtml(final String input) {
+		return renderer.render(parser.parse(input));
+	}
+
+	public String toHtml(final InputStream inputStream, final String encoding) throws IOException {
+		return toHtml(new InputStreamReader(inputStream, encoding));
+	}
+
+	public String toHtml(final Reader input) throws IOException {
+		return renderer.render(parser.parseReader(input));
 	}
 
 	public String fileToHtml(final String path, final String encoding) throws IOException {
@@ -114,7 +121,7 @@ public class MarkdownTool extends AbstractLibrary {
 
 	public String resourceToHtml(final String resourceName, final String encoding) throws IOException {
 		try (final InputStream input = libraryManager.getClassLoaderManager().getResourceAsStream(resourceName)) {
-			return markdownProcessor.markdownToHtml(IOUtils.toString(input, encoding));
+			return toHtml(input, encoding);
 		}
 	}
 
@@ -123,59 +130,22 @@ public class MarkdownTool extends AbstractLibrary {
 	}
 
 	public String toHtml(final File file) throws IOException {
-		return markdownProcessor.markdownToHtml(FileUtils.readFileToString(file, DEFAULT_CHARSET));
+		return toHtml(file, DEFAULT_CHARSET);
 	}
 
 	public String toHtml(final File file, final String encoding) throws IOException {
-		return markdownProcessor.markdownToHtml(FileUtils.readFileToString(file, encoding));
+		try (final InputStream input = new FileInputStream(file)) {
+			return toHtml(input, encoding);
+		}
 	}
 
-	private class MarkdownProcessor extends PegDownProcessor {
-
-		private final Constructor<? extends ToHtmlSerializer> htmlSerializerConstructor;
-
-		private MarkdownProcessor(final Class<? extends ToHtmlSerializer> htmlSerializerClass,
-				final int extensionsValue, final Long maxParsingTime) throws NoSuchMethodException {
-			super(extensionsValue, maxParsingTime == null ? PegDownProcessor.DEFAULT_MAX_PARSING_TIME : maxParsingTime);
-			this.htmlSerializerConstructor = htmlSerializerClass == null ?
-					null :
-					htmlSerializerClass.getConstructor(LinkRenderer.class, Map.class, List.class);
-		}
+	public static class BoostrapAttributeProvider implements AttributeProvider {
 
 		@Override
-		public synchronized String markdownToHtml(char[] markdownSource, LinkRenderer linkRenderer,
-				Map<String, VerbatimSerializer> verbatimSerializerMap, List<ToHtmlSerializerPlugin> plugins) {
-			if (htmlSerializerConstructor == null)
-				return super.markdownToHtml(markdownSource, linkRenderer, verbatimSerializerMap, plugins);
-			// Synchronized because PegDownProcessor is not thread safe
-			try {
-				RootNode astRoot = parseMarkdown(markdownSource);
-				return htmlSerializerConstructor.newInstance(linkRenderer, verbatimSerializerMap, plugins)
-						.toHtml(astRoot);
-			} catch (ParsingTimeoutException e) {
-				return null;
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
+		public void setAttributes(final Node node, final String tagName, final Map<String, String> attributes) {
+			if ("table".equals(tagName)) {
+				attributes.put("class", "table");
 			}
-		}
-	}
-
-	public static class BootstrapHtmlSerializer extends ToHtmlSerializer {
-
-		public BootstrapHtmlSerializer(final LinkRenderer linkRenderer,
-				final Map<String, VerbatimSerializer> verbatimSerializers, final List<ToHtmlSerializerPlugin> plugins) {
-			super(linkRenderer, verbatimSerializers, plugins);
-		}
-
-		@Override
-		public void visit(TableNode node) {
-			currentTableNode = node;
-			printer.print("<table");
-			printAttribute("class", "table");
-			printer.print('>').indent(+2);
-			visitChildren(node);
-			printer.indent(-2).println().print('<').print('/').print("table").print('>');
-			currentTableNode = null;
 		}
 	}
 }
