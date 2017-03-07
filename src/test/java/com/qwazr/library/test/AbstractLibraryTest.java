@@ -20,17 +20,19 @@ import com.qwazr.library.LibraryManager;
 import com.qwazr.server.BaseServer;
 import com.qwazr.server.GenericServer;
 import com.qwazr.server.configuration.ServerConfiguration;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import java.io.File;
 import java.io.IOException;
 
-abstract class AbstractLibraryTest {
+public abstract class AbstractLibraryTest {
 
 	private static TestServer INSTANCE;
 
-	@Before
-	public void before() {
+	@BeforeClass
+	public static void beforeClass() {
 		if (INSTANCE == null) {
 			try {
 				INSTANCE = new TestServer();
@@ -38,7 +40,19 @@ abstract class AbstractLibraryTest {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	@Before
+	public void before() {
 		INSTANCE.libraryManager.inject(this);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (INSTANCE != null) {
+			INSTANCE.stop();
+			INSTANCE = null;
+		}
 	}
 
 	private static class TestServer implements BaseServer {
