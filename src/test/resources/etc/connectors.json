@@ -1,14 +1,5 @@
 {
   "library": {
-    "cassandra": {
-      "class": "com.qwazr.connectors.CassandraConnector",
-      "hosts": [
-        "localhost"
-      ],
-      "timeout_connect_ms": 20000,
-      "timeout_read_ms": 60000,
-      "timeout_pool_ms": 10000
-    },
     "hdfs": {
       "class": "com.qwazr.connectors.HdfsConnector",
       "config_path": "src/test/resources/hadoop",
@@ -29,13 +20,6 @@
       "username": "anonymous",
       "password": "test@qwazr.com",
       "hostname": "ftp.qwazr.com"
-    },
-    "mysql": {
-      "class": "com.qwazr.connectors.DatabaseConnector",
-      "driver": "com.mysql.jdbc.Driver",
-      "url": "jdbc:mysql://localhost:3306/test?autoReconnect=true",
-      "username": "test",
-      "password": "test"
     },
     "mybatis_default": {
       "class": "com.qwazr.connectors.MybatisConnector",
