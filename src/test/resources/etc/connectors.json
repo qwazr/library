@@ -1,12 +1,5 @@
 {
   "library": {
-    "hdfs": {
-      "class": "com.qwazr.connectors.HdfsConnector",
-      "config_path": "src/test/resources/hadoop",
-      "config_files": [
-        "core-site.xml"
-      ]
-    },
     "ldap": {
       "class": "com.qwazr.connectors.LdapConnector",
       "host": "loclahost",
