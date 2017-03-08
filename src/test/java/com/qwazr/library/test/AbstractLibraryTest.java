@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public abstract class AbstractLibraryTest {
 
@@ -55,20 +56,27 @@ public abstract class AbstractLibraryTest {
 		}
 	}
 
+	static File getDataDirectory() {
+		return INSTANCE == null ? null : INSTANCE.dataDirectory;
+	}
+
 	private static class TestServer implements BaseServer {
 
 		private final GenericServer server;
 		private final LibraryManager libraryManager;
+		private final File dataDirectory;
 
 		private TestServer() throws IOException {
+			dataDirectory = Files.createTempDirectory("library-test").toFile();
 			final ServerConfiguration configuration = ServerConfiguration.of()
-					.data(new File("src/test/resources"))
+					.data(dataDirectory)
 					.etcDirectory(new File("src/test/resources/etc"))
 					.build();
 			final GenericServer.Builder builder = GenericServer.of(configuration, null);
 			final ClassLoaderManager classLoaderManager =
 					new ClassLoaderManager(builder.getConfiguration().dataDirectory, Thread.currentThread());
-			libraryManager = new LibraryManager(classLoaderManager, null, builder);
+			libraryManager = new LibraryManager(classLoaderManager, null, configuration.dataDirectory,
+					configuration.getEtcFiles());
 			server = builder.build();
 		}
 

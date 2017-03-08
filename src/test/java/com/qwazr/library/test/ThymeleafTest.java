@@ -17,10 +17,13 @@ package com.qwazr.library.test;
 
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.ThymeleafTool;
+import com.qwazr.utils.FileUtils;
 import freemarker.template.TemplateException;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,7 +31,8 @@ import java.util.Map;
 
 public class ThymeleafTest extends AbstractLibraryTest {
 
-	private final static String TEMPLATE_RESOURCE = "com/qwazr/library/test/thymeleaf/template";
+	private final static String TEMPLATE_PATH = "com/qwazr/library/test/thymeleaf";
+	private final static String TEMPLATE_RESOURCE = TEMPLATE_PATH + "/template";
 	private final static String TEST_TEXT = "Hello world!";
 
 	@Library("thymeleaf_classloader")
@@ -41,6 +45,11 @@ public class ThymeleafTest extends AbstractLibraryTest {
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("test", TEST_TEXT);
 		return variables;
+	}
+
+	@BeforeClass
+	public static void copyFiles() throws IOException {
+		FileUtils.copyDirectory(new File("src/test/resources"), getDataDirectory());
 	}
 
 	@Test

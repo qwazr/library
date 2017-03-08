@@ -67,12 +67,15 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 			etcFiles.forEach(this::loadLibrarySet);
 	}
 
-	public LibraryManager(final ClassLoaderManager classLoaderManager, final TableServiceInterface tableService,
-			final GenericServer.Builder builder) throws IOException {
-		this(classLoaderManager, tableService, builder.getConfiguration().dataDirectory,
-				builder.getConfiguration().getEtcFiles());
+	public void registerWebService(final GenericServer.Builder builder) {
 		builder.webService(LibraryServiceImpl.class);
+	}
+
+	public void registerIdentityManager(final GenericServer.Builder builder) {
 		builder.identityManagerProvider(this);
+	}
+
+	public void registerContextAttribute(final GenericServer.Builder builder) {
 		builder.contextAttribute(this);
 	}
 
