@@ -51,24 +51,6 @@
     },
     "csv": {
       "class": "com.qwazr.tools.CSVTool"
-    },
-    "markdown_default": {
-      "class": "com.qwazr.tools.MarkdownTool"
-    },
-    "markdown_extensions": {
-      "class": "com.qwazr.tools.MarkdownTool",
-      "extensions": [
-        "heading_anchor",
-        "autolinks",
-        "tables"
-      ]
-    },
-    "markdown_bootstrap": {
-      "class": "com.qwazr.tools.MarkdownTool",
-      "extensions": [
-        "tables"
-      ],
-      "attribute_provider_class": "com.qwazr.tools.MarkdownTool$BoostrapAttributeProvider"
     }
   }
 }
