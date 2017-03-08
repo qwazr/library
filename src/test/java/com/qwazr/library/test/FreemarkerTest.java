@@ -17,10 +17,13 @@ package com.qwazr.library.test;
 
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.FreeMarkerTool;
+import com.qwazr.utils.FileUtils;
 import freemarker.template.TemplateException;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +45,11 @@ public class FreemarkerTest extends AbstractLibraryTest {
 		return variables;
 	}
 
+	@BeforeClass
+	public static void copyFiles() throws IOException {
+		FileUtils.copyDirectory(new File("src/test/resources"), getDataDirectory());
+	}
+	
 	@Test
 	public void classloaderTemplate() throws IOException, TemplateException {
 		Assert.assertNotNull(freemarker_classloader);

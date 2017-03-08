@@ -31,8 +31,7 @@ import java.util.Map;
 
 public class ThymeleafTest extends AbstractLibraryTest {
 
-	private final static String TEMPLATE_PATH = "com/qwazr/library/test/thymeleaf";
-	private final static String TEMPLATE_RESOURCE = TEMPLATE_PATH + "/template";
+	private final static String TEMPLATE_RESOURCE = "com/qwazr/library/test/thymeleaf/template";
 	private final static String TEST_TEXT = "Hello world!";
 
 	@Library("thymeleaf_classloader")
