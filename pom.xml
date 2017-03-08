@@ -17,7 +17,6 @@
         <connection>scm:git:git@github.com:qwazr/library.git</connection>
         <developerConnection>scm:git:git@github.com:qwazr/library.git</developerConnection>
         <url>git@github.com:qwazr/library.git</url>
-        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
@@ -28,11 +27,6 @@
         <dependency>
             <groupId>com.qwazr</groupId>
             <artifactId>qwazr-compiler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.datastax.cassandra</groupId>
-            <artifactId>cassandra-driver-core</artifactId>
-            <version>3.1.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -97,35 +91,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>6.0.5</version>
-        </dependency>
-        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>3.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <version>2.1.1</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-excelant</artifactId>
-            <version>3.15</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -155,17 +123,6 @@
             <groupId>org.apache.directory.api</groupId>
             <artifactId>api-util</artifactId>
             <version>1.0.0-RC2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-            <version>1.4</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>activation</artifactId>
-                    <groupId>javax.activation</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.atlassian.commonmark</groupId>

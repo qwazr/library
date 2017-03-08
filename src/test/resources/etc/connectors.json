@@ -15,31 +15,6 @@
       "username": "cn=admin,dc=qwazr,dc=net",
       "password": "test"
     },
-    "ftp": {
-      "class": "com.qwazr.connectors.FtpConnector",
-      "username": "anonymous",
-      "password": "test@qwazr.com",
-      "hostname": "ftp.qwazr.com"
-    },
-    "mybatis_default": {
-      "class": "com.qwazr.connectors.MybatisConnector",
-      "properties": {
-        "driver": "com.mysql.jdbc.Driver",
-        "url": "jdbc:mysql://localhost:3306/test?autoReconnect=true",
-        "username": "test",
-        "password": "test"
-      }
-    },
-    "mybatis_file": {
-      "class": "com.qwazr.connectors.MybatisConnector",
-      "configuration_file": "src/main/resources/com/qwazr/connectors/mybatis/default-config.xml",
-      "properties": {
-        "driver": "com.mysql.jdbc.Driver",
-        "url": "jdbc:mysql://localhost:3306/test?autoReconnect=true",
-        "username": "test",
-        "password": "test"
-      }
-    },
     "mongo": {
       "class": "com.qwazr.connectors.MongoDbConnector",
       "servers": [
