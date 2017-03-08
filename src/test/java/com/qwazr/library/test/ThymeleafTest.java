@@ -18,7 +18,6 @@ package com.qwazr.library.test;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.ThymeleafTool;
 import com.qwazr.utils.FileUtils;
-import freemarker.template.TemplateException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,7 +51,7 @@ public class ThymeleafTest extends AbstractLibraryTest {
 	}
 
 	@Test
-	public void classloaderTemplate() throws IOException, TemplateException {
+	public void classloaderTemplate() throws IOException {
 		Assert.assertNotNull(thymeleaf_classloader);
 		String test = thymeleaf_classloader.template(TEMPLATE_RESOURCE, Locale.getDefault(), getVariables());
 		Assert.assertNotNull(test);
@@ -60,7 +59,7 @@ public class ThymeleafTest extends AbstractLibraryTest {
 	}
 
 	@Test
-	public void fileTemplate() throws IOException, TemplateException {
+	public void fileTemplate() throws IOException {
 		Assert.assertNotNull(thymeleaf_files);
 		String test = thymeleaf_files.template(TEMPLATE_RESOURCE, Locale.getDefault(), getVariables());
 		Assert.assertNotNull(test);

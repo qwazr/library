@@ -52,19 +52,6 @@
     "csv": {
       "class": "com.qwazr.tools.CSVTool"
     },
-    "freemarker_classloader": {
-      "class": "com.qwazr.tools.FreeMarkerTool",
-      "use_classloader": true,
-      "output_encoding": "UTF-8",
-      "default_encoding": "UTF-8",
-      "default_content_type": "TEXT/HTML"
-    },
-    "freemarker_files": {
-      "class": "com.qwazr.tools.FreeMarkerTool",
-      "output_encoding": "UTF-8",
-      "default_encoding": "UTF-8",
-      "default_content_type": "TEXT/HTML"
-    },
     "thymeleaf_classloader": {
       "class": "com.qwazr.tools.ThymeleafTool",
       "use_classloader": true,

@@ -17,7 +17,6 @@ package com.qwazr.library.test;
 
 import com.qwazr.library.annotations.Library;
 import com.qwazr.tools.MarkdownTool;
-import freemarker.template.TemplateException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +35,7 @@ public class MarkdownTest extends AbstractLibraryTest {
 	private MarkdownTool markdownBootstrapTool;
 
 	@Test
-	public void convertString() throws IOException, TemplateException {
+	public void convertString() throws IOException {
 		Assert.assertNotNull(markdownExtensionsTool);
 		String html = markdownExtensionsTool.toHtml("# Test");
 		Assert.assertNotNull(html);
@@ -46,7 +45,7 @@ public class MarkdownTest extends AbstractLibraryTest {
 	final static String TABLE_MD_PATH = "src/test/resources/com/qwazr/library/test/markdown/table.md";
 
 	@Test
-	public void customAttributeProvider() throws IOException, TemplateException {
+	public void customAttributeProvider() throws IOException {
 		Assert.assertNotNull(markdownBootstrapTool);
 		String html = markdownBootstrapTool.toHtml(new File(TABLE_MD_PATH));
 		Assert.assertNotNull(html);
