@@ -69,14 +69,6 @@
         "tables"
       ],
       "attribute_provider_class": "com.qwazr.tools.MarkdownTool$BoostrapAttributeProvider"
-    },
-    "archiver": {
-      "class": "com.qwazr.tools.ArchiverTool",
-      "codec": "deflate"
-    },
-    "gzip_archiver": {
-      "class": "com.qwazr.tools.ArchiverTool",
-      "codec": "gzip"
     }
   }
 }

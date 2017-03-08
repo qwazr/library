@@ -22,16 +22,19 @@
     <dependencies>
         <dependency>
             <groupId>com.qwazr</groupId>
-            <artifactId>qwazr-database</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
+            <artifactId>qwazr-server</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.qwazr</groupId>
             <artifactId>qwazr-compiler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qwazr</groupId>
+            <artifactId>qwazr-database</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -103,10 +106,6 @@
                     <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

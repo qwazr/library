@@ -16,11 +16,8 @@
 package com.qwazr.library.test;
 
 import com.qwazr.library.annotations.Library;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.IOException;
 
 public class CustomTest extends AbstractLibraryTest {
 
@@ -28,7 +25,7 @@ public class CustomTest extends AbstractLibraryTest {
 	private CustomLibrary custom;
 
 	@Test
-	public void check() throws CompressorException, IOException {
+	public void check() {
 		Assert.assertNotNull(custom);
 		Assert.assertTrue(custom.isLoaded());
 		Assert.assertEquals(Integer.valueOf(12), custom.myParam);
