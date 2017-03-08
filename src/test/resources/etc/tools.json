@@ -52,21 +52,6 @@
     "csv": {
       "class": "com.qwazr.tools.CSVTool"
     },
-    "thymeleaf_classloader": {
-      "class": "com.qwazr.tools.ThymeleafTool",
-      "use_classloader": true,
-      "cache_enabled": true,
-      "cache_ttl_ms": 60000,
-      "template_mode": "XHTML",
-      "suffix": ".html"
-    },
-    "thymeleaf_files": {
-      "class": "com.qwazr.tools.ThymeleafTool",
-      "cache_enabled": false,
-      "character_encoding": "UTF-8",
-      "suffix": ".html",
-      "template_mode": "XHTML"
-    },
     "markdown_default": {
       "class": "com.qwazr.tools.MarkdownTool"
     },
