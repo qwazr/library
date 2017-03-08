@@ -25,6 +25,11 @@
             <artifactId>qwazr-database</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
             <groupId>com.qwazr</groupId>
             <artifactId>qwazr-compiler</artifactId>
         </dependency>
@@ -51,16 +56,6 @@
                     <groupId>xml-apis</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.directory.api</groupId>
-            <artifactId>api-ldap-client-all</artifactId>
-            <version>1.0.0-RC2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.directory.api</groupId>
-            <artifactId>api-util</artifactId>
-            <version>1.0.0-RC2</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.commonmark</groupId>

@@ -1,13 +1,5 @@
 {
   "library": {
-    "ldap": {
-      "class": "com.qwazr.connectors.LdapConnector",
-      "host": "loclahost",
-      "port": 389,
-      "base_dn": "dc=qwazr,dc=net",
-      "username": "cn=admin,dc=qwazr,dc=net",
-      "password": "test"
-    },
     "mongo": {
       "class": "com.qwazr.connectors.MongoDbConnector",
       "servers": [
