@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-package com.qwazr.tools;
+package com.qwazr.library.tools;
 
 import com.qwazr.library.AbstractLibrary;
 import com.qwazr.utils.ScriptUtils;
