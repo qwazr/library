@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2016 Emmanuel Keller / QWAZR
+ * Copyright 2015-2017 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,13 @@ public class LibraryServiceImpl extends AbstractServiceImpl implements LibrarySe
 		libraryManager = getContextAttribute(LibraryManager.class);
 	}
 
+	@Override
 	public Map<String, String> getLibraries() {
 		return libraryManager.getLibraries();
 	}
 
-	public AbstractLibrary getLibrary(String libraryName) {
+	@Override
+	public LibraryInterface getLibrary(String libraryName) {
 		return libraryManager.getLibrary(libraryName);
 	}
 

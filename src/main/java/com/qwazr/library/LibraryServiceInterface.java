@@ -40,6 +40,6 @@ public interface LibraryServiceInterface extends ServiceInterface {
 	@GET
 	@Path("/{library_name}")
 	@Produces(ServiceInterface.APPLICATION_JSON_UTF8)
-	AbstractLibrary getLibrary(@PathParam("library_name") String library_name);
+	LibraryInterface getLibrary(@PathParam("library_name") String library_name);
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2014-2016 Emmanuel Keller / QWAZR
+ * Copyright 2015-2017 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private final File dataDirectory;
 	private final ClassLoaderManager classLoaderManager;
+	private final LibraryServiceInterface service;
 	private final TableServiceInterface tableService;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
@@ -57,6 +58,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 			final File dataDirectory, final Collection<File> etcFiles) throws IOException {
 		this.classLoaderManager = classLoaderManager;
 		this.dataDirectory = dataDirectory;
+		this.service = new LibraryServiceImpl(this);
 		this.tableService = tableService;
 		this.libraryFileMap = new HashMap<>();
 
@@ -77,6 +79,10 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	public void registerContextAttribute(final GenericServer.Builder builder) {
 		builder.contextAttribute(this);
+	}
+
+	final public LibraryServiceInterface getService() {
+		return service;
 	}
 
 	@Override
