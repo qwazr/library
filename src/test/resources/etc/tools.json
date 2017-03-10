@@ -1,8 +1,5 @@
 {
   "library": {
-    "xml": {
-      "class": "com.qwazr.tools.XMLTool"
-    },
     "csv": {
       "class": "com.qwazr.tools.CSVTool"
     }

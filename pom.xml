@@ -90,11 +90,6 @@
             <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.rrd4j</groupId>
-            <artifactId>rrd4j</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.iban4j</groupId>
             <artifactId>iban4j</artifactId>
             <version>3.2.1</version>
