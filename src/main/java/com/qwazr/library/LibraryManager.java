@@ -70,6 +70,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	}
 
 	public LibraryManager registerWebService(final GenericServer.Builder builder) {
+		registerContextAttribute(builder);
 		builder.webService(LibraryServiceImpl.class);
 		return this;
 	}
