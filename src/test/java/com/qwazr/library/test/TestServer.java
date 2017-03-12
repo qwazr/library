@@ -42,9 +42,7 @@ class TestServer implements BaseServer {
 				new ClassLoaderManager(builder.getConfiguration().dataDirectory, Thread.currentThread());
 		libraryManager =
 				new LibraryManager(classLoaderManager, null, configuration.dataDirectory, configuration.getEtcFiles());
-		libraryManager.registerContextAttribute(builder);
-		libraryManager.registerWebService(builder);
-		libraryManager.registerIdentityManager(builder);
+		libraryManager.registerAll(builder);
 		localService = libraryManager.getService();
 		server = builder.build();
 	}

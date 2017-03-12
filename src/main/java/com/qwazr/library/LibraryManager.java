@@ -81,6 +81,12 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		builder.contextAttribute(this);
 	}
 
+	public void registerAll(final GenericServer.Builder builder) {
+		registerWebService(builder);
+		registerIdentityManager(builder);
+		registerContextAttribute(builder);
+	}
+
 	final public LibraryServiceInterface getService() {
 		return service;
 	}
