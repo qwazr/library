@@ -69,22 +69,19 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 			etcFiles.forEach(this::loadLibrarySet);
 	}
 
-	public void registerWebService(final GenericServer.Builder builder) {
+	public LibraryManager registerWebService(final GenericServer.Builder builder) {
 		builder.webService(LibraryServiceImpl.class);
+		return this;
 	}
 
-	public void registerIdentityManager(final GenericServer.Builder builder) {
+	public LibraryManager registerIdentityManager(final GenericServer.Builder builder) {
 		builder.identityManagerProvider(this);
+		return this;
 	}
 
-	public void registerContextAttribute(final GenericServer.Builder builder) {
+	public LibraryManager registerContextAttribute(final GenericServer.Builder builder) {
 		builder.contextAttribute(this);
-	}
-
-	public void registerAll(final GenericServer.Builder builder) {
-		registerWebService(builder);
-		registerIdentityManager(builder);
-		registerContextAttribute(builder);
+		return this;
 	}
 
 	final public LibraryServiceInterface getService() {

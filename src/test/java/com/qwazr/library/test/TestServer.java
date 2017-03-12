@@ -40,9 +40,10 @@ class TestServer implements BaseServer {
 		final GenericServer.Builder builder = GenericServer.of(configuration, null);
 		final ClassLoaderManager classLoaderManager =
 				new ClassLoaderManager(builder.getConfiguration().dataDirectory, Thread.currentThread());
-		libraryManager =
-				new LibraryManager(classLoaderManager, null, configuration.dataDirectory, configuration.getEtcFiles());
-		libraryManager.registerAll(builder);
+		libraryManager = new LibraryManager(classLoaderManager, null, configuration.dataDirectory,
+				configuration.getEtcFiles()).registerIdentityManager(builder)
+				.registerContextAttribute(builder)
+				.registerWebService(builder);
 		localService = libraryManager.getService();
 		server = builder.build();
 	}
