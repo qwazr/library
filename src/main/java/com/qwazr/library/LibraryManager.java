@@ -15,12 +15,10 @@
  **/
 package com.qwazr.library;
 
-import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.database.TableServiceInterface;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.server.GenericServer;
 import com.qwazr.utils.AnnotationsUtils;
-import com.qwazr.utils.ClassLoaderUtils;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
@@ -41,32 +39,29 @@ import java.util.Map;
 import java.util.Objects;
 
 public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
-		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, ClassLoaderUtils.ClassFactory,
-		Closeable {
+		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManager.class);
 
 	private final File dataDirectory;
-	private final ClassLoaderManager classLoaderManager;
 	private final LibraryServiceInterface service;
 	private final TableServiceInterface tableService;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
-	public LibraryManager(final ClassLoaderManager classLoaderManager, final TableServiceInterface tableService,
-			final File dataDirectory, final Collection<File> etcFiles) throws IOException {
-		this.classLoaderManager = classLoaderManager;
+	public LibraryManager(final TableServiceInterface tableService, final File dataDirectory,
+			final Collection<File> etcFiles) throws IOException {
 		this.dataDirectory = dataDirectory;
 		this.service = new LibraryServiceImpl(this);
 		this.tableService = tableService;
 		this.libraryFileMap = new HashMap<>();
-
-		if (classLoaderManager != null)
-			classLoaderManager.register(this);
-
 		if (etcFiles != null)
 			etcFiles.forEach(this::loadLibrarySet);
+	}
+
+	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
+		this(null, dataDirectory, etcFiles);
 	}
 
 	public LibraryManager registerWebService(final GenericServer.Builder builder) {
@@ -106,10 +101,6 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		return dataDirectory;
 	}
 
-	final public ClassLoaderManager getClassLoaderManager() {
-		return classLoaderManager;
-	}
-
 	final public TableServiceInterface getTableService() {
 		return tableService;
 	}
@@ -119,21 +110,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
 		return map;
 	}
-
-	/**
-	 * Create a new object using a public empty constructor and inject the library objects in the annotated properties
-	 *
-	 * @param clazz
-	 * @param <T>
-	 * @return
-	 * @throws ReflectiveOperationException
-	 */
-	final public <T> T newInstance(final Class<T> clazz) throws ReflectiveOperationException {
-		final T instance = clazz.newInstance();
-		inject(instance);
-		return instance;
-	}
-
+	
 	/**
 	 * Inject the library objects in the annotated properties
 	 *

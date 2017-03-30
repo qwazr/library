@@ -15,7 +15,6 @@
  **/
 package com.qwazr.library.test;
 
-import com.qwazr.classloader.ClassLoaderManager;
 import com.qwazr.database.TableManager;
 import com.qwazr.library.LibraryManager;
 import com.qwazr.library.LibraryServiceInterface;
@@ -39,10 +38,8 @@ class TestServer implements BaseServer {
 		final ServerConfiguration configuration =
 				ServerConfiguration.of().data(dataDirectory).etcDirectory(new File("src/test/resources/etc")).build();
 		final GenericServer.Builder builder = GenericServer.of(configuration, null);
-		final ClassLoaderManager classLoaderManager =
-				new ClassLoaderManager(builder.getConfiguration().dataDirectory, Thread.currentThread());
 		final TableManager tableManager = new TableManager(TableManager.checkTablesDirectory(dataDirectory.toPath()));
-		libraryManager = new LibraryManager(classLoaderManager, tableManager.getService(), configuration.dataDirectory,
+		libraryManager = new LibraryManager(tableManager.getService(), configuration.dataDirectory,
 				configuration.getEtcFiles()).registerIdentityManager(builder)
 				.registerContextAttribute(builder)
 				.registerWebService(builder);

@@ -37,8 +37,8 @@ public class CustomTest {
 	@BeforeClass
 	public static void beforeClass() throws IOException {
 		final File dataDirectory = Files.createTempDirectory("library-test").toFile();
-		libraryManager = new LibraryManager(null, null, dataDirectory,
-				Arrays.asList(new File("src/test/resources/etc/library.json")));
+		libraryManager =
+				new LibraryManager(dataDirectory, Arrays.asList(new File("src/test/resources/etc/library.json")));
 	}
 
 	@Before

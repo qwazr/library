@@ -27,11 +27,6 @@
         </dependency>
         <dependency>
             <groupId>com.qwazr</groupId>
-            <artifactId>qwazr-compiler</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.qwazr</groupId>
             <artifactId>qwazr-database</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
