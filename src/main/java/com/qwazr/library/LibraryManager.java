@@ -110,7 +110,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
 		return map;
 	}
-	
+
 	/**
 	 * Inject the library objects in the annotated properties
 	 *
@@ -216,7 +216,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	public IdentityManager getIdentityManager(final String realm) throws IOException {
 		final LibraryInterface library = get(realm);
 		if (library == null)
-			throw new IOException("No realm connector with this name: " + realm);
+			return null;
 		if (!(library instanceof IdentityManager))
 			throw new IOException("This is a not a realm connector: " + realm);
 		return (IdentityManager) library;
