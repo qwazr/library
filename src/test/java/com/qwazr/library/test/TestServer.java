@@ -49,6 +49,8 @@ class TestServer implements BaseServer {
 						.registerContextAttribute(builder)
 						.registerWebService(builder);
 		localService = libraryManager.getService();
+		libraryManager.getInstancesSupplier()
+				.registerInstance(LibraryServiceInterface.class, localService);
 		server = builder.build();
 	}
 

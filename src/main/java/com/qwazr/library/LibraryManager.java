@@ -22,6 +22,7 @@ import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LockUtils;
 import com.qwazr.utils.ReadOnlyMap;
 import com.qwazr.utils.json.JsonMapper;
+import com.qwazr.utils.reflection.InstancesSupplier;
 import io.undertow.security.idm.IdentityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +45,23 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private final File dataDirectory;
 	private final LibraryServiceInterface service;
+	private final InstancesSupplier instancesSupplier;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
-	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
+	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles,
+			final InstancesSupplier instancesSupplier) throws IOException {
 		this.dataDirectory = dataDirectory;
 		this.service = new LibraryServiceImpl(this);
 		this.libraryFileMap = new HashMap<>();
+		this.instancesSupplier = instancesSupplier == null ? InstancesSupplier.withConcurrentMap() : instancesSupplier;
 		if (etcFiles != null)
 			etcFiles.forEach(this::loadLibrarySet);
+	}
+
+	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
+		this(dataDirectory, etcFiles, null);
 	}
 
 	public LibraryManager registerWebService(final GenericServer.Builder builder) {
@@ -74,6 +82,10 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	final public LibraryServiceInterface getService() {
 		return service;
+	}
+
+	final public InstancesSupplier getInstancesSupplier() {
+		return instancesSupplier;
 	}
 
 	@Override

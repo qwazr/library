@@ -15,6 +15,7 @@
  **/
 package com.qwazr.library.test;
 
+import com.qwazr.library.LibraryServiceInterface;
 import com.qwazr.library.annotations.Library;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -58,11 +59,19 @@ public class ServerTest {
 
 	@Test
 	public void list() {
-		Assert.assertTrue(server.localService.getLibraries().containsKey("custom"));
+		Assert.assertTrue(server.localService.getLibraries()
+								  .containsKey("custom"));
 	}
 
 	@Test
 	public void get() {
 		Assert.assertNotNull(server.localService.getLibrary("custom"));
+	}
+
+	@Test
+	public void checkInstancesSupplier() {
+		Assert.assertEquals(server.localService,
+							server.libraryManager.getInstancesSupplier()
+									.getInstance(LibraryServiceInterface.class));
 	}
 }
