@@ -15,7 +15,6 @@
  **/
 package com.qwazr.library;
 
-import com.qwazr.database.TableServiceInterface;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.server.GenericServer;
 import com.qwazr.utils.AnnotationsUtils;
@@ -45,23 +44,16 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private final File dataDirectory;
 	private final LibraryServiceInterface service;
-	private final TableServiceInterface tableService;
 
 	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
-	public LibraryManager(final TableServiceInterface tableService, final File dataDirectory,
-			final Collection<File> etcFiles) throws IOException {
+	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
 		this.dataDirectory = dataDirectory;
 		this.service = new LibraryServiceImpl(this);
-		this.tableService = tableService;
 		this.libraryFileMap = new HashMap<>();
 		if (etcFiles != null)
 			etcFiles.forEach(this::loadLibrarySet);
-	}
-
-	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
-		this(null, dataDirectory, etcFiles);
 	}
 
 	public LibraryManager registerWebService(final GenericServer.Builder builder) {
@@ -101,20 +93,18 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		return dataDirectory;
 	}
 
-	final public TableServiceInterface getTableService() {
-		return tableService;
-	}
-
 	public Map<String, String> getLibraries() {
 		final Map<String, String> map = new LinkedHashMap<>();
-		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
+		this.forEach((name, library) -> map.put(name,
+												library.getClass()
+														.getName()));
 		return map;
 	}
 
 	/**
 	 * Inject the library objects in the annotated properties
 	 *
-	 * @param object
+	 * @param object the class instance to inject
 	 */
 	final public void inject(final Object object) {
 		if (object == null)
@@ -138,8 +128,8 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	/**
 	 * Return the LibraryManager instance from the ServletContext
 	 *
-	 * @param context
-	 * @return
+	 * @param context the servletContext which may hold the LibraryManager instance
+	 * @return the LibraryManager instance present in the given ServletContext
 	 */
 	static public LibraryManager getInstance(final ServletContext context) {
 		Objects.requireNonNull(context, "Cannot find a Library instance, the context is null");
@@ -151,8 +141,8 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	 * <p>
 	 * The LibraryManager instance is extracted from the ServletContext
 	 *
-	 * @param context
-	 * @param object
+	 * @param context the servletContext which may hold the LibraryManager instance
+	 * @param object  the class instance to inject
 	 */
 	static public void inject(final ServletContext context, final Object object) {
 		if (object == null)
@@ -164,7 +154,8 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private void loadLibrarySet(final File jsonFile) {
 		try {
-			final LibraryConfiguration configuration =
+			final LibraryConfiguration
+					configuration =
 					JsonMapper.MAPPER.readValue(jsonFile, LibraryConfiguration.class);
 
 			if (configuration == null || configuration.library == null) {
@@ -176,14 +167,15 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 				LOGGER.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 
 			mapLock.writeEx(() -> {
-				configuration.library.values().forEach((library) -> {
-					try {
-						library.load(this);
-						library.load();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				});
+				configuration.library.values()
+						.forEach((library) -> {
+							try {
+								library.load(this);
+								library.load();
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+						});
 				libraryFileMap.put(jsonFile, configuration.library);
 				buildGlobalMap();
 			});

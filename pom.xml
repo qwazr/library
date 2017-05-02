@@ -25,13 +25,6 @@
             <artifactId>qwazr-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.qwazr</groupId>
-            <artifactId>qwazr-database</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
     </dependencies>
 
 </project>
