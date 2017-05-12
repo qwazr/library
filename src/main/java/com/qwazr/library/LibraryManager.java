@@ -66,7 +66,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	public LibraryManager registerWebService(final GenericServer.Builder builder) {
 		registerContextAttribute(builder);
-		builder.webService(LibraryServiceImpl.class);
+		builder.singletons(service);
 		return this;
 	}
 
@@ -107,9 +107,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	public Map<String, String> getLibraries() {
 		final Map<String, String> map = new LinkedHashMap<>();
-		this.forEach((name, library) -> map.put(name,
-												library.getClass()
-														.getName()));
+		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
 		return map;
 	}
 
@@ -166,8 +164,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private void loadLibrarySet(final File jsonFile) {
 		try {
-			final LibraryConfiguration
-					configuration =
+			final LibraryConfiguration configuration =
 					JsonMapper.MAPPER.readValue(jsonFile, LibraryConfiguration.class);
 
 			if (configuration == null || configuration.library == null) {
@@ -179,15 +176,14 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 				LOGGER.info("Load library configuration file: " + jsonFile.getAbsolutePath());
 
 			mapLock.writeEx(() -> {
-				configuration.library.values()
-						.forEach((library) -> {
-							try {
-								library.load(this);
-								library.load();
-							} catch (Exception e) {
-								throw new RuntimeException(e);
-							}
-						});
+				configuration.library.values().forEach((library) -> {
+					try {
+						library.load(this);
+						library.load();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				});
 				libraryFileMap.put(jsonFile, configuration.library);
 				buildGlobalMap();
 			});
