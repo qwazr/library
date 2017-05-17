@@ -16,6 +16,7 @@
 package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
+import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.GenericServer;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.IOUtils;
@@ -64,8 +65,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		this(dataDirectory, etcFiles, null);
 	}
 
-	public LibraryManager registerWebService(final GenericServer.Builder builder) {
-		registerContextAttribute(builder);
+	public LibraryManager registerWebService(final ApplicationBuilder builder) {
 		builder.singletons(service);
 		return this;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright 2014-2016 Emmanuel Keller / QWAZR
+ * Copyright 2015-2017 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.qwazr.library;
 
 import com.qwazr.server.ServiceInterface;
-import com.qwazr.server.ServiceName;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -25,9 +24,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.util.Map;
 
-@Path("/library")
+@Path("/" + LibraryServiceInterface.SERVICE_NAME)
 @RolesAllowed(LibraryServiceInterface.SERVICE_NAME)
-@ServiceName(LibraryServiceInterface.SERVICE_NAME)
 public interface LibraryServiceInterface extends ServiceInterface {
 
 	String SERVICE_NAME = "library";

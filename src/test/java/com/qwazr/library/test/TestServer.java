@@ -17,8 +17,10 @@ package com.qwazr.library.test;
 
 import com.qwazr.library.LibraryManager;
 import com.qwazr.library.LibraryServiceInterface;
+import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.BaseServer;
 import com.qwazr.server.GenericServer;
+import com.qwazr.server.RestApplication;
 import com.qwazr.server.configuration.ServerConfiguration;
 
 import java.io.File;
@@ -33,24 +35,17 @@ class TestServer implements BaseServer {
 	final LibraryServiceInterface localService;
 
 	TestServer() throws IOException {
-		dataDirectory =
-				Files.createTempDirectory("library-test")
-						.toFile();
-		final ServerConfiguration
-				configuration =
-				ServerConfiguration.of()
-						.data(dataDirectory)
-						.etcDirectory(new File("src/test/resources/etc"))
-						.build();
+		dataDirectory = Files.createTempDirectory("library-test").toFile();
+		final ServerConfiguration configuration =
+				ServerConfiguration.of().data(dataDirectory).etcDirectory(new File("src/test/resources/etc")).build();
 		final GenericServer.Builder builder = GenericServer.of(configuration, null);
+		final ApplicationBuilder webServices = ApplicationBuilder.of("/*").classes(RestApplication.JSON_CLASSES);
 		libraryManager =
 				new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles()).registerIdentityManager(
-						builder)
-						.registerContextAttribute(builder)
-						.registerWebService(builder);
+						builder).registerContextAttribute(builder).registerWebService(webServices);
 		localService = libraryManager.getService();
-		libraryManager.getInstancesSupplier()
-				.registerInstance(LibraryServiceInterface.class, localService);
+		libraryManager.getInstancesSupplier().registerInstance(LibraryServiceInterface.class, localService);
+		builder.getWebServiceContext().jaxrs(webServices);
 		server = builder.build();
 	}
 
