@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015-2017 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
@@ -20,13 +20,12 @@ import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.GenericServer;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.IOUtils;
-import com.qwazr.utils.LockUtils;
+import com.qwazr.utils.LoggerUtils;
 import com.qwazr.utils.ReadOnlyMap;
+import com.qwazr.utils.concurrent.ReadWriteLock;
 import com.qwazr.utils.json.JsonMapper;
 import com.qwazr.utils.reflection.InstancesSupplier;
 import io.undertow.security.idm.IdentityManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.Closeable;
@@ -38,17 +37,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, Closeable {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryManager.class);
+	private static final Logger LOGGER = LoggerUtils.getLogger(LibraryManager.class);
 
 	private final File dataDirectory;
 	private final LibraryServiceInterface service;
 	private final InstancesSupplier instancesSupplier;
 
-	private final LockUtils.ReadWriteLock mapLock = new LockUtils.ReadWriteLock();
+	private final ReadWriteLock mapLock;
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
 	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles,
@@ -56,6 +57,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		this.dataDirectory = dataDirectory;
 		this.service = new LibraryServiceImpl(this);
 		this.libraryFileMap = new HashMap<>();
+		this.mapLock = ReadWriteLock.stamped();
 		this.instancesSupplier = instancesSupplier == null ? InstancesSupplier.withConcurrentMap() : instancesSupplier;
 		if (etcFiles != null)
 			etcFiles.forEach(this::loadLibrarySet);
@@ -164,16 +166,15 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private void loadLibrarySet(final File jsonFile) {
 		try {
-			final LibraryConfiguration configuration =
-					JsonMapper.MAPPER.readValue(jsonFile, LibraryConfiguration.class);
+			final LibraryConfiguration configuration = JsonMapper.MAPPER.readValue(jsonFile,
+					LibraryConfiguration.class);
 
 			if (configuration == null || configuration.library == null) {
 				unloadLibrarySet(jsonFile);
 				return;
 			}
 
-			if (LOGGER.isInfoEnabled())
-				LOGGER.info("Load library configuration file: " + jsonFile.getAbsolutePath());
+			LOGGER.info(() -> "Load library configuration file: " + jsonFile.getAbsolutePath());
 
 			mapLock.writeEx(() -> {
 				configuration.library.values().forEach((library) -> {
@@ -189,8 +190,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 			});
 
 		} catch (IOException e) {
-			if (LOGGER.isErrorEnabled())
-				LOGGER.error(e.getMessage(), e);
+			LOGGER.log(Level.SEVERE, e, () -> "Cannot load the file: " + jsonFile);
 		}
 	}
 
@@ -199,8 +199,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 			final Map<String, LibraryInterface> map = libraryFileMap.remove(jsonFile);
 			if (map == null)
 				return;
-			if (LOGGER.isInfoEnabled())
-				LOGGER.info("Unload library configuration file: " + jsonFile.getAbsolutePath());
+			LOGGER.info(() -> "Unload library configuration file: " + jsonFile.getAbsolutePath());
 			buildGlobalMap();
 			IOUtils.closeObjects(map.values());
 		});
