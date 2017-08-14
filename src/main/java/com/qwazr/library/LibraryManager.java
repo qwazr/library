@@ -21,9 +21,9 @@ import com.qwazr.server.GenericServer;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LoggerUtils;
+import com.qwazr.utils.ObjectMappers;
 import com.qwazr.utils.ReadOnlyMap;
 import com.qwazr.utils.concurrent.ReadWriteLock;
-import com.qwazr.utils.json.JsonMapper;
 import com.qwazr.utils.reflection.InstancesSupplier;
 import io.undertow.security.idm.IdentityManager;
 
@@ -166,7 +166,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private void loadLibrarySet(final File jsonFile) {
 		try {
-			final LibraryConfiguration configuration = JsonMapper.MAPPER.readValue(jsonFile,
+			final LibraryConfiguration configuration = ObjectMappers.JSON.readValue(jsonFile,
 					LibraryConfiguration.class);
 
 			if (configuration == null || configuration.library == null) {
