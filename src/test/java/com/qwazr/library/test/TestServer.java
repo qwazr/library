@@ -20,6 +20,7 @@ import com.qwazr.library.LibraryServiceInterface;
 import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.BaseServer;
 import com.qwazr.server.GenericServer;
+import com.qwazr.server.GenericServerBuilder;
 import com.qwazr.server.RestApplication;
 import com.qwazr.server.configuration.ServerConfiguration;
 
@@ -38,7 +39,7 @@ class TestServer implements BaseServer {
 		dataDirectory = Files.createTempDirectory("library-test").toFile();
 		final ServerConfiguration configuration =
 				ServerConfiguration.of().data(dataDirectory).etcDirectory(new File("src/test/resources/etc")).build();
-		final GenericServer.Builder builder = GenericServer.of(configuration, null);
+		final GenericServerBuilder builder = GenericServer.of(configuration, null);
 		final ApplicationBuilder webServices = ApplicationBuilder.of("/*").classes(RestApplication.JSON_CLASSES);
 		libraryManager =
 				new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles()).registerIdentityManager(

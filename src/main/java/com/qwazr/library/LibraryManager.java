@@ -18,6 +18,7 @@ package com.qwazr.library;
 import com.qwazr.library.annotations.Library;
 import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.GenericServer;
+import com.qwazr.server.GenericServerBuilder;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LoggerUtils;
@@ -72,12 +73,12 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 		return this;
 	}
 
-	public LibraryManager registerIdentityManager(final GenericServer.Builder builder) {
+	public LibraryManager registerIdentityManager(final GenericServerBuilder builder) {
 		builder.identityManagerProvider(this);
 		return this;
 	}
 
-	public LibraryManager registerContextAttribute(final GenericServer.Builder builder) {
+	public LibraryManager registerContextAttribute(final GenericServerBuilder builder) {
 		builder.contextAttribute(this);
 		return this;
 	}
@@ -166,8 +167,8 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	private void loadLibrarySet(final File jsonFile) {
 		try {
-			final LibraryConfiguration configuration = ObjectMappers.JSON.readValue(jsonFile,
-					LibraryConfiguration.class);
+			final LibraryConfiguration configuration =
+					ObjectMappers.JSON.readValue(jsonFile, LibraryConfiguration.class);
 
 			if (configuration == null || configuration.library == null) {
 				unloadLibrarySet(jsonFile);
