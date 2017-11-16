@@ -1,6 +1,4 @@
-package com.qwazr.library.test;
-
-import com.qwazr.library.LibraryInterface;
+package com.qwazr.library;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.qwazr.library.test;
+package com.qwazr.library;
 
-import com.qwazr.library.LibraryManager;
-import com.qwazr.library.LibraryServiceInterface;
 import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.BaseServer;
 import com.qwazr.server.GenericServer;
