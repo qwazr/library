@@ -38,6 +38,11 @@ public abstract class ComponentDescription {
 		return name;
 	}
 
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -91,6 +96,11 @@ public abstract class ComponentDescription {
 
 		public List<LinkParameter> getParameters() {
 			return parameters;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString() + parameters;
 		}
 	}
 

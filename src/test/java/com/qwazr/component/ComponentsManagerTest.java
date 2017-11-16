@@ -33,11 +33,14 @@ public class ComponentsManagerTest {
 		Assert.assertNotNull(constructors);
 		final List<ComponentDescription.LinkMethod> methods = linkClass.getMethods();
 		Assert.assertNotNull(methods);
-		Assert.assertEquals(2, methods.size());
-		final List<ComponentDescription.LinkParameter> parameters = methods.get(1).getParameters();
-		Assert.assertNotNull(parameters);
-		Assert.assertEquals(1, parameters.size());
-		Assert.assertNotNull(parameters.get(0).getName());
-		Assert.assertEquals("The text to print", parameters.get(0).getDescription());
+		Assert.assertEquals(methods.toString(), 2, methods.size(), 1);
+		for (ComponentDescription.LinkMethod method : methods) {
+			final List<ComponentDescription.LinkParameter> parameters = method.getParameters();
+			Assert.assertNotNull(parameters);
+			for (ComponentDescription.LinkParameter parameter : parameters) {
+				Assert.assertNotNull(parameters.get(0).getName());
+				Assert.assertNotNull(parameters.get(0).getDescription());
+			}
+		}
 	}
 }

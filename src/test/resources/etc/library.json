@@ -1,7 +1,7 @@
 {
   "library": {
     "custom": {
-      "class": "com.qwazr.library.test.CustomLibrary",
+      "class": "com.qwazr.library.CustomLibrary",
       "myParam": 12
     }
   }
