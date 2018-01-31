@@ -5,5 +5,10 @@ QWAZR Library
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.qwazr/qwazr-library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.qwazr/qwazr-library)
 [![Coverage Status](https://coveralls.io/repos/github/qwazr/library/badge.svg?branch=master)](https://coveralls.io/github/qwazr/library?branch=master)
 
-Library service for [QWAZR](https://www.qwazr.com/library)
+Documentation
+-------------
+Get started by reading the online [documentation](http://www.qwazr.com/library).
 
+License
+-------
+Released under the [Apache 2 license](https://www.apache.org/licenses/LICENSE-2.0).
