@@ -30,8 +30,8 @@ class TestServer implements BaseServer {
 
 	final GenericServer server;
 	final LibraryManager libraryManager;
+	final LibraryServiceInterface libraryService;
 	final File dataDirectory;
-	final LibraryServiceInterface localService;
 
 	TestServer() throws IOException {
 		dataDirectory = Files.createTempDirectory("library-test").toFile();
@@ -39,12 +39,11 @@ class TestServer implements BaseServer {
 				ServerConfiguration.of().data(dataDirectory).etcDirectory(new File("src/test/resources/etc")).build();
 		final GenericServerBuilder builder = GenericServer.of(configuration, null);
 		final ApplicationBuilder webServices = ApplicationBuilder.of("/*").classes(RestApplication.JSON_CLASSES);
-		libraryManager =
-				new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles()).registerIdentityManager(
-						builder).registerContextAttribute(builder).registerWebService(webServices);
-		localService = libraryManager.getService();
-		libraryManager.getInstancesSupplier().registerInstance(LibraryServiceInterface.class, localService);
+		libraryManager = new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles());
+		webServices.singletons(libraryService = libraryManager.getService());
+		libraryManager.getInstancesSupplier().registerInstance(LibraryServiceInterface.class, libraryService);
 		builder.getWebServiceContext().jaxrs(webServices);
+		builder.shutdownListener(server -> libraryManager.close());
 		server = builder.build();
 	}
 

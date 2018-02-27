@@ -46,7 +46,7 @@ public class ServerTest {
 
 	@Before
 	public void before() {
-		server.libraryManager.inject(this);
+		server.libraryService.inject(this);
 	}
 
 	@Test
@@ -58,19 +58,17 @@ public class ServerTest {
 
 	@Test
 	public void list() {
-		Assert.assertTrue(server.localService.getLibraries()
-								  .containsKey("custom"));
+		Assert.assertTrue(server.libraryService.getLibraries().containsKey("custom"));
 	}
 
 	@Test
 	public void get() {
-		Assert.assertNotNull(server.localService.getLibrary("custom"));
+		Assert.assertNotNull(server.libraryService.getLibrary("custom"));
 	}
 
 	@Test
 	public void checkInstancesSupplier() {
-		Assert.assertEquals(server.localService,
-							server.libraryManager.getInstancesSupplier()
-									.getInstance(LibraryServiceInterface.class));
+		Assert.assertEquals(server.libraryService,
+				server.libraryManager.getInstancesSupplier().getInstance(LibraryServiceInterface.class));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Emmanuel Keller / QWAZR
+ * Copyright 2016-2018 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,9 @@
  */
 package com.qwazr.library;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class CustomPasswordLibrary extends AbstractPasswordLibrary {
 
-public abstract class AbstractPasswordLibrary extends AbstractLibrary {
-
-	protected String password = null;
-
-	/**
-	 * Obfuscated password
-	 *
-	 * @param password
-	 */
-	@JsonProperty("password")
-	final private void setPassword(String password) {
-		this.password = password;
-	}
-
+	public LibraryManager getLibraryManager() {
+	return libraryManager;
+}
 }

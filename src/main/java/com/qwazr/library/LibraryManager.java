@@ -16,9 +16,7 @@
 package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
-import com.qwazr.server.ApplicationBuilder;
 import com.qwazr.server.GenericServer;
-import com.qwazr.server.GenericServerBuilder;
 import com.qwazr.utils.AnnotationsUtils;
 import com.qwazr.utils.IOUtils;
 import com.qwazr.utils.LoggerUtils;
@@ -28,7 +26,6 @@ import com.qwazr.utils.concurrent.ReadWriteLock;
 import com.qwazr.utils.reflection.InstancesSupplier;
 import io.undertow.security.idm.IdentityManager;
 
-import javax.servlet.ServletContext;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +34,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +50,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
 
 	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles,
-			final InstancesSupplier instancesSupplier) throws IOException {
+			final InstancesSupplier instancesSupplier) {
 		this.dataDirectory = dataDirectory;
 		this.service = new LibraryServiceImpl(this);
 		this.libraryFileMap = new HashMap<>();
@@ -66,21 +62,6 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 
 	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
 		this(dataDirectory, etcFiles, null);
-	}
-
-	public LibraryManager registerWebService(final ApplicationBuilder builder) {
-		builder.singletons(service);
-		return this;
-	}
-
-	public LibraryManager registerIdentityManager(final GenericServerBuilder builder) {
-		builder.identityManagerProvider(this);
-		return this;
-	}
-
-	public LibraryManager registerContextAttribute(final GenericServerBuilder builder) {
-		builder.contextAttribute(this);
-		return this;
 	}
 
 	final public LibraryServiceInterface getService() {
@@ -119,7 +100,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 	 *
 	 * @param object the class instance to inject
 	 */
-	final public void inject(final Object object) {
+	final void inject(final Object object) {
 		if (object == null)
 			return;
 		AnnotationsUtils.browseFieldsRecursive(object.getClass(), field -> {
@@ -136,33 +117,6 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
 				throw new RuntimeException(e);
 			}
 		});
-	}
-
-	/**
-	 * Return the LibraryManager instance from the ServletContext
-	 *
-	 * @param context the servletContext which may hold the LibraryManager instance
-	 * @return the LibraryManager instance present in the given ServletContext
-	 */
-	static public LibraryManager getInstance(final ServletContext context) {
-		Objects.requireNonNull(context, "Cannot find a Library instance, the context is null");
-		return GenericServer.getContextAttribute(context, LibraryManager.class);
-	}
-
-	/**
-	 * Inject the library object in the annotated property of the given object.
-	 * <p>
-	 * The LibraryManager instance is extracted from the ServletContext
-	 *
-	 * @param context the servletContext which may hold the LibraryManager instance
-	 * @param object  the class instance to inject
-	 */
-	static public void inject(final ServletContext context, final Object object) {
-		if (object == null)
-			return;
-		final LibraryManager libraryManager = getInstance(context);
-		Objects.requireNonNull(libraryManager, "No library manager found in this context");
-		libraryManager.inject(object);
 	}
 
 	private void loadLibrarySet(final File jsonFile) {

@@ -1,5 +1,5 @@
-/**
- * Copyright 2016-2017 Emmanuel Keller / QWAZR
+/*
+ * Copyright 2016-2018 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 package com.qwazr.library;
 
 import com.qwazr.library.annotations.Library;
@@ -31,6 +31,12 @@ public class CustomTest {
 	@Library("custom")
 	private CustomLibrary custom;
 
+	@Library("customAbstract")
+	private CustomAbstractLibrary customAbstract;
+
+	@Library("customPassword")
+	private CustomPasswordLibrary customPassword;
+
 	private static LibraryManager libraryManager;
 
 	@BeforeClass
@@ -42,13 +48,27 @@ public class CustomTest {
 
 	@Before
 	public void before() {
-		libraryManager.inject(this);
+		libraryManager.getService().inject(this);
 	}
 
 	@Test
-	public void check() {
+	public void checkCustom() {
 		Assert.assertNotNull(custom);
 		Assert.assertTrue(custom.isLoaded());
 		Assert.assertEquals(Integer.valueOf(12), custom.myParam);
+	}
+
+	@Test
+	public void checkCustomAbstract() {
+		Assert.assertNotNull(customAbstract);
+		Assert.assertEquals(libraryManager, customAbstract.libraryManager);
+		Assert.assertEquals(libraryManager.getDataDirectory(), customAbstract.getDataDirectory());
+	}
+
+	@Test
+	public void checkCustomPassword() {
+		Assert.assertNotNull(customPassword);
+		Assert.assertEquals(libraryManager, customPassword.getLibraryManager());
+		Assert.assertEquals("myPass", customPassword.password);
 	}
 }

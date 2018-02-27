@@ -1,5 +1,5 @@
-/**
- * Copyright 2015-2017 Emmanuel Keller / QWAZR
+/*
+ * Copyright 2015-2018 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,29 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 package com.qwazr.library;
 
 import com.qwazr.server.AbstractServiceImpl;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 
 public class LibraryServiceImpl extends AbstractServiceImpl implements LibraryServiceInterface {
 
-	private volatile LibraryManager libraryManager;
+	private final LibraryManager libraryManager;
 
 	public LibraryServiceImpl(final LibraryManager libraryManager) {
 		this.libraryManager = libraryManager;
-	}
-
-	public LibraryServiceImpl() {
-		this(null);
-	}
-
-	@PostConstruct
-	public void init() {
-		libraryManager = getContextAttribute(LibraryManager.class);
 	}
 
 	@Override
@@ -45,6 +35,11 @@ public class LibraryServiceImpl extends AbstractServiceImpl implements LibrarySe
 	@Override
 	public LibraryInterface getLibrary(String libraryName) {
 		return libraryManager.getLibrary(libraryName);
+	}
+
+	@Override
+	public void inject(Object object) {
+		libraryManager.inject(object);
 	}
 
 }

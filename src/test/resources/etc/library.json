@@ -3,6 +3,13 @@
     "custom": {
       "class": "com.qwazr.library.CustomLibrary",
       "myParam": 12
+    },
+    "customAbstract": {
+      "class": "com.qwazr.library.CustomAbstractLibrary"
+    },
+    "customPassword": {
+      "class": "com.qwazr.library.CustomPasswordLibrary",
+      "password": "myPass"
     }
   }
 }

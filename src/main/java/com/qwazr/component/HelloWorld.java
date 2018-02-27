@@ -20,7 +20,7 @@ import com.qwazr.component.annotations.Component;
 @Component("This component is an example")
 public class HelloWorld implements ComponentInterface {
 
-	@Component("Print Hello World to the std. out")
+	@Component("Print Hello World to the std.out")
 	public void print() {
 		print("Hello World!");
 	}
