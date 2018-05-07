@@ -21,54 +21,55 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class CustomTest {
 
-	@Library("custom")
-	private CustomLibrary custom;
+    @Library("custom")
+    private CustomLibrary custom;
 
-	@Library("customAbstract")
-	private CustomAbstractLibrary customAbstract;
+    @Library("customAbstract")
+    private CustomAbstractLibrary customAbstract;
 
-	@Library("customPassword")
-	private CustomPasswordLibrary customPassword;
+    @Library("customPassword")
+    private CustomPasswordLibrary customPassword;
 
-	private static LibraryManager libraryManager;
+    private static LibraryManager libraryManager;
 
-	@BeforeClass
-	public static void beforeClass() throws IOException {
-		final File dataDirectory = Files.createTempDirectory("library-test").toFile();
-		libraryManager =
-				new LibraryManager(dataDirectory, Arrays.asList(new File("src/test/resources/etc/library.json")));
-	}
+    @BeforeClass
+    public static void beforeClass() throws IOException {
+        final Path dataDirectory = Files.createTempDirectory("library-test");
+        libraryManager =
+                new LibraryManager(dataDirectory, Arrays.asList(Paths.get("src/test/resources/etc/library.json")));
+    }
 
-	@Before
-	public void before() {
-		libraryManager.getService().inject(this);
-	}
+    @Before
+    public void before() {
+        libraryManager.getService().inject(this);
+    }
 
-	@Test
-	public void checkCustom() {
-		Assert.assertNotNull(custom);
-		Assert.assertTrue(custom.isLoaded());
-		Assert.assertEquals(Integer.valueOf(12), custom.myParam);
-	}
+    @Test
+    public void checkCustom() {
+        Assert.assertNotNull(custom);
+        Assert.assertTrue(custom.isLoaded());
+        Assert.assertEquals(Integer.valueOf(12), custom.myParam);
+    }
 
-	@Test
-	public void checkCustomAbstract() {
-		Assert.assertNotNull(customAbstract);
-		Assert.assertEquals(libraryManager, customAbstract.libraryManager);
-		Assert.assertEquals(libraryManager.getDataDirectory(), customAbstract.getDataDirectory());
-	}
+    @Test
+    public void checkCustomAbstract() {
+        Assert.assertNotNull(customAbstract);
+        Assert.assertEquals(libraryManager, customAbstract.libraryManager);
+        Assert.assertEquals(libraryManager.getDataDirectory(), customAbstract.getDataDirectory());
+    }
 
-	@Test
-	public void checkCustomPassword() {
-		Assert.assertNotNull(customPassword);
-		Assert.assertEquals(libraryManager, customPassword.getLibraryManager());
-		Assert.assertEquals("myPass", customPassword.password);
-	}
+    @Test
+    public void checkCustomPassword() {
+        Assert.assertNotNull(customPassword);
+        Assert.assertEquals(libraryManager, customPassword.getLibraryManager());
+        Assert.assertEquals("myPass", customPassword.password);
+    }
 }

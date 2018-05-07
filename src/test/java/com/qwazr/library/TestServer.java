@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Emmanuel Keller / QWAZR
+ * Copyright 2015-2018 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,33 +22,34 @@ import com.qwazr.server.GenericServerBuilder;
 import com.qwazr.server.RestApplication;
 import com.qwazr.server.configuration.ServerConfiguration;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 class TestServer implements BaseServer {
 
-	final GenericServer server;
-	final LibraryManager libraryManager;
-	final LibraryServiceInterface libraryService;
-	final File dataDirectory;
+    final GenericServer server;
+    final LibraryManager libraryManager;
+    final LibraryServiceInterface libraryService;
+    final Path dataDirectory;
 
-	TestServer() throws IOException {
-		dataDirectory = Files.createTempDirectory("library-test").toFile();
-		final ServerConfiguration configuration =
-				ServerConfiguration.of().data(dataDirectory).etcDirectory(new File("src/test/resources/etc")).build();
-		final GenericServerBuilder builder = GenericServer.of(configuration, null);
-		final ApplicationBuilder webServices = ApplicationBuilder.of("/*").classes(RestApplication.JSON_CLASSES);
-		libraryManager = new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles());
-		webServices.singletons(libraryService = libraryManager.getService());
-		libraryManager.getInstancesSupplier().registerInstance(LibraryServiceInterface.class, libraryService);
-		builder.getWebServiceContext().jaxrs(webServices);
-		builder.shutdownListener(server -> libraryManager.close());
-		server = builder.build();
-	}
+    TestServer() throws IOException {
+        dataDirectory = Files.createTempDirectory("library-test");
+        final ServerConfiguration configuration =
+                ServerConfiguration.of().data(dataDirectory).etcDirectory(Paths.get("src/test/resources/etc")).build();
+        final GenericServerBuilder builder = GenericServer.of(configuration, null);
+        final ApplicationBuilder webServices = ApplicationBuilder.of("/*").classes(RestApplication.JSON_CLASSES);
+        libraryManager = new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles());
+        webServices.singletons(libraryService = libraryManager.getService());
+        libraryManager.getInstancesSupplier().registerInstance(LibraryServiceInterface.class, libraryService);
+        builder.getWebServiceContext().jaxrs(webServices);
+        builder.shutdownListener(server -> libraryManager.close());
+        server = builder.build();
+    }
 
-	@Override
-	public GenericServer getServer() {
-		return server;
-	}
+    @Override
+    public GenericServer getServer() {
+        return server;
+    }
 }

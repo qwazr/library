@@ -15,11 +15,11 @@
  */
 package com.qwazr.library;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class CustomAbstractLibrary extends AbstractLibrary {
 
-	public File getDataDirectory() {
-		return libraryManager.getDataDirectory();
-	}
+    public Path getDataDirectory() {
+        return libraryManager.getDataDirectory();
+    }
 }

@@ -29,6 +29,7 @@ import io.undertow.security.idm.IdentityManager;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,142 +39,142 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
-		implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, Closeable {
+        implements Map<String, LibraryInterface>, GenericServer.IdentityManagerProvider, Closeable {
 
-	private static final Logger LOGGER = LoggerUtils.getLogger(LibraryManager.class);
+    private static final Logger LOGGER = LoggerUtils.getLogger(LibraryManager.class);
 
-	private final File dataDirectory;
-	private final LibraryServiceInterface service;
-	private final InstancesSupplier instancesSupplier;
+    private final Path dataDirectory;
+    private final LibraryServiceInterface service;
+    private final InstancesSupplier instancesSupplier;
 
-	private final ReadWriteLock mapLock;
-	private final Map<File, Map<String, LibraryInterface>> libraryFileMap;
+    private final ReadWriteLock mapLock;
+    private final Map<Path, Map<String, LibraryInterface>> libraryFileMap;
 
-	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles,
-			final InstancesSupplier instancesSupplier) {
-		this.dataDirectory = dataDirectory;
-		this.service = new LibraryServiceImpl(this);
-		this.libraryFileMap = new HashMap<>();
-		this.mapLock = ReadWriteLock.stamped();
-		this.instancesSupplier = instancesSupplier == null ? InstancesSupplier.withConcurrentMap() : instancesSupplier;
-		if (etcFiles != null)
-			etcFiles.forEach(this::loadLibrarySet);
-	}
+    public LibraryManager(final Path dataDirectory, final Collection<Path> etcFiles,
+                          final InstancesSupplier instancesSupplier) {
+        this.dataDirectory = dataDirectory;
+        this.service = new LibraryServiceImpl(this);
+        this.libraryFileMap = new HashMap<>();
+        this.mapLock = ReadWriteLock.stamped();
+        this.instancesSupplier = instancesSupplier == null ? InstancesSupplier.withConcurrentMap() : instancesSupplier;
+        if (etcFiles != null)
+            etcFiles.forEach(this::loadLibrarySet);
+    }
 
-	public LibraryManager(final File dataDirectory, final Collection<File> etcFiles) throws IOException {
-		this(dataDirectory, etcFiles, null);
-	}
+    public LibraryManager(final Path dataDirectory, final Collection<Path> etcFiles) throws IOException {
+        this(dataDirectory, etcFiles, null);
+    }
 
-	final public LibraryServiceInterface getService() {
-		return service;
-	}
+    final public LibraryServiceInterface getService() {
+        return service;
+    }
 
-	final public InstancesSupplier getInstancesSupplier() {
-		return instancesSupplier;
-	}
+    final public InstancesSupplier getInstancesSupplier() {
+        return instancesSupplier;
+    }
 
-	@Override
-	public void close() {
-		mapLock.write(() -> {
-			libraryFileMap.clear();
-			IOUtils.closeObjects(this.values());
-			setMap(Collections.emptyMap());
-		});
-	}
+    @Override
+    public void close() {
+        mapLock.write(() -> {
+            libraryFileMap.clear();
+            IOUtils.closeObjects(this.values());
+            setMap(Collections.emptyMap());
+        });
+    }
 
-	final public <T extends LibraryInterface> T getLibrary(final String name) {
-		return (T) super.get(name);
-	}
+    final public <T extends LibraryInterface> T getLibrary(final String name) {
+        return (T) super.get(name);
+    }
 
-	final public File getDataDirectory() {
-		return dataDirectory;
-	}
+    final public Path getDataDirectory() {
+        return dataDirectory;
+    }
 
-	public Map<String, String> getLibraries() {
-		final Map<String, String> map = new LinkedHashMap<>();
-		this.forEach((name, library) -> map.put(name, library.getClass().getName()));
-		return map;
-	}
+    public Map<String, String> getLibraries() {
+        final Map<String, String> map = new LinkedHashMap<>();
+        this.forEach((name, library) -> map.put(name, library.getClass().getName()));
+        return map;
+    }
 
-	/**
-	 * Inject the library objects in the annotated properties
-	 *
-	 * @param object the class instance to inject
-	 */
-	final void inject(final Object object) {
-		if (object == null)
-			return;
-		AnnotationsUtils.browseFieldsRecursive(object.getClass(), field -> {
-			final Library library = field.getAnnotation(Library.class);
-			if (library == null)
-				return;
-			final LibraryInterface libraryItem = getLibrary(library.value());
-			if (libraryItem == null)
-				return;
-			field.setAccessible(true);
-			try {
-				field.set(object, libraryItem);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-		});
-	}
+    /**
+     * Inject the library objects in the annotated properties
+     *
+     * @param object the class instance to inject
+     */
+    final void inject(final Object object) {
+        if (object == null)
+            return;
+        AnnotationsUtils.browseFieldsRecursive(object.getClass(), field -> {
+            final Library library = field.getAnnotation(Library.class);
+            if (library == null)
+                return;
+            final LibraryInterface libraryItem = getLibrary(library.value());
+            if (libraryItem == null)
+                return;
+            field.setAccessible(true);
+            try {
+                field.set(object, libraryItem);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 
-	private void loadLibrarySet(final File jsonFile) {
-		try {
-			final LibraryConfiguration configuration =
-					ObjectMappers.JSON.readValue(jsonFile, LibraryConfiguration.class);
+    private void loadLibrarySet(final Path jsonFile) {
+        try {
+            final LibraryConfiguration configuration =
+                    ObjectMappers.JSON.readValue(jsonFile.toFile(), LibraryConfiguration.class);
 
-			if (configuration == null || configuration.library == null) {
-				unloadLibrarySet(jsonFile);
-				return;
-			}
+            if (configuration == null || configuration.library == null) {
+                unloadLibrarySet(jsonFile.toFile());
+                return;
+            }
 
-			LOGGER.info(() -> "Load library configuration file: " + jsonFile.getAbsolutePath());
+            LOGGER.info(() -> "Load library configuration file: " + jsonFile.toAbsolutePath());
 
-			mapLock.writeEx(() -> {
-				configuration.library.values().forEach((library) -> {
-					try {
-						library.load(this);
-						library.load();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				});
-				libraryFileMap.put(jsonFile, configuration.library);
-				buildGlobalMap();
-			});
+            mapLock.writeEx(() -> {
+                configuration.library.values().forEach((library) -> {
+                    try {
+                        library.load(this);
+                        library.load();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                libraryFileMap.put(jsonFile, configuration.library);
+                buildGlobalMap();
+            });
 
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e, () -> "Cannot load the file: " + jsonFile);
-		}
-	}
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Cannot load the file: " + jsonFile);
+        }
+    }
 
-	private void unloadLibrarySet(File jsonFile) {
-		mapLock.write(() -> {
-			final Map<String, LibraryInterface> map = libraryFileMap.remove(jsonFile);
-			if (map == null)
-				return;
-			LOGGER.info(() -> "Unload library configuration file: " + jsonFile.getAbsolutePath());
-			buildGlobalMap();
-			IOUtils.closeObjects(map.values());
-		});
-	}
+    private void unloadLibrarySet(File jsonFile) {
+        mapLock.write(() -> {
+            final Map<String, LibraryInterface> map = libraryFileMap.remove(jsonFile);
+            if (map == null)
+                return;
+            LOGGER.info(() -> "Unload library configuration file: " + jsonFile.getAbsolutePath());
+            buildGlobalMap();
+            IOUtils.closeObjects(map.values());
+        });
+    }
 
-	private void buildGlobalMap() {
-		final Map<String, LibraryInterface> libraries = new HashMap<>();
-		libraryFileMap.forEach((file, libraryMap) -> libraries.putAll(libraryMap));
-		setMap(libraries);
-	}
+    private void buildGlobalMap() {
+        final Map<String, LibraryInterface> libraries = new HashMap<>();
+        libraryFileMap.forEach((file, libraryMap) -> libraries.putAll(libraryMap));
+        setMap(libraries);
+    }
 
-	@Override
-	public IdentityManager getIdentityManager(final String realm) throws IOException {
-		final LibraryInterface library = get(realm);
-		if (library == null)
-			return null;
-		if (!(library instanceof IdentityManager))
-			throw new IOException("This is a not a realm connector: " + realm);
-		return (IdentityManager) library;
-	}
+    @Override
+    public IdentityManager getIdentityManager(final String realm) throws IOException {
+        final LibraryInterface library = get(realm);
+        if (library == null)
+            return null;
+        if (!(library instanceof IdentityManager))
+            throw new IOException("This is a not a realm connector: " + realm);
+        return (IdentityManager) library;
+    }
 
 }
