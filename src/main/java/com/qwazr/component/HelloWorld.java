@@ -20,13 +20,13 @@ import com.qwazr.component.annotations.Component;
 @Component("This component is an example")
 public class HelloWorld implements ComponentInterface {
 
-	@Component("Print Hello World to the std.out")
-	public void print() {
-		print("Hello World!");
-	}
+    @Component("Print Hello World to the std.out")
+    public void print() {
+        print("Hello World!");
+    }
 
-	@Component("Print the text pass as parameter")
-	public void print(@Component("The text to print") String text) {
-		System.out.println(text);
-	}
+    @Component("Print the text pass as parameter")
+    public void print(@Component("The text to print") String text) {
+        System.out.println(text);
+    }
 }

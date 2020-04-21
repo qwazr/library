@@ -15,32 +15,31 @@
  */
 package com.qwazr.component;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ComponentsManager {
 
-	private final ConcurrentHashMap<String, ComponentDescription.LinkClass> components;
+    private final ConcurrentHashMap<String, ComponentDescription.LinkClass> components;
 
-	public ComponentsManager() {
-		components = new ConcurrentHashMap();
-	}
+    public ComponentsManager() {
+        components = new ConcurrentHashMap();
+    }
 
-	public ComponentsManager registerServices() throws IOException, ClassNotFoundException {
-		ServiceLoader.load(ComponentInterface.class, Thread.currentThread().getContextClassLoader())
-				.forEach(this::register);
-		return this;
-	}
+    public ComponentsManager registerServices() {
+        ServiceLoader.load(ComponentInterface.class, Thread.currentThread().getContextClassLoader())
+                .forEach(this::register);
+        return this;
+    }
 
-	final void register(ComponentInterface componentClass) {
-		final ComponentDescription.LinkClass linkClass = new ComponentDescription.LinkClass(componentClass.getClass());
-		components.put(linkClass.getName(), linkClass);
-	}
+    final void register(ComponentInterface componentClass) {
+        final ComponentDescription.LinkClass linkClass = new ComponentDescription.LinkClass(componentClass.getClass());
+        components.put(linkClass.getName(), linkClass);
+    }
 
-	final public Map<String, ComponentDescription.LinkClass> getComponents() {
-		return components;
-	}
+    final public Map<String, ComponentDescription.LinkClass> getComponents() {
+        return components;
+    }
 
 }
