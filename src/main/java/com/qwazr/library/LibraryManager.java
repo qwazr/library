@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Emmanuel Keller / QWAZR
+ * Copyright 2015-2020 Emmanuel Keller / QWAZR
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import com.qwazr.utils.concurrent.ReadWriteLock;
 import com.qwazr.utils.reflection.InstancesSupplier;
 import io.undertow.security.idm.IdentityManager;
 
+import javax.ws.rs.InternalServerErrorException;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -61,7 +61,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
             etcFiles.forEach(this::loadLibrarySet);
     }
 
-    public LibraryManager(final Path dataDirectory, final Collection<Path> etcFiles) throws IOException {
+    public LibraryManager(final Path dataDirectory, final Collection<Path> etcFiles) {
         this(dataDirectory, etcFiles, null);
     }
 
@@ -114,7 +114,8 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
             field.setAccessible(true);
             try {
                 field.set(object, libraryItem);
-            } catch (IllegalAccessException e) {
+            }
+            catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -126,7 +127,7 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
                     ObjectMappers.JSON.readValue(jsonFile.toFile(), LibraryConfiguration.class);
 
             if (configuration == null || configuration.library == null) {
-                unloadLibrarySet(jsonFile.toFile());
+                unloadLibrarySet(jsonFile);
                 return;
             }
 
@@ -137,7 +138,8 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
                     try {
                         library.load(this);
                         library.load();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 });
@@ -145,17 +147,18 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
                 buildGlobalMap();
             });
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             LOGGER.log(Level.SEVERE, e, () -> "Cannot load the file: " + jsonFile);
         }
     }
 
-    private void unloadLibrarySet(File jsonFile) {
+    private void unloadLibrarySet(Path jsonFile) {
         mapLock.write(() -> {
             final Map<String, LibraryInterface> map = libraryFileMap.remove(jsonFile);
             if (map == null)
                 return;
-            LOGGER.info(() -> "Unload library configuration file: " + jsonFile.getAbsolutePath());
+            LOGGER.info(() -> "Unload library configuration file: " + jsonFile.toAbsolutePath());
             buildGlobalMap();
             IOUtils.closeObjects(map.values());
         });
@@ -168,12 +171,12 @@ public class LibraryManager extends ReadOnlyMap<String, LibraryInterface>
     }
 
     @Override
-    public IdentityManager getIdentityManager(final String realm) throws IOException {
+    public IdentityManager getIdentityManager(final String realm) {
         final LibraryInterface library = get(realm);
         if (library == null)
             return null;
         if (!(library instanceof IdentityManager))
-            throw new IOException("This is a not a realm connector: " + realm);
+            throw new InternalServerErrorException("This is a not a realm connector: " + realm);
         return (IdentityManager) library;
     }
 

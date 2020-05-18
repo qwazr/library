@@ -20,9 +20,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
 public interface LibraryInterface {
 
-	default void load(final LibraryManager libraryManager) throws Exception {
-	}
+    default void load(final LibraryManager libraryManager) {
+    }
 
-	default void load() throws Exception {
-	}
+    default void load() {
+    }
 }
