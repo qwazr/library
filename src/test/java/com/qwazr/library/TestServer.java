@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 class TestServer implements BaseServer {
 
@@ -37,10 +39,10 @@ class TestServer implements BaseServer {
     TestServer() throws IOException {
         dataDirectory = Files.createTempDirectory("library-test");
         final ServerConfiguration configuration =
-                ServerConfiguration.of().data(dataDirectory).etcDirectory(Paths.get("src/test/resources/etc")).build();
+                ServerConfiguration.of().data(dataDirectory).build();
         final GenericServerBuilder builder = GenericServer.of(configuration, null);
         final ApplicationBuilder webServices = ApplicationBuilder.of("/*").classes(RestApplication.JSON_CLASSES);
-        libraryManager = new LibraryManager(configuration.dataDirectory, configuration.getEtcFiles());
+        libraryManager = new LibraryManager(configuration.dataDirectory, List.of(Paths.get("src/test/resources/etc/library.json")));
         webServices.singletons(libraryService = libraryManager.getService());
         libraryManager.getInstancesSupplier().registerInstance(LibraryServiceInterface.class, libraryService);
         builder.getWebServiceContext().jaxrs(webServices);
